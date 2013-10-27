@@ -1,6 +1,8 @@
 package dataTier;
 import java.sql.*;
 
+import common.UserMetaData;
+
 public final class DataAccess{
 
 	private static DataAccess dataAccessInstance;
@@ -143,8 +145,8 @@ public final class DataAccess{
 	
 	public ResultSet GetLoginHistory(UserMetaData user)
 	{
-		try{
-			return stat.executeQuery("SELECT * FROM LOGLOGIN WHERE User ='"+ user.getUser() +"' AND ");
+		try{			
+			return stat.executeQuery("SELECT * FROM LOGLOGIN WHERE User ='"+ user.getUser() +"' AND DATEADD(day,15,FECHAHORAINICIO)");
 		}
 		catch(Exception ex)
 		{
