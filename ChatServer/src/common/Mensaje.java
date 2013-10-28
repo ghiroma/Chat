@@ -12,6 +12,7 @@ public class Mensaje implements Serializable{
 	public static final int ENVIAR_MENSAJE = 6;
 	public static final int BUSCAR_USUARIO = 7;
 	public static final int INVITAR_USUARIO = 8;
+	public static final int BANNED = 9; 
 	
 	private int id;
 	private Object cuerpo;
