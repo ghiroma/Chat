@@ -60,7 +60,7 @@ public class ConnectionListener extends Thread{
                     new Thread(clientHandler).start();  //verificar que tan cabeza es hacer esto.   (nuevo thread con un ClientHandler adentro que recibe la data del user)
                     
                     /* aviso de cambio de estado */
-                    //TODO y  escribo en consola
+                    //TODO y   escribo en consola
                 }  
             }
          } 

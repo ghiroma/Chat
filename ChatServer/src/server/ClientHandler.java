@@ -11,7 +11,7 @@ public class ClientHandler extends Thread{
     private String IP;
     private Mensaje msg;
     private String user;
- 
+  
     /* Constructores */
     public ClientHandler(Socket client, String user, ObjectInputStream in, ObjectOutputStream out)
     {
