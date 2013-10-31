@@ -3,8 +3,8 @@ package common;
 import java.io.*;
 
 public class Mensaje implements Serializable{
-	
-	/* Server */
+	 
+	/* Server */ 
 	public static final int BANNED = 9; 
 	public static final int ACCEPTED = 11;
 	public static final int DENIED = 12;

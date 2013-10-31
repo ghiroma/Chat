@@ -3,7 +3,7 @@ package common;
 public class FriendStatus {
 	private String username;
 	private int estado;
-	
+	 
 	/* Constructor */
 	public FriendStatus(String username, int estado){
 		this.username = username;

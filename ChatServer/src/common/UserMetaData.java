@@ -1,7 +1,7 @@
 package common;
 import java.util.*;
 
-
+ 
 public class UserMetaData implements java.io.Serializable {
 
 	private String user;
