@@ -2,7 +2,13 @@ package server;
 
 import java.io.*;
 import java.net.*;
+import java.util.EventListener;
+import java.util.EventObject;
+
+import javax.swing.event.EventListenerList;
+
 import common.*;
+import events.*;
 
 public class ClientHandler extends Thread{
     private ObjectInputStream in;
@@ -11,6 +17,8 @@ public class ClientHandler extends Thread{
     private String IP;
     private Mensaje msg;
     private String user;
+    private EventListenerList listenerList;
+    private int estado;
   
     /* Constructores */
     public ClientHandler(Socket client, String user, ObjectInputStream in, ObjectOutputStream out)
@@ -19,27 +27,39 @@ public class ClientHandler extends Thread{
         this.in = in;
         this.out = out;
         this.user = user;
+        estado = 1;
         
         IP = client.getInetAddress().toString();
         IP = IP.replace("/"," ");
         IP = IP.trim();
     }
     
-    /* Metodos */
+    /* Run */
     @Override
     public void run()
     {
         try{
             client.setSoTimeout(10000); //10 seg
+    		/* TODO evento de inicio sesion */
+            dispatchEvent(new StatusChangedEvent(this,user,estado));
+            /* Inicio escucha al cliente */
             while(client.isConnected())
             {
               msg = (Mensaje)in.readObject();		// se traba acá hasta que hay mensaje
-              readMessage(msg);
+              
+              //TODO: switch con cada constante de mensaje que ejecute un metodo privado.
+              switch(msg.getId()){
+              case Mensaje.ENVIAR_MENSAJE: break;
+              case Mensaje.BUSCAR_USUARIO: break;
+              case Mensaje.INVITAR_USUARIO: break;
+              }
+              
             }
         }
         
         catch (SocketTimeoutException e){
-           /* msg = new Mensaje("logout","",user);
+           /* TODO "connection lost"
+            msg = new Mensaje("logout","",user);
             removeUser(out);
             serverFrame.removeUser(user);
             userList.remove(user);
@@ -59,59 +79,36 @@ public class ClientHandler extends Thread{
         { 
             System.err.println(e.getMessage());
             //removeUser(out);
-            //serverFrame.removeUser(msg.getUser());
         }
     }
     
-    private void readMessage(Mensaje msg)
-    {/*
-    	TODO actualizar la lectura de mensajes del cliente al formato actual
+    /* Metodos */
     
-        try{
-        if(msg.getId().equals("say"))
-        {
-            sayToAll(msg);
-            serverFrame.writeMessage(msg);
-        }   
-              
-        if(msg.getId().equals("logout"))
-        {
-            removeUser(out);
-            serverFrame.removeUser(msg.getUser());
-            userList.remove(msg.getUser());
-            console.write(msg.getUser() + " logged out.");
-            msg.setMessage("logged out.");
-            serverFrame.writeMessage(msg);
-            sayToAll(msg);                  
-            client.close();
-         }
-             
-         if(msg.getId().equals("kicked"))
-         {
-            sayToAll(msg);
-            removeUser(out);
-            serverFrame.removeUser(msg.getMessage());
-            userList.remove(msg.getMessage());
-            console.write(msg.getMessage() + " was kicked by " + msg.getUser() + ".");
-            serverFrame.writeMessage(msg);                  
-            client.close();    
-         }
-         
-         if(msg.getId().equals("banned"))
-         {
-            sayToAll(msg);
-            removeUser(out);
-            serverFrame.removeUser(msg.getMessage());
-            userList.remove(msg.getMessage());
-            console.write(msg.getMessage() + " was banned by " + msg.getUser() + ".");
-            serverFrame.writeMessage(msg);                  
-            client.close();    
-         }
-        } catch (IOException se) {
-            se.printStackTrace(System.err);
-        }*/
+    
+    /* Desconectar al cliente*/
+    public void close(){
+    	//TODO: almacenar la información, y desconectar al cliente del servidor.
+    }
+
+    /* Eventos */
+    public void addEventListener(ClientEventListener e){
+    	listenerList.add(ClientEventListener.class, e);
     }
     
+    public void removeEventListener(ClientEventListener e){
+    	listenerList.remove(ClientEventListener.class, e);
+    }
+    
+    private void dispatchEvent(EventObject e){
+    	Object[] listeners = listenerList.getListenerList();
+    	for (int i = 0; i < listeners.length; i = i+2) {
+    		if (listeners[i] == ClientEventListener.class) {
+    	        ((ClientEventListener) listeners[i+1]).statusChanged(e);
+    		}
+    	}
+    }
+    
+    /* Getters & Setters */
     public String getUser()
     {
         return user;
@@ -121,10 +118,5 @@ public class ClientHandler extends Thread{
     {
         return IP;
     }
-    
-    public void close(Mensaje msg)
-    {
-    	// TODO verificar necesidad de la funcion
-        readMessage(msg);
-    }
+      
 }

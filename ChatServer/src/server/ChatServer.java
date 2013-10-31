@@ -11,7 +11,7 @@ public class ChatServer {
 	private ChatServer(){
         handlerList = new ArrayList<ClientHandler>();
 		/* Leo los datos del properties.txt */
-        //loadProperties();      
+        //TODO loadProperties();      
 	}
 	
 	/* Main*/
@@ -22,11 +22,12 @@ public class ChatServer {
 	public void go(){
 		
 		/*  Lanzamiento de handler de manejo de informacion de GUI */
-    
-        /* Informacion del startup a la consola */
-		//console.write();
+		//TODO ver GUI del otro grupo
+        
+		/* Informacion del startup a la consola */
+		//TODO console.write();
         
         /* Thread de espera y manejo de clientes */
-		new ConnectionListener(port, handlerList).run();
+		new ConnectionListener(port, handlerList).run();	// Thread que espera las conexiones
 	}
 }
