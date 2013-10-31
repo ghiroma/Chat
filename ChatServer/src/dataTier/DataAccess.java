@@ -185,24 +185,7 @@ public final class DataAccess{
 	
 	
 	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		try{
-//			User guillermo = new User("ghiroma3","","guille","guillermo.hiroma@gmail.com",null,null,0);
-//			DataAccess.getInstance().InsertUser(guillermo);
-//			User user = DataAccess.getInstance().GetUserByUsername("ghiroma");
-//			System.out.println(user);
-//			ResultSet rs = DataAccess.getInstance().GetUsers(new User("ghiro","","gui","gui",null,null,0));
-			UserMetaData user = new UserMetaData("ghiroma","","","",null,null,0);
-			ResultSet rs = DataAccess.getInstance().getFriends(user);
-			System.out.println("hola");
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace();
-		}
 
-	}
 
 
 }
