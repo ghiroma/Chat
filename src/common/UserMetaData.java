@@ -1,7 +1,7 @@
 package common;
 import java.util.*;
 
-
+ 
 public class UserMetaData implements java.io.Serializable {
 
 	private String user;
@@ -10,7 +10,7 @@ public class UserMetaData implements java.io.Serializable {
 	private String mail;
 	private Date fechaAlta;
 	private Date fechaNacimiento;
-	private int conectado;
+	private int conectado;					
 	
 	public UserMetaData()
 	{

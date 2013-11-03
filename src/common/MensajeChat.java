@@ -1,7 +1,7 @@
 package common;
 
 import java.io.Serializable;
-
+ 
 public class MensajeChat implements Serializable {
 	private String destinatario;
 	private String texto;
