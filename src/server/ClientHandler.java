@@ -9,7 +9,7 @@ import javax.swing.event.EventListenerList;
 
 import common.*;
 import events.*;
-
+ 
 public class ClientHandler extends Thread{
     private ObjectInputStream in;
     private ObjectOutputStream out;
@@ -40,7 +40,7 @@ public class ClientHandler extends Thread{
     {
         try{
             client.setSoTimeout(10000); //10 seg, el alive tira cada 5 una señal
-    		/* TODO evento de inicio sesion */
+    		/* evento de inicio sesion */
             dispatchEvent(new StatusChangedEvent(this,user,estado));
             /* Inicio escucha al cliente */
             while(client.isConnected())
@@ -55,6 +55,8 @@ public class ClientHandler extends Thread{
             	  break;
               case Mensaje.INVITAR_USUARIO: 
             	  break;
+            	  
+            	  
               }
               
             }
@@ -81,8 +83,16 @@ public class ClientHandler extends Thread{
     
     
     
-    /* Metodos */
-    
+    /* Metodos de update (Son llamados desde los ClientEventListener)*/
+    public void friendStatusUpdate(String user, int estado){
+    	try{	
+        	out.writeObject(new Mensaje(Mensaje.CAMBIO_ESTADO,new FriendStatus(user, estado)));    		
+    	}
+    	catch(IOException e){
+    		e.printStackTrace();
+    		System.err.println("Error al enviar cambio de estado al cliente.");
+    	}
+    }
     
     /* Desconectar al cliente*/
     public void close(){
@@ -102,8 +112,11 @@ public class ClientHandler extends Thread{
     	Object[] listeners = listenerList.getListenerList();
     	for (int i = 0; i < listeners.length; i = i+2) {
     		
-    		if(e instanceof StatusChangedEvent)
-     	       ((ClientEventListener) listeners[i+1]).statusChanged(e);
+    		if(e instanceof StatusChangedEvent){
+    			StatusChangedEvent e1 = (StatusChangedEvent)e;
+    			((ClientEventListener) listeners[i+1]).statusChanged(e1);	
+    		}
+
 
     		/*if(e instanceof TuEvento)
     		 * 	((ClientEventListener) listeners[i+1]).tuMetodo(e);

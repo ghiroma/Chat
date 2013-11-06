@@ -6,16 +6,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
-
+ 
 public class ChatServer {
-	private ArrayList<ClientHandler> handlerList;
+	private HashMap<String,ClientHandler> handlerList;
 	private int port;
 	private String serverName;
 	
 	/* Constructor */
 	private ChatServer(){
-        handlerList = new ArrayList<ClientHandler>();
+        handlerList = new HashMap<String,ClientHandler>();
 		/* Cargo properties */
         loadProperties();    
 	}

@@ -3,13 +3,14 @@ package server;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import common.*;
 import dataTier.BanInfo;
 import dataTier.DataAccess;
-
+ 
 public class ConnectionListener extends Thread{
-	ArrayList<ClientHandler> handlerList;
+	HashMap<String,ClientHandler> handlerList;
 	ClientHandler clientHandler;    
 	String loggedUser,clientIP;     
     Mensaje msg;
@@ -22,7 +23,7 @@ public class ConnectionListener extends Thread{
     DataAccess dataAccess;
     
     /* Constructores */
-    public ConnectionListener(int serverPort, ArrayList<ClientHandler> handlerList){
+    public ConnectionListener(int serverPort, HashMap<String,ClientHandler> handlerList){
     	this.serverPort = serverPort;
     	this.handlerList = handlerList;
     	dataAccess = DataAccess.getInstance();
@@ -75,8 +76,8 @@ public class ConnectionListener extends Thread{
                 		
                 	    /* lanzo client handler */
                 		clientHandler = new ClientHandler(client, loggedUser,in, out);
-                		clientHandler.addEventListener(new ClientEventListener(handlerList,userMeta.getUser()));
-                    	handlerList.add(clientHandler);
+                		clientHandler.addEventListener(new ClientEventListener(handlerList,userMeta));
+                    	handlerList.put(userMeta.getUser(), clientHandler);
                     	new Thread(clientHandler).start();  //verificar que tan cabeza es hacer esto.   (nuevo thread con un ClientHandler adentro que recibe la data del user)                    
                     	//TODO y escribo en consola que se termino la entrada del cliente al server
                 	}  
