@@ -101,9 +101,13 @@ public class ClientHandler extends Thread{
     private void dispatchEvent(EventObject e){
     	Object[] listeners = listenerList.getListenerList();
     	for (int i = 0; i < listeners.length; i = i+2) {
-    		if (listeners[i] == ClientEventListener.class) {
-    	        ((ClientEventListener) listeners[i+1]).statusChanged(e);
-    		}
+    		
+    		if(e instanceof StatusChangedEvent)
+     	       ((ClientEventListener) listeners[i+1]).statusChanged(e);
+
+    		/*if(e instanceof TuEvento)
+    		 * 	((ClientEventListener) listeners[i+1]).tuMetodo(e);
+    		 */ 
     	}
     }
     
