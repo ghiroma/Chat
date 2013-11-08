@@ -24,10 +24,10 @@ public class ClienteInicial extends JFrame {
 		setTitle("Chat Principal");
 		setResizable(false);
 
-		// Modificar esto cuando se vaya a trabajar bien, qu� datos se lleva y
-		// qu� datos se trae//
+		// Modificar esto cuando se vaya a trabajar bien, que datos se lleva y
+		// que datos se trae//
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		// Si es necesario que se cierre toda la aplicaci�n o no//
+		// Si es necesario que se cierre toda la aplicacion o no//
 
 		setBounds(100, 100, 450, 301);
 		contentPane = new JPanel();
@@ -85,7 +85,7 @@ public class ClienteInicial extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				// Inicializo una nueva Conversaci�n//
+				// Inicializo una nueva Conversacion//
 
 				ClienteConversacion nuevaConversacion = new ClienteConversacion();
 				nuevaConversacion.setVisible(true);

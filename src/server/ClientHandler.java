@@ -47,8 +47,8 @@ public class ClientHandler extends Thread {
 			dispatchEvent(new StatusChangedEvent(this, user, estado));
 			/* Inicio escucha al cliente */
 			while (client.isConnected()) {
-				msg = (Mensaje) in.readObject(); // se traba ac� hasta que hay
-													// mensaje
+				// se traba aca hasta que hay mensaje
+				msg = (Mensaje) in.readObject();
 
 				// TODO: switch con cada constante de mensaje que ejecute un
 				// metodo privado.

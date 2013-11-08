@@ -42,10 +42,8 @@ public class UserLogin {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				// Aca hay que validar los campos contra la base de datos y
-				// decidir si dejar ingresar o no,
-				// como estamos trabajando con una maqueta, abrimos la ventana
-				// correspondiente//
+				// Aca hay que validar los campos contra la base de datos y decidir si dejar ingresar o no,
+				// como estamos trabajando con una maqueta, abrimos la ventana correspondiente
 				UserMetaData userData = new UserMetaData(textField.getText(), textField_1.getPassword());
 				if(ChatClient.getInstance().login(userData)){
 					ClienteInicial nuevoCliente = new ClienteInicial();
@@ -62,8 +60,7 @@ public class UserLogin {
 		btnNuevoUsuario.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				// Instancio una nueva ventana de creaci�n de Creaci�n de nuevo
-				// usuario//
+				// Instancio una nueva ventana de creacion de Creacion de nuevo usuario
 				ClienteNuevoUsuario nuevoCliente = new ClienteNuevoUsuario();
 				nuevoCliente.setVisible(true);
 

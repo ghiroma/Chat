@@ -16,7 +16,7 @@ public class Alive extends Thread {
 			out = new ObjectOutputStream(socket.getOutputStream());
 			while (true) {
 				out.writeObject(new Mensaje(Mensaje.ALIVE, null));
-				sleep(5000); // timeout es 10 seg, esto manda una señal cada 5 seg.
+				sleep(5000); // timeout es 10 seg, esto manda una senial cada 5 seg.
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -24,7 +24,7 @@ public class Alive extends Thread {
 
 		catch (InterruptedException e2) {
 			e2.printStackTrace();
-			System.err.println("\n Thread Alive: sueño interrumpido.\n");
+			System.err.println("\n Thread Alive: suenio interrumpido.\n");
 		}
 
 		finally {

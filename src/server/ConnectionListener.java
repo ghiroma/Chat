@@ -58,7 +58,7 @@ public class ConnectionListener extends Thread {
 				// chequeo User y PW contra DB
 				if (!dataAccess.checkUser(userMeta)) {
 					msg.setId(Mensaje.DENIED);
-					msg.setCuerpo("Usuario o contrase�a incorrecta.");
+					msg.setCuerpo("Usuario o contrasenia incorrecta.");
 					out.writeObject(msg);
 					client.close();
 				}

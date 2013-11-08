@@ -151,8 +151,7 @@ public class ClienteNuevoUsuario extends JFrame {
 		panel_1.setBounds(10, 11, 158, 77);
 		panel.add(panel_1);
 
-		// Bot�n de verificaci�n de existencia de nombre de usuario, as� no se
-		// repite//
+		// Boton de verificacion de existencia de nombre de usuario, asi no se repite
 		JButton btnNewButton = new JButton("Verificar");
 		btnNewButton.setBounds(376, 141, 89, 23);
 		panel.add(btnNewButton);

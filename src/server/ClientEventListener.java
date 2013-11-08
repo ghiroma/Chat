@@ -29,7 +29,7 @@ public class ClientEventListener implements EventListener {
 	public void statusChanged(StatusChangedEvent e){
 		//TODO Nico: Avisa a todos los amigos conectados
 
-		/* A cada handler de amigo conectado le envio se�al de cambio de estado */
+		/* A cada handler de amigo conectado le envio senial de cambio de estado */
 		Iterator<ClientHandler> it = friendsOnline.iterator();
 		while(it.hasNext()) {
 			ClientHandler clientHandler = it.next();
