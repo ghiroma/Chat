@@ -1,14 +1,10 @@
 package interfaces.cliente;
 
 import java.awt.Component;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageProducer;
-import java.io.File;
-import java.io.IOException;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -19,10 +15,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class ClienteDatosPersonales extends JFrame {
+
+	private static final long serialVersionUID = 1597995466151011550L;
 
 	private JPanel contentPane;
 	private JTextField textField;
@@ -33,22 +29,6 @@ public class ClienteDatosPersonales extends JFrame {
 	private JTextField textField_5;
 	private JPasswordField textField_6;
 	private JPasswordField textField_7;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ClienteDatosPersonales frame = new ClienteDatosPersonales();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.

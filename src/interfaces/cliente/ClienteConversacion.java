@@ -1,39 +1,23 @@
 package interfaces.cliente;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.ImageIcon;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JTextArea;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import java.awt.Font;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 public class ClienteConversacion extends JFrame {
 
+	private static final long serialVersionUID = 5267263456354525306L;
+
 	private JPanel contentPane;
 	private JTextField textField;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ClienteConversacion frame = new ClienteConversacion();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -65,7 +49,7 @@ public class ClienteConversacion extends JFrame {
 		contentPane.add(textArea);
 
 		ImageIcon imagen = new ImageIcon(
-				"C:\\Users\\Jorge Nicolás\\Desktop\\icono_Fran.jpg");
+				"C:\\Users\\Jorge Nicolas\\Desktop\\icono_Fran.jpg");
 		JLabel lblNewLabel = new JLabel(imagen);
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblNewLabel.setBounds(10, 11, 148, 114);

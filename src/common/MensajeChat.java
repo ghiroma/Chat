@@ -3,22 +3,24 @@ package common;
 import java.io.Serializable;
  
 public class MensajeChat implements Serializable {
+
+	private static final long serialVersionUID = 4715850049574929960L;
+
 	private String destinatario;
 	private String texto;
-	
+
 	/* Constructores */
-	public MensajeChat(String destinatario,String texto)
-	{
+	public MensajeChat(String destinatario,String texto) {
 		this.destinatario = destinatario;
 		this.texto = texto;
 	}
-	
-	public MensajeChat()
-	{
+	public MensajeChat() {
 		this("","");
 	}
+
 	/* Metodos */
-	
+
+
 	/* Getters & Setters */
 	public String getDestinatario() {
 		return destinatario;
@@ -32,5 +34,5 @@ public class MensajeChat implements Serializable {
 	public void setTexto(String texto) {
 		this.texto = texto;
 	}
-	
+
 }

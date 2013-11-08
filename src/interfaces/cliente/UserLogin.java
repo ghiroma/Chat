@@ -1,17 +1,19 @@
 package interfaces.cliente;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.KeyAdapter;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
+import client.ChatClient;
+
+import common.UserMetaData;
 
 public class UserLogin {
 
@@ -19,33 +21,14 @@ public class UserLogin {
 	private JTextField textField;
 	private JPasswordField textField_1;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					UserLogin window = new UserLogin();
-					window.frmIngreso.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the application.
-	 */
-	public UserLogin() {
-		initialize();
+	public void mostrar() {
+		frmIngreso.setVisible(true);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	public UserLogin() {
 		frmIngreso = new JFrame();
 		frmIngreso.setTitle("Ingreso");
 		frmIngreso.setBounds(100, 100, 450, 134);
@@ -59,12 +42,17 @@ public class UserLogin {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				// Acá hay que validar los campos contra la base de datos y
+				// Aca hay que validar los campos contra la base de datos y
 				// decidir si dejar ingresar o no,
 				// como estamos trabajando con una maqueta, abrimos la ventana
 				// correspondiente//
-				ClienteInicial nuevoCliente = new ClienteInicial();
-				nuevoCliente.setVisible(true);
+				UserMetaData userData = new UserMetaData(textField.getText(), textField_1.getPassword());
+				if(ChatClient.getInstance().login(userData)){
+					ClienteInicial nuevoCliente = new ClienteInicial();
+					nuevoCliente.setVisible(true);
+				} else {
+					//TODO hacer algo al login fallido
+				}
 			}
 		});
 		btnNewButton.setBounds(304, 26, 117, 23);
@@ -74,7 +62,7 @@ public class UserLogin {
 		btnNuevoUsuario.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				// Instancio una nueva ventana de creación de Creación de nuevo
+				// Instancio una nueva ventana de creaciï¿½n de Creaciï¿½n de nuevo
 				// usuario//
 				ClienteNuevoUsuario nuevoCliente = new ClienteNuevoUsuario();
 				nuevoCliente.setVisible(true);

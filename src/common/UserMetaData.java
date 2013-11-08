@@ -1,8 +1,12 @@
 package common;
-import java.util.*;
 
- 
-public class UserMetaData implements java.io.Serializable {
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
+public class UserMetaData implements Serializable {
+
+	private static final long serialVersionUID = -3375334612913839297L;
 
 	private String user;
 	private String password;
@@ -10,15 +14,14 @@ public class UserMetaData implements java.io.Serializable {
 	private String mail;
 	private Date fechaAlta;
 	private Date fechaNacimiento;
-	private int conectado;					
-	
-	public UserMetaData()
-	{
-		this("","","","",Calendar.getInstance().getTime(),Calendar.getInstance().getTime(),0);
+	private int conectado;
+
+	public UserMetaData() {
+		this("", "", "", "", Calendar.getInstance().getTime(), Calendar.getInstance().getTime(), 0);
 	}
-	
-	public UserMetaData(String nickName,String passWord, String apyn, String mail, Date fechaAlta, Date fechaNacimiento, int conectado)
-	{
+
+	public UserMetaData(String nickName, String passWord, String apyn, String mail, Date fechaAlta,
+			Date fechaNacimiento, int conectado) {
 		this.user = nickName;
 		this.password = passWord;
 		this.apyn = apyn;
@@ -27,8 +30,18 @@ public class UserMetaData implements java.io.Serializable {
 		this.fechaNacimiento = fechaNacimiento;
 		this.conectado = conectado;
 	}
-	
-	
+
+	// Constructor usado para el login.
+	public UserMetaData(String nickName, char[] passWord) {
+		this.user = nickName;
+		this.password = new String(passWord);
+		this.apyn = "";
+		this.mail = "";
+		this.fechaAlta = null;
+		this.fechaNacimiento = null;
+		this.conectado = 0;
+	}
+
 	public String getUser() {
 		return user;
 	}
@@ -72,15 +85,15 @@ public class UserMetaData implements java.io.Serializable {
 		this.conectado = conectado;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "User [user=" + user + ", password=" + password + ", apyn="
-				+ apyn + ", mail=" + mail + ", fechaAlta=" + fechaAlta
-				+ ", fechaNacimiento=" + fechaNacimiento + ", conectado="
-				+ conectado + "]";
+		return "User [user=" + user + ", password=" + password + ", apyn=" + apyn + ", mail=" + mail
+				+ ", fechaAlta=" + fechaAlta + ", fechaNacimiento=" + fechaNacimiento + ", conectado=" + conectado
+				+ "]";
 	}
-	
+
 }

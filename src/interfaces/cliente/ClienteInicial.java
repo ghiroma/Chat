@@ -1,38 +1,21 @@
 package interfaces.cliente;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import java.awt.FlowLayout;
-import javax.swing.JButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JList;
-import javax.swing.ListSelectionModel;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
 
 public class ClienteInicial extends JFrame {
 
-	private JPanel contentPane;
+	private static final long serialVersionUID = 9163791121149343849L;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ClienteInicial frame = new ClienteInicial();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private JPanel contentPane;
 
 	/**
 	 * Create the frame.
@@ -41,10 +24,10 @@ public class ClienteInicial extends JFrame {
 		setTitle("Chat Principal");
 		setResizable(false);
 
-		// Modificar esto cuando se vaya a trabajar bien, qué datos se lleva y
-		// qué datos se trae//
+		// Modificar esto cuando se vaya a trabajar bien, quï¿½ datos se lleva y
+		// quï¿½ datos se trae//
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		// Si es necesario que se cierre toda la aplicación o no//
+		// Si es necesario que se cierre toda la aplicaciï¿½n o no//
 
 		setBounds(100, 100, 450, 301);
 		contentPane = new JPanel();
@@ -102,10 +85,10 @@ public class ClienteInicial extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				// Inicializo una nueva Conversación//
+				// Inicializo una nueva Conversaciï¿½n//
 
-				ClienteConversacion nuevaConversación = new ClienteConversacion();
-				nuevaConversación.setVisible(true);
+				ClienteConversacion nuevaConversacion = new ClienteConversacion();
+				nuevaConversacion.setVisible(true);
 			}
 		});
 		btnIniciarChat.setBounds(283, 160, 114, 23);

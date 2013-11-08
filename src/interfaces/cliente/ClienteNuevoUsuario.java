@@ -1,22 +1,22 @@
 package interfaces.cliente;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import java.awt.Font;
-import javax.swing.SwingConstants;
 import java.awt.Component;
+import java.awt.Font;
+
 import javax.swing.Box;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
 public class ClienteNuevoUsuario extends JFrame {
+
+	private static final long serialVersionUID = -821695818153018559L;
 
 	private JPanel contentPane;
 	private JTextField textField;
@@ -27,22 +27,6 @@ public class ClienteNuevoUsuario extends JFrame {
 	private JTextField textField_5;
 	private JPasswordField passwordField;
 	private JPasswordField passwordField_1;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ClienteNuevoUsuario frame = new ClienteNuevoUsuario();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the frame.
@@ -167,7 +151,7 @@ public class ClienteNuevoUsuario extends JFrame {
 		panel_1.setBounds(10, 11, 158, 77);
 		panel.add(panel_1);
 
-		// Botón de verificación de existencia de nombre de usuario, así no se
+		// Botï¿½n de verificaciï¿½n de existencia de nombre de usuario, asï¿½ no se
 		// repite//
 		JButton btnNewButton = new JButton("Verificar");
 		btnNewButton.setBounds(376, 141, 89, 23);
