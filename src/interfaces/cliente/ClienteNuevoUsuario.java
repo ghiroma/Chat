@@ -14,6 +14,11 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 
+import client.ChatClient;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 public class ClienteNuevoUsuario extends JFrame {
 
 	private static final long serialVersionUID = -821695818153018559L;
@@ -139,10 +144,20 @@ public class ClienteNuevoUsuario extends JFrame {
 		panel.add(passwordField_1);
 
 		JButton button = new JButton("Guardar");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		button.setBounds(255, 356, 89, 23);
 		panel.add(button);
 
 		JButton button_1 = new JButton("Cancelar");
+		button_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		button_1.setBounds(376, 356, 89, 23);
 		panel.add(button_1);
 
@@ -153,6 +168,15 @@ public class ClienteNuevoUsuario extends JFrame {
 
 		// Boton de verificacion de existencia de nombre de usuario, asi no se repite
 		JButton btnNewButton = new JButton("Verificar");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(ChatClient.getInstance().verificarNombreUsuario(textField.getText())){
+					//TODO terminar PABLO
+				} else {
+					//TODO terminar PABLO					
+				}
+			}
+		});
 		btnNewButton.setBounds(376, 141, 89, 23);
 		panel.add(btnNewButton);
 	}

@@ -14,12 +14,17 @@ import javax.swing.JPanel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 
+import server.ChatServer;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 public class Principal extends JFrame {
 
 	private static final long serialVersionUID = 1501608729613907406L;
 
 	private JPanel contentPane;
-
+	private JTextArea logEventos;
+	
 	/**
 	 * Create the frame.
 	 */
@@ -41,11 +46,9 @@ public class Principal extends JFrame {
 		
 		JList listDesconectados = new JList();
 		
-		JList listLogEventos = new JList();
-		
 		JLabel lblLogDeEventos = new JLabel("Eventos");
 		lblLogDeEventos.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		
+
 		JButton btnAlerta = new JButton("Enviar Alerta General");
 		btnAlerta.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -53,22 +56,23 @@ public class Principal extends JFrame {
 				alertaView.setVisible(true);
 			}
 		});
-		
 		JButton btnCerrarServer = new JButton("Cerrar Server");
 		btnCerrarServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				if(ChatServer.getInstance().cerrarServer())
+					dispose();
 			}
 		});
+		logEventos = new JTextArea();
+		logEventos.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(logEventos);
+
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(listLogEventos, GroupLayout.PREFERRED_SIZE, 369, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED))
 						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 							.addGroup(gl_contentPane.createSequentialGroup()
 								.addComponent(btnAlerta, GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
@@ -77,12 +81,15 @@ public class Principal extends JFrame {
 								.addGap(49))
 							.addGroup(gl_contentPane.createSequentialGroup()
 								.addComponent(lblLogDeEventos)
-								.addPreferredGap(ComponentPlacement.RELATED))))
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+								.addPreferredGap(ComponentPlacement.RELATED)))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 371, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)))
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
 							.addComponent(listConectados, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
 							.addComponent(lblNewLabel))
-						.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+						.addGroup(gl_contentPane.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblDesconectados)
@@ -93,8 +100,8 @@ public class Principal extends JFrame {
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-						.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 								.addGroup(gl_contentPane.createSequentialGroup()
 									.addGap(1)
@@ -103,7 +110,8 @@ public class Principal extends JFrame {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(lblLogDeEventos)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(listLogEventos, GroupLayout.PREFERRED_SIZE, 322, GroupLayout.PREFERRED_SIZE))
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 324, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(lblNewLabel)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -116,4 +124,11 @@ public class Principal extends JFrame {
 		);
 		contentPane.setLayout(gl_contentPane);
 	}
+
+	private void logearEvento(String msg) {
+		//TODO terminar de ver como metemos los mensajes en el log
+		logEventos.append(msg + "\n");
+		System.out.println(msg);
+	}
+
 }

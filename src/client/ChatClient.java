@@ -30,6 +30,7 @@ public class ChatClient {
 	//alive
 	private Alive alive;
 
+
 	/* Constructor */
 	private ChatClient() {
 		try {
@@ -45,7 +46,6 @@ public class ChatClient {
 			e.printStackTrace();
 		}
 	}
-
 	public static ChatClient getInstance() {
 		if (chatClientInstance == null)
 			chatClientInstance = new ChatClient();
@@ -55,26 +55,7 @@ public class ChatClient {
 	public static void main(String args[]) {
 		ChatClient.getInstance().go();
 	}
-
-	public boolean login(UserMetaData userData){
-		//agregar método de verificación contra la base para realizar el login
-		//si la conexión es buena se inicia el alive;
-		if (true) {
-			// alive.start??
-			// TODO: método login
-			Mensaje msg = new Mensaje(Mensaje.LOG_IN, userData);
-			this.enviarMensaje(msg);
-			return true;
-		} else
-			return false;
-	}
-
-	public void enviarMensaje(Mensaje msg) {
-		enviarAlServer(msg);
-	}
-
 	private void go() {
-
 		//interface
 		UserLogin frontEnd = new UserLogin();
 		frontEnd.mostrar();
@@ -89,7 +70,10 @@ public class ChatClient {
 		// TODO GUI principal
 	}
 
-	/* Metodos */
+
+	//-----------------
+	// Metodos privados
+	//-----------------
 	private void loadProperties() {
 		Properties prop = new Properties();
 		try {
@@ -119,6 +103,35 @@ public class ChatClient {
 		}
 	}
 
+
+	//-----------------
+	// Metodos publicos para las pantallas del cliente
+	//-----------------
+	public boolean login(UserMetaData userData){
+		//agregar método de verificación contra la base para realizar el login
+		//si la conexión es buena se inicia el alive;
+		if (true) {
+			// alive.start??
+			// TODO: método login
+			Mensaje msg = new Mensaje(Mensaje.LOG_IN, userData);
+			this.enviarAlServer(msg);
+			return true;
+		} else
+			return false;
+	}
+
+	public boolean verificarNombreUsuario(String nombre) {
+		//TODO validar que "nombre" este disponible para una nueva ALTA
+		return false;
+	}
+
+	public void enviarMensaje(Mensaje msg) {
+		enviarAlServer(msg);
+	}
+
+
+
+	// Thread de escucha de mensajes del server
 	class ListenFromServer extends Thread {
 		public void run() {
 			while (true) {

@@ -11,6 +11,7 @@ import java.util.Properties;
 
 public class ChatServer {
 
+	private static ChatServer chatServerInstance;
 	private HashMap<String, ClientHandler> handlerList;
 	private int port;
 	private String serverName;
@@ -20,15 +21,33 @@ public class ChatServer {
 		handlerList = new HashMap<String, ClientHandler>();
 		/* Cargo properties */
 		loadProperties();
+		chatServerInstance = this;
+	}
+
+	public static ChatServer getInstance() {
+		if (chatServerInstance == null)
+			chatServerInstance = new ChatServer();
+		return chatServerInstance;
 	}
 
 	/* Main*/
 	public static void main(String args[]){
-		new ChatServer().go();
+		ChatServer.getInstance().go();
 	}
 
-	public void go(){
 
+	public void enviarAlerta(String textoAlerta) {
+		//TODO llamar metodo de alerta
+	}
+
+	public boolean cerrarServer() {
+		//TODO llamar metodo de cerrar server
+		return true;
+	}
+
+
+
+	private void go() {
 		/*  Lanzamiento de handler de manejo de informacion de GUI */
 		Principal frontEnd = new Principal();
 		frontEnd.setVisible(true);
@@ -41,7 +60,6 @@ public class ChatServer {
 		new ConnectionListener(port, handlerList).run();
 	}
 
-
 	/* Metodos */
 	private void loadProperties(){
 		Properties prop = new Properties();
@@ -49,8 +67,7 @@ public class ChatServer {
 			prop.load(new FileInputStream("ServerConfig.properties"));
 			port = Integer.valueOf(prop.getProperty("port"));
 			serverName = prop.getProperty("name");			
-		}
-		catch (FileNotFoundException e1){
+		} catch (FileNotFoundException e1) {
 			//Properties no existe => creo uno
 			prop.setProperty("port", "16016");
 			prop.setProperty("name", "default");
@@ -62,10 +79,9 @@ public class ChatServer {
 			}
 			port = 16016;
 			serverName = "default";
-		}
-		catch (IOException e3){
+		} catch (IOException e3) {
 			e3.printStackTrace();
 		}
-
 	}
+
 }

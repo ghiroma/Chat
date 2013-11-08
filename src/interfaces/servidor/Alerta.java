@@ -15,6 +15,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
+import server.ChatServer;
+
 public class Alerta extends JFrame {
 
 	private static final long serialVersionUID = 4836049167772662766L;
@@ -42,12 +44,11 @@ public class Alerta extends JFrame {
 		JButton btnEnviar = new JButton("Enviar");
 		btnEnviar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				textAlerta.getText();
-				//TODO llamar metodo del back end
+				ChatServer.getInstance().enviarAlerta(textAlerta.getText());
 				setVisible(false);
-				
 			}
 		});
+
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
