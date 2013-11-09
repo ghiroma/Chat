@@ -15,6 +15,7 @@ public class ChatServer {
 	private HashMap<String, ClientHandler> handlerList;
 	private int port;
 	private String serverName;
+	private Principal frontEnd;
 
 	/* Constructor */
 	private ChatServer() {
@@ -49,7 +50,7 @@ public class ChatServer {
 
 	private void go() {
 		/*  Lanzamiento de handler de manejo de informacion de GUI */
-		Principal frontEnd = new Principal();
+		frontEnd = new Principal();
 		frontEnd.setVisible(true);
 
 		/* Informacion del startup a la consola */
@@ -82,6 +83,10 @@ public class ChatServer {
 		} catch (IOException e3) {
 			e3.printStackTrace();
 		}
+	}
+
+	public void logearEvento(String mensaje) {
+		this.frontEnd.logearEvento(mensaje);
 	}
 
 }

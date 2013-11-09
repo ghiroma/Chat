@@ -1,7 +1,10 @@
 package interfaces.cliente;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -16,14 +19,12 @@ import javax.swing.border.EtchedBorder;
 
 import client.ChatClient;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
 public class ClienteNuevoUsuario extends JFrame {
 
 	private static final long serialVersionUID = -821695818153018559L;
 
 	private JPanel contentPane;
+	private JLabel lblValidez;
 	private JTextField textField;
 	private JTextField textField_1;
 	private JTextField textField_2;
@@ -146,7 +147,25 @@ public class ClienteNuevoUsuario extends JFrame {
 		JButton button = new JButton("Guardar");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+//				if(ChatClient.getInstance().verificarNombreUsuario(textField.getText())){
+					if(!textField_1.getText().equals("") && !textField_2.getText().equals("") && !textField_3.getText().equals("") &&
+							!textField_4.getText().equals("") && !textField_5.getText().equals("")) {
+						if(verificarPassword(passwordField.getPassword(),passwordField_1.getPassword())) {
+							ChatClient.getInstance().altaNuevoUsuario();
+							setVisible(false);
+						} else {
+							lblValidez.setText("<html>"+ "La contraseña vacia o no coinciden" +"</html>");
+							lblValidez.setForeground(Color.RED);
+						}
+					} else {
+						lblValidez.setText("<html>"+ "Todos los campos son obligatorios" +"</html>");
+						lblValidez.setForeground(Color.RED);
+					}
+//				} else {
+//					lblValidez.setText("<html>"+ "Nombre vacio o no disponible" +"</html>");
+//					lblValidez.setForeground(Color.RED);
+//					textField.setText("");
+//				}
 			}
 		});
 		button.setBounds(255, 356, 89, 23);
@@ -155,7 +174,7 @@ public class ClienteNuevoUsuario extends JFrame {
 		JButton button_1 = new JButton("Cancelar");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				setVisible(false);
 			}
 		});
 		button_1.setBounds(376, 356, 89, 23);
@@ -168,16 +187,35 @@ public class ClienteNuevoUsuario extends JFrame {
 
 		// Boton de verificacion de existencia de nombre de usuario, asi no se repite
 		JButton btnNewButton = new JButton("Verificar");
+		lblValidez = new JLabel();
+		lblValidez.setBounds(324, 170, 164, 90);
+		panel.add(lblValidez);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(ChatClient.getInstance().verificarNombreUsuario(textField.getText())){
-					//TODO terminar PABLO
+					lblValidez.setText("Nombre Disponible");
+					lblValidez.setForeground(Color.GREEN);
 				} else {
-					//TODO terminar PABLO					
+					lblValidez.setText("Nombre no disponible");
+					lblValidez.setForeground(Color.RED);
+					textField.setText("");
 				}
 			}
 		});
 		btnNewButton.setBounds(376, 141, 89, 23);
 		panel.add(btnNewButton);
+		
+	}
+
+	private boolean verificarPassword(char[] pass1, char[] pass2) {
+		if(pass1.length != 0 && pass2.length != 0 && pass1.length==pass2.length){
+			boolean esDistinto = false;
+			for(int i = 0; i<pass1.length; i++) {
+				if(pass1[i] != pass2[i])
+					esDistinto = true; 
+			}
+			return !esDistinto;
+		}
+		return false;
 	}
 }

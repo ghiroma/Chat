@@ -108,21 +108,33 @@ public class ChatClient {
 	// Metodos publicos para las pantallas del cliente
 	//-----------------
 	public boolean login(UserMetaData userData){
-		//agregar método de verificación contra la base para realizar el login
-		//si la conexión es buena se inicia el alive;
+		//agregar metodo de verificacion contra la base para realizar el login
+		//si la conexion es buena se inicia el alive;
+		Mensaje msg = new Mensaje(Mensaje.LOG_IN, userData);
 		if (true) {
 			// alive.start??
-			// TODO: método login
-			Mensaje msg = new Mensaje(Mensaje.LOG_IN, userData);
+			// TODO: metodo login
 			this.enviarAlServer(msg);
 			return true;
 		} else
 			return false;
 	}
 
-	public boolean verificarNombreUsuario(String nombre) {
-		//TODO validar que "nombre" este disponible para una nueva ALTA
+	synchronized public boolean verificarNombreUsuario(String nombre) {
+		Mensaje msg = new Mensaje();
+		enviarAlServer(msg);
+		try {
+			//TODO validar que "nombre" este disponible para una nueva ALTA
+			msg = (Mensaje) entrada.readObject();
+			//return (Boolean)msg.getCuerpo();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return false;
+	}
+
+	public void altaNuevoUsuario() {
+		//TODO llamar al alta del nuevo usuario 
 	}
 
 	public void enviarMensaje(Mensaje msg) {
@@ -133,7 +145,7 @@ public class ChatClient {
 
 	// Thread de escucha de mensajes del server
 	class ListenFromServer extends Thread {
-		public void run() {
+		synchronized public void run() {
 			while (true) {
 				try {
 					//TODO aca se cambia por la salida de pantalla

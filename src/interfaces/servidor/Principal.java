@@ -125,7 +125,7 @@ public class Principal extends JFrame {
 		contentPane.setLayout(gl_contentPane);
 	}
 
-	private void logearEvento(String msg) {
+	public void logearEvento(String msg) {
 		//TODO terminar de ver como metemos los mensajes en el log
 		logEventos.append(msg + "\n");
 		System.out.println(msg);

@@ -12,7 +12,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-public class ClienteAgragarAmigo extends JFrame {
+public class ClienteAgregarAmigo extends JFrame {
 
 	private static final long serialVersionUID = 4891039026246519212L;
 
@@ -24,7 +24,7 @@ public class ClienteAgragarAmigo extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public ClienteAgragarAmigo() {
+	public ClienteAgregarAmigo() {
 		setTitle("Invitar Amigos");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

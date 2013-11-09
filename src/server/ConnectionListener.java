@@ -41,6 +41,8 @@ public class ConnectionListener extends Thread {
 
 			// Espera y manejo de clientes
 			while (true) {
+				//TODO NICO: generar un thread de accept y separarlo del conexionListener
+				// Asi como esta, la conexion se bloquea si un cliente inicia el programa
 				client = server.accept(); // La espera traba el flujo de codigo
 				in = new ObjectInputStream(client.getInputStream());
 				out = new ObjectOutputStream(client.getOutputStream());

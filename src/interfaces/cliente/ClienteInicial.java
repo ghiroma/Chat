@@ -3,6 +3,7 @@ package interfaces.cliente;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,8 +25,7 @@ public class ClienteInicial extends JFrame {
 		setTitle("Chat Principal");
 		setResizable(false);
 
-		// Modificar esto cuando se vaya a trabajar bien, que datos se lleva y
-		// que datos se trae//
+		// Modificar esto cuando se vaya a trabajar bien, que datos se lleva y que datos se trae//
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		// Si es necesario que se cierre toda la aplicacion o no//
 
@@ -41,7 +41,7 @@ public class ClienteInicial extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 
 				// Instancio un nuevo panel para agregar los Amigos//
-				ClienteAgragarAmigo agregarAmigos = new ClienteAgragarAmigo();
+				ClienteAgregarAmigo agregarAmigos = new ClienteAgregarAmigo();
 				agregarAmigos.setVisible(true);
 			}
 		});
@@ -71,10 +71,14 @@ public class ClienteInicial extends JFrame {
 		contentPane.add(btnDesconectar);
 
 		JList list = new JList();
+		DefaultListModel asd = new DefaultListModel();
+		asd.addElement("1");
+		asd.addElement("2");
+		list.setModel(asd);
 		list.setLayoutOrientation(JList.VERTICAL_WRAP);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setBounds(10, 92, 184, 160);
-		contentPane.add(list);
+		list.setBounds(11, 87, 205, 171);
+		contentPane.add(list,0);
 
 		JLabel lblAmigosOnline = new JLabel("Amigos Online");
 		lblAmigosOnline.setBounds(11, 67, 183, 21);
@@ -86,9 +90,14 @@ public class ClienteInicial extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 
 				// Inicializo una nueva Conversacion//
-
-				ClienteConversacion nuevaConversacion = new ClienteConversacion();
-				nuevaConversacion.setVisible(true);
+				JList lista=(JList)contentPane.getComponent(0);
+				if(lista.getSelectedValue() != null) {
+					//TODO: controlar que las ventanas no esten abiertas previamente.
+					ClienteConversacion nuevaConversacion = new ClienteConversacion();
+					nuevaConversacion.setTitle((String)lista.getSelectedValue());
+					nuevaConversacion.setVisible(true);
+				}
+				
 			}
 		});
 		btnIniciarChat.setBounds(283, 160, 114, 23);
