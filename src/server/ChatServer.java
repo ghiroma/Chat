@@ -6,8 +6,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
+
+import common.FriendStatus;
+import common.UserMetaData;
 
 public class ChatServer {
 
@@ -24,7 +30,6 @@ public class ChatServer {
 		loadProperties();
 		chatServerInstance = this;
 	}
-
 	public static ChatServer getInstance() {
 		if (chatServerInstance == null)
 			chatServerInstance = new ChatServer();
@@ -35,19 +40,6 @@ public class ChatServer {
 	public static void main(String args[]){
 		ChatServer.getInstance().go();
 	}
-
-
-	public void enviarAlerta(String textoAlerta) {
-		//TODO llamar metodo de alerta
-	}
-
-	public boolean cerrarServer() {
-		//TODO llamar metodo de cerrar server
-		return true;
-	}
-
-
-
 	private void go() {
 		/*  Lanzamiento de handler de manejo de informacion de GUI */
 		frontEnd = new Principal();
@@ -61,7 +53,10 @@ public class ChatServer {
 		new ConnectionListener(port, handlerList).run();
 	}
 
-	/* Metodos */
+
+	//-----------------
+	// Metodos privados
+	//-----------------
 	private void loadProperties(){
 		Properties prop = new Properties();
 		try {
@@ -85,7 +80,61 @@ public class ChatServer {
 		}
 	}
 
+
+	//-----------------
+	// Metodos publicos para las pantallas del cliente
+	//-----------------
+	public List<FriendStatus> obtenerUsuarios() {
+		//TODO metodo : ver de obtener todos los usuarios registrados en el sistema
+		List<FriendStatus> usuarios = new ArrayList<FriendStatus>();
+		usuarios.add(new FriendStatus("pepe", -1));
+		usuarios.add(new FriendStatus("grillo", 0));
+		usuarios.add(new FriendStatus("la Martha", 2));
+		return usuarios;
+	}
+
+	public void enviarAlerta(String textoAlerta, String usuarioDestino) {
+		//Se debe tomar q si el usuarioDestino es null entonces es una alerta general
+		//TODO metodo : llamar metodo de alerta
+	}
+
+	public UserMetaData obtenerInfoUsuario(String nombreUsuario) {
+		//TODO metodo : llamar metodo para obtener los datos de un usuario dado
+		return new UserMetaData("pepe", "asd", "Pepe Grillo", "pepe@algo.com", "0810-555-1111", new Date(), new Date(), 1);
+	}
+
+	public List<String> obtenerHistorialLoginUsuario(String nombreUsuario) {
+		//TODO metodo : llamar metodo para obtener el historial de login de un usuario dado
+		List<String> historialLogin = new ArrayList<String>();
+		historialLogin.add("algun dia");
+		historialLogin.add("algun otro dia");
+		historialLogin.add("algun otro dia mas");
+		return historialLogin;
+	}
+
+	public void blanquearClave(String nombreUsuario) {
+		//TODO metodo : llamar al metodo que realice el blanqueo de clave. se considera en poner como clave el mismo nombre de usuario
+	}
+
+	public void penalizar(String nombreUsuario, String horas, String motivo) {
+		//TODO metodo : llamar al metodo que realice la penalizacion de un usuario dado
+	}
+
+	public void despenalizar(String nombreUsuario) {
+		//TODO metodo : llamar al metodo que realice la despenalizacion de un usuario dado
+	}
+
+	public void desconectarUsuario(String nombreUsuario) {
+		//TODO metodo : llamar al metodo que realice la desconexion de un usuario dado
+	}
+
+	public boolean cerrarServer() {
+		//TODO metodo : llamar metodo de cerrar server
+		return true;
+	}
+
 	public void logearEvento(String mensaje) {
+		//TODO realizar el llamado al metodo cada vez q haya q logear algo
 		this.frontEnd.logearEvento(mensaje);
 	}
 

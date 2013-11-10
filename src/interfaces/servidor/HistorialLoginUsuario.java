@@ -1,16 +1,23 @@
 package interfaces.servidor;
 
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+
+import server.ChatServer;
 
 public class HistorialLoginUsuario extends JFrame {
 
@@ -21,23 +28,35 @@ public class HistorialLoginUsuario extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public HistorialLoginUsuario() {
+	public HistorialLoginUsuario(String nombreUsuario) {
 		setTitle("Historial de Login");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		
+
 		JLabel lblHistorialDeLogin = new JLabel("Historial de login del usuario:");
 		lblHistorialDeLogin.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		
-		JLabel lblNombreusuario = new JLabel("NombreUsuario");
-		lblNombreusuario.setFont(new Font("Tahoma", Font.PLAIN, 18));
-		
-		JList listHistorial = new JList();
-		
+
+		JLabel lblNombreusuario = new JLabel(nombreUsuario);
+		lblNombreusuario.setForeground(Color.BLUE);
+		lblNombreusuario.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNombreusuario.setFont(new Font("Tahoma", Font.ITALIC, 18));
+
+		JTextArea historialLogin = new JTextArea();
+		historialLogin.setEditable(false);
+		for(String linea : ChatServer.getInstance().obtenerHistorialLoginUsuario(nombreUsuario)) {
+			historialLogin.append(linea + "\n");
+		}
+		JScrollPane scrollPane = new JScrollPane(historialLogin);
+
 		JButton btnCerrar = new JButton("Cerrar");
+		btnCerrar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -45,24 +64,26 @@ public class HistorialLoginUsuario extends JFrame {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(lblHistorialDeLogin)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblNombreusuario))
+							.addGap(29)
+							.addComponent(lblNombreusuario, GroupLayout.PREFERRED_SIZE, 126, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(listHistorial, GroupLayout.PREFERRED_SIZE, 305, GroupLayout.PREFERRED_SIZE)
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 305, GroupLayout.PREFERRED_SIZE)
 							.addGap(18)
 							.addComponent(btnCerrar)))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(28, Short.MAX_VALUE))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addComponent(lblHistorialDeLogin)
-						.addComponent(lblNombreusuario))
-					.addPreferredGap(ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(2)
+							.addComponent(lblNombreusuario)))
+					.addPreferredGap(ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-						.addComponent(listHistorial, GroupLayout.PREFERRED_SIZE, 221, GroupLayout.PREFERRED_SIZE)
+						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 221, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(btnCerrar)
 							.addContainerGap())))
