@@ -1,7 +1,10 @@
 package interfaces.cliente;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -14,21 +17,23 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
+
+import client.ChatClient;
+
+import common.UserMetaData;
 
 public class ClienteDatosPersonales extends JFrame {
 
 	private static final long serialVersionUID = 1597995466151011550L;
 
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
-	private JTextField textField_5;
-	private JPasswordField textField_6;
-	private JPasswordField textField_7;
+	private JLabel lblValidez;
+	private JTextField txtUserName;
+	private JTextField txtNombre;
+	private JTextField txtEmail;
+	private JTextField txtTel;
+	private JPasswordField txtPass;
+	private JPasswordField txtPass2;
 
 	/**
 	 * Create the frame.
@@ -37,7 +42,7 @@ public class ClienteDatosPersonales extends JFrame {
 		setTitle("Modificaci\u00F3n de datos del Cliente");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 527, 428);
+		setBounds(100, 100, 618, 344);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -51,91 +56,91 @@ public class ClienteDatosPersonales extends JFrame {
 		JLabel lblDatosPersonales = new JLabel("DATOS PERSONALES");
 		lblDatosPersonales.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDatosPersonales.setFont(new Font("Tahoma", Font.PLAIN, 26));
-		lblDatosPersonales.setBounds(188, 11, 313, 77);
+		lblDatosPersonales.setBounds(146, 11, 313, 77);
 		contentPane.add(lblDatosPersonales);
 
-		JLabel lblNombre = new JLabel("Nombre :");
+		JLabel lblNombre = new JLabel("Nombre y apellido :");
 		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblNombre.setBounds(31, 169, 122, 14);
 		contentPane.add(lblNombre);
 
-		JLabel lblApellido = new JLabel("Apellido : ");
-		lblApellido.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblApellido.setBounds(31, 194, 122, 14);
-		contentPane.add(lblApellido);
-
-		JLabel lblEmail = new JLabel("email :");
+		JLabel lblEmail = new JLabel("Email :");
 		lblEmail.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblEmail.setBounds(31, 220, 122, 14);
+		lblEmail.setBounds(324, 194, 122, 14);
 		contentPane.add(lblEmail);
-
-		JLabel lblDireccin = new JLabel("Direcci\u00F3n :");
-		lblDireccin.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblDireccin.setBounds(31, 246, 122, 14);
-		contentPane.add(lblDireccin);
 
 		JLabel lblTelfono = new JLabel("Tel\u00E9fono :");
 		lblTelfono.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblTelfono.setBounds(31, 271, 122, 14);
+		lblTelfono.setBounds(31, 194, 122, 14);
 		contentPane.add(lblTelfono);
 
 		JLabel lblContrasea = new JLabel("Contrase\u00F1a : ");
 		lblContrasea.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblContrasea.setBounds(31, 296, 122, 14);
+		lblContrasea.setBounds(31, 219, 122, 14);
 		contentPane.add(lblContrasea);
 
 		JLabel lblRepetirContrasea = new JLabel("Repetir Contrase\u00F1a :");
 		lblRepetirContrasea.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblRepetirContrasea.setBounds(31, 321, 122, 14);
+		lblRepetirContrasea.setBounds(324, 219, 122, 14);
 		contentPane.add(lblRepetirContrasea);
 
 		Component horizontalGlue = Box.createHorizontalGlue();
-		horizontalGlue.setBounds(10, 99, 491, 0);
+		horizontalGlue.setBounds(10, 99, 574, 12);
 		contentPane.add(horizontalGlue);
 
-		textField = new JTextField();
-		textField.setEditable(false);
-		textField.setBounds(188, 142, 113, 20);
-		contentPane.add(textField);
-		textField.setColumns(10);
+		txtUserName = new JTextField();
+		txtUserName.setEditable(false);
+		txtUserName.setBounds(188, 142, 113, 20);
+		contentPane.add(txtUserName);
+		txtUserName.setColumns(10);
 
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(188, 167, 113, 20);
-		contentPane.add(textField_1);
+		txtNombre = new JTextField();
+		txtNombre.setColumns(10);
+		txtNombre.setBounds(188, 167, 381, 20);
+		contentPane.add(txtNombre);
 
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(188, 192, 113, 20);
-		contentPane.add(textField_2);
+		txtEmail = new JTextField();
+		txtEmail.setColumns(10);
+		txtEmail.setBounds(456, 192, 113, 20);
+		contentPane.add(txtEmail);
 
-		textField_3 = new JTextField();
-		textField_3.setColumns(10);
-		textField_3.setBounds(188, 218, 113, 20);
-		contentPane.add(textField_3);
+		txtTel = new JTextField();
+		txtTel.setColumns(10);
+		txtTel.setBounds(188, 192, 113, 20);
+		contentPane.add(txtTel);
 
-		textField_4 = new JTextField();
-		textField_4.setColumns(10);
-		textField_4.setBounds(188, 244, 113, 20);
-		contentPane.add(textField_4);
+		txtPass = new JPasswordField();
+		txtPass.setColumns(10);
+		txtPass.setBounds(188, 217, 113, 20);
+		contentPane.add(txtPass);
 
-		textField_5 = new JTextField();
-		textField_5.setColumns(10);
-		textField_5.setBounds(188, 269, 113, 20);
-		contentPane.add(textField_5);
+		txtPass2 = new JPasswordField();
+		txtPass2.setColumns(10);
+		txtPass2.setBounds(456, 217, 113, 20);
+		contentPane.add(txtPass2);
 
-		textField_6 = new JPasswordField();
-		textField_6.setColumns(10);
-		textField_6.setBounds(188, 294, 113, 20);
-		contentPane.add(textField_6);
-
-		textField_7 = new JPasswordField();
-		textField_7.setColumns(10);
-		textField_7.setBounds(188, 319, 113, 20);
-		contentPane.add(textField_7);
+		lblValidez = new JLabel();
+		lblValidez.setBounds(10, 244, 314, 61);
+		contentPane.add(lblValidez);
 
 		JButton btnGuardar = new JButton("Guardar");
-		btnGuardar.setBounds(255, 356, 89, 23);
+		btnGuardar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(!txtNombre.getText().equals("") && !txtEmail.getText().equals("") && !txtTel.getText().equals("")) {
+					if(verificarPassword(txtPass.getPassword(),txtPass2.getPassword())) {
+						ChatClient.getInstance().modificarUsuario();
+						dispose();
+					} else {
+						lblValidez.setText("<html>"+ "El campo password esta vacio o no coinciden" +"</html>");
+						lblValidez.setForeground(Color.RED);
+					}
+				} else {
+					lblValidez.setText("<html>"+ "Todos los campos son obligatorios" +"</html>");
+					lblValidez.setForeground(Color.RED);
+				}
+			}
+		});
+		btnGuardar.setBounds(335, 267, 89, 23);
 		contentPane.add(btnGuardar);
 
 		JButton btnCancelar = new JButton("Cancelar");
@@ -145,12 +150,31 @@ public class ClienteDatosPersonales extends JFrame {
 				dispose();
 			}
 		});
-		btnCancelar.setBounds(376, 356, 89, 23);
+		btnCancelar.setBounds(480, 267, 89, 23);
 		contentPane.add(btnCancelar);
 
-		JPanel panel = new JPanel();
-		panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel.setBounds(10, 11, 158, 77);
-		contentPane.add(panel);
+		this.cargarDatos();
+
 	}
+
+	private boolean verificarPassword(char[] pass1, char[] pass2) {
+		if(pass1.length != 0 && pass2.length != 0 && pass1.length==pass2.length){
+			boolean esDistinto = false;
+			for(int i = 0; i<pass1.length; i++) {
+				if(pass1[i] != pass2[i])
+					esDistinto = true; 
+			}
+			return !esDistinto;
+		}
+		return false;
+	}
+
+	private void cargarDatos() {
+		UserMetaData user = ChatClient.getInstance().getUsuarioLogeado();
+		txtUserName.setText(user.getUser());
+		txtNombre.setText(user.getApyn());
+		txtTel.setText(user.getTelefono());
+		txtEmail.setText(user.getMail());		
+	}
+
 }

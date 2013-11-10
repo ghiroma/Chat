@@ -9,8 +9,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
+import common.FriendStatus;
 import common.Mensaje;
 import common.UserMetaData;
 
@@ -19,9 +23,6 @@ public class ChatClient {
 	private int port;
 	private String serverIP;
 
-	// User
-	private String username;
-
 	// Conexion / Auxiliar
 	private ObjectInputStream entrada;
 	private ObjectOutputStream salida;
@@ -29,6 +30,10 @@ public class ChatClient {
 	private static ChatClient chatClientInstance;
 	//alive
 	private Alive alive;
+
+	// User
+	private UserMetaData usuarioLogeado;
+	private ArrayList<FriendStatus> amigos;
 
 
 	/* Constructor */
@@ -107,14 +112,19 @@ public class ChatClient {
 	//-----------------
 	// Metodos publicos para las pantallas del cliente
 	//-----------------
-	public boolean login(UserMetaData userData){
+	synchronized public boolean login(UserMetaData userData){
 		//agregar metodo de verificacion contra la base para realizar el login
 		//si la conexion es buena se inicia el alive;
 		Mensaje msg = new Mensaje(Mensaje.LOG_IN, userData);
 		if (true) {
 			// alive.start??
-			// TODO: metodo login
-			this.enviarAlServer(msg);
+			// TODO: metodo : login
+			// this.enviarAlServer(msg);
+			amigos = new ArrayList<FriendStatus>();
+			amigos.add(new FriendStatus("pepe", 1));
+			amigos.add(new FriendStatus("grillo", 0));
+			amigos.add(new FriendStatus("la Martha", 2));
+			usuarioLogeado = new UserMetaData("pepe", "asd", "Pepe Grillo", "pepe@algo.com", "0810-555-1111", new Date(), new Date(), 1);
 			return true;
 		} else
 			return false;
@@ -124,7 +134,7 @@ public class ChatClient {
 		Mensaje msg = new Mensaje();
 		enviarAlServer(msg);
 		try {
-			//TODO validar que "nombre" este disponible para una nueva ALTA
+			//TODO metodo : validar que "nombre" este disponible para una nueva ALTA
 			msg = (Mensaje) entrada.readObject();
 			//return (Boolean)msg.getCuerpo();
 		} catch (Exception e) {
@@ -134,11 +144,27 @@ public class ChatClient {
 	}
 
 	public void altaNuevoUsuario() {
-		//TODO llamar al alta del nuevo usuario 
+		//TODO metodo : llamar al alta del nuevo usuario 
 	}
 
-	public void enviarMensaje(Mensaje msg) {
-		enviarAlServer(msg);
+	public void modificarUsuario() {
+		//TODO metodo : llamar a la modificacion del usuario 
+	}
+
+	synchronized public List<String> buscarAmigoPorTexto(String texto) {
+		//TODO metodo : llamar a la busqueda de contactos conectados que ya no sean amigos segun texto ingresado
+		List<String> listaFiltrada = new ArrayList<String>();
+		listaFiltrada.add("Martha");
+		listaFiltrada.add("Wanda");
+		return listaFiltrada;
+	}
+
+	public void invitarAmigo(String contacto) {
+		//TODO metodo : llamar a la invitacion de un amigo
+	}
+
+	public void enviarMensajeChat(String amigo, String texto) {
+		//TODO metodo : llamar al envio de mensajes de una conversacion
 	}
 
 
@@ -148,7 +174,7 @@ public class ChatClient {
 		synchronized public void run() {
 			while (true) {
 				try {
-					//TODO aca se cambia por la salida de pantalla
+					//TODO aca se debe se filtrar segun tipo de mensaje recibido
 					System.out.println((Mensaje) entrada.readObject());
 					System.out.print("> ");
 				} catch (IOException e) {
@@ -158,4 +184,13 @@ public class ChatClient {
 			}
 		}
 	}
+
+	//Getters and Setters
+	public UserMetaData getUsuarioLogeado() {
+		return usuarioLogeado;
+	}
+	public ArrayList<FriendStatus> getAmigos() {
+		return amigos;
+	}
+
 }

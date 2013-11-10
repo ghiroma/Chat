@@ -1,5 +1,6 @@
 package interfaces.cliente;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,6 +21,7 @@ public class UserLogin {
 	private JFrame frmIngreso;
 	private JTextField textField;
 	private JPasswordField textField_1;
+	private JLabel lblValidez;
 
 	public void mostrar() {
 		frmIngreso.setVisible(true);
@@ -31,7 +33,7 @@ public class UserLogin {
 	public UserLogin() {
 		frmIngreso = new JFrame();
 		frmIngreso.setTitle("Ingreso");
-		frmIngreso.setBounds(100, 100, 450, 134);
+		frmIngreso.setBounds(100, 100, 450, 157);
 		frmIngreso.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmIngreso.getContentPane().setLayout(null);
 		frmIngreso.setResizable(false);
@@ -42,14 +44,21 @@ public class UserLogin {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-				// Aca hay que validar los campos contra la base de datos y decidir si dejar ingresar o no,
-				// como estamos trabajando con una maqueta, abrimos la ventana correspondiente
-				UserMetaData userData = new UserMetaData(textField.getText(), textField_1.getPassword());
-				if(ChatClient.getInstance().login(userData)){
-					ClienteInicial nuevoCliente = new ClienteInicial();
-					nuevoCliente.setVisible(true);
+				if(!textField.getText().equals("") && textField_1.getPassword().length != 0){
+					UserMetaData userData = new UserMetaData(textField.getText(), textField_1.getPassword());
+					if(ChatClient.getInstance().login(userData)){
+						ClienteInicial nuevoCliente = new ClienteInicial();
+						nuevoCliente.setVisible(true);
+						frmIngreso.dispose();
+					} else {
+						lblValidez.setText("<html>"+ "La combinacion de usuario y password no se encuentra registrada o fue bloqueada" +"</html>");
+						lblValidez.setForeground(Color.RED);
+						textField.setText("");
+						textField_1.setText("");
+					}
 				} else {
-					//TODO hacer algo al login fallido
+					lblValidez.setText("Los campos no pueden estar vacios");
+					lblValidez.setForeground(Color.RED);
 				}
 			}
 		});
@@ -63,7 +72,6 @@ public class UserLogin {
 				// Instancio una nueva ventana de creacion de Creacion de nuevo usuario
 				ClienteNuevoUsuario nuevoCliente = new ClienteNuevoUsuario();
 				nuevoCliente.setVisible(true);
-
 			}
 		});
 		btnNuevoUsuario.setBounds(304, 60, 117, 23);
@@ -90,5 +98,12 @@ public class UserLogin {
 		textField_1.setColumns(10);
 		textField_1.setBounds(153, 61, 103, 20);
 		frmIngreso.getContentPane().add(textField_1);
+		
+		lblValidez = new JLabel();
+		lblValidez.setForeground(Color.BLUE);
+		lblValidez.setHorizontalAlignment(SwingConstants.CENTER);
+		lblValidez.setText("Ingrese su usuario y contraseña o dese de alta, si no tiene usuario.");
+		lblValidez.setBounds(10, 92, 411, 26);
+		frmIngreso.getContentPane().add(lblValidez);
 	}
 }

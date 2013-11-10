@@ -15,7 +15,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
 
 import client.ChatClient;
 
@@ -25,14 +24,12 @@ public class ClienteNuevoUsuario extends JFrame {
 
 	private JPanel contentPane;
 	private JLabel lblValidez;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
-	private JTextField textField_5;
-	private JPasswordField passwordField;
-	private JPasswordField passwordField_1;
+	private JTextField txtUsername;
+	private JTextField txtNyA;
+	private JTextField txtEmail;
+	private JTextField txtTel;
+	private JPasswordField txtPass1;
+	private JPasswordField txtPass2;
 
 	/**
 	 * Create the frame.
@@ -42,7 +39,7 @@ public class ClienteNuevoUsuario extends JFrame {
 		setTitle("Chat - Nuevo Usuario");
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 527, 428);
+		setBounds(100, 100, 596, 376);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -51,7 +48,7 @@ public class ClienteNuevoUsuario extends JFrame {
 		JPanel panel = new JPanel();
 		panel.setLayout(null);
 		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		panel.setBounds(0, 0, 521, 400);
+		panel.setBounds(0, 0, 590, 348);
 		contentPane.add(panel);
 
 		JLabel label = new JLabel("Nombre de Usuario :");
@@ -62,147 +59,122 @@ public class ClienteNuevoUsuario extends JFrame {
 		JLabel lblNuevoUsuario = new JLabel("NUEVO USUARIO");
 		lblNuevoUsuario.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNuevoUsuario.setFont(new Font("Tahoma", Font.PLAIN, 26));
-		lblNuevoUsuario.setBounds(188, 11, 313, 77);
+		lblNuevoUsuario.setBounds(140, 11, 313, 77);
 		panel.add(lblNuevoUsuario);
 
-		JLabel label_2 = new JLabel("Nombre :");
-		label_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		label_2.setBounds(31, 169, 122, 14);
-		panel.add(label_2);
+		JLabel lblNombreYApellido = new JLabel("Nombre y Apellido :");
+		lblNombreYApellido.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblNombreYApellido.setBounds(31, 179, 122, 14);
+		panel.add(lblNombreYApellido);
 
-		JLabel label_3 = new JLabel("Apellido : ");
-		label_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		label_3.setBounds(31, 194, 122, 14);
-		panel.add(label_3);
-
-		JLabel label_4 = new JLabel("email :");
-		label_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		label_4.setBounds(31, 220, 122, 14);
-		panel.add(label_4);
-
-		JLabel label_5 = new JLabel("Direcci\u00F3n :");
-		label_5.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		label_5.setBounds(31, 246, 122, 14);
-		panel.add(label_5);
+		JLabel lblEmail = new JLabel("Email :");
+		lblEmail.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblEmail.setBounds(31, 212, 122, 14);
+		panel.add(lblEmail);
 
 		JLabel label_6 = new JLabel("Tel\u00E9fono :");
 		label_6.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		label_6.setBounds(31, 271, 122, 14);
+		label_6.setBounds(311, 212, 122, 14);
 		panel.add(label_6);
 
 		JLabel label_7 = new JLabel("Contrase\u00F1a : ");
 		label_7.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		label_7.setBounds(31, 296, 122, 14);
+		label_7.setBounds(31, 240, 122, 14);
 		panel.add(label_7);
 
 		JLabel label_8 = new JLabel("Repetir Contrase\u00F1a :");
 		label_8.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		label_8.setBounds(31, 321, 122, 14);
+		label_8.setBounds(311, 240, 122, 14);
 		panel.add(label_8);
 
 		Component horizontalGlue = Box.createHorizontalGlue();
-		horizontalGlue.setBounds(10, 99, 491, 0);
+		horizontalGlue.setBounds(10, 99, 570, 12);
 		panel.add(horizontalGlue);
 
-		textField = new JTextField();
-		textField.setColumns(10);
-		textField.setBounds(188, 142, 113, 20);
-		panel.add(textField);
+		txtUsername = new JTextField();
+		txtUsername.setColumns(10);
+		txtUsername.setBounds(188, 142, 113, 20);
+		panel.add(txtUsername);
 
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(188, 167, 113, 20);
-		panel.add(textField_1);
+		txtNyA = new JTextField();
+		txtNyA.setColumns(10);
+		txtNyA.setBounds(188, 177, 368, 20);
+		panel.add(txtNyA);
 
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(188, 192, 113, 20);
-		panel.add(textField_2);
+		txtEmail = new JTextField();
+		txtEmail.setColumns(10);
+		txtEmail.setBounds(188, 210, 113, 20);
+		panel.add(txtEmail);
 
-		textField_3 = new JTextField();
-		textField_3.setColumns(10);
-		textField_3.setBounds(188, 218, 113, 20);
-		panel.add(textField_3);
+		txtTel = new JTextField();
+		txtTel.setColumns(10);
+		txtTel.setBounds(443, 210, 113, 20);
+		panel.add(txtTel);
 
-		textField_4 = new JTextField();
-		textField_4.setColumns(10);
-		textField_4.setBounds(188, 244, 113, 20);
-		panel.add(textField_4);
+		txtPass1 = new JPasswordField();
+		txtPass1.setColumns(10);
+		txtPass1.setBounds(188, 239, 113, 20);
+		panel.add(txtPass1);
 
-		textField_5 = new JTextField();
-		textField_5.setColumns(10);
-		textField_5.setBounds(188, 269, 113, 20);
-		panel.add(textField_5);
-
-		passwordField = new JPasswordField();
-		passwordField.setColumns(10);
-		passwordField.setBounds(188, 294, 113, 20);
-		panel.add(passwordField);
-
-		passwordField_1 = new JPasswordField();
-		passwordField_1.setColumns(10);
-		passwordField_1.setBounds(188, 319, 113, 20);
-		panel.add(passwordField_1);
+		txtPass2 = new JPasswordField();
+		txtPass2.setColumns(10);
+		txtPass2.setBounds(443, 238, 113, 20);
+		panel.add(txtPass2);
 
 		JButton button = new JButton("Guardar");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				if(ChatClient.getInstance().verificarNombreUsuario(textField.getText())){
-					if(!textField_1.getText().equals("") && !textField_2.getText().equals("") && !textField_3.getText().equals("") &&
-							!textField_4.getText().equals("") && !textField_5.getText().equals("")) {
-						if(verificarPassword(passwordField.getPassword(),passwordField_1.getPassword())) {
+				if(ChatClient.getInstance().verificarNombreUsuario(txtUsername.getText())){
+					if(!txtNyA.getText().equals("") && !txtEmail.getText().equals("") && !txtTel.getText().equals("")) {
+						if(verificarPassword(txtPass1.getPassword(),txtPass2.getPassword())) {
 							ChatClient.getInstance().altaNuevoUsuario();
 							setVisible(false);
 						} else {
-							lblValidez.setText("<html>"+ "La contraseña vacia o no coinciden" +"</html>");
+							lblValidez.setText("<html>"+ "El campo password esta vacio o no coinciden" +"</html>");
 							lblValidez.setForeground(Color.RED);
 						}
 					} else {
 						lblValidez.setText("<html>"+ "Todos los campos son obligatorios" +"</html>");
 						lblValidez.setForeground(Color.RED);
 					}
-//				} else {
-//					lblValidez.setText("<html>"+ "Nombre vacio o no disponible" +"</html>");
-//					lblValidez.setForeground(Color.RED);
-//					textField.setText("");
-//				}
+				} else {
+					lblValidez.setText("<html>"+ "Nombre vacio o no disponible" +"</html>");
+					lblValidez.setForeground(Color.RED);
+					txtUsername.setText("");
+				}
 			}
 		});
-		button.setBounds(255, 356, 89, 23);
+		button.setBounds(322, 294, 89, 23);
 		panel.add(button);
 
 		JButton button_1 = new JButton("Cancelar");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
+				dispose();
 			}
 		});
-		button_1.setBounds(376, 356, 89, 23);
+		button_1.setBounds(446, 294, 89, 23);
 		panel.add(button_1);
 
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_1.setBounds(10, 11, 158, 77);
-		panel.add(panel_1);
-
-		// Boton de verificacion de existencia de nombre de usuario, asi no se repite
-		JButton btnNewButton = new JButton("Verificar");
 		lblValidez = new JLabel();
-		lblValidez.setBounds(324, 170, 164, 90);
+		lblValidez.setBounds(31, 268, 269, 67);
 		panel.add(lblValidez);
+	
+		JButton btnNewButton = new JButton("Verificar");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(ChatClient.getInstance().verificarNombreUsuario(textField.getText())){
+				// Boton de verificacion de existencia de nombre de usuario, asi no se repite
+				if(ChatClient.getInstance().verificarNombreUsuario(txtUsername.getText())){
 					lblValidez.setText("Nombre Disponible");
 					lblValidez.setForeground(Color.GREEN);
 				} else {
 					lblValidez.setText("Nombre no disponible");
 					lblValidez.setForeground(Color.RED);
-					textField.setText("");
+					txtUsername.setText("");
 				}
 			}
 		});
-		btnNewButton.setBounds(376, 141, 89, 23);
+		btnNewButton.setBounds(341, 141, 89, 23);
 		panel.add(btnNewButton);
 		
 	}

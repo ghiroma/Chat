@@ -12,20 +12,21 @@ public class UserMetaData implements Serializable {
 	private String password;
 	private String apyn;
 	private String mail;
+	private String telefono;
 	private Date fechaAlta;
 	private Date fechaNacimiento;
 	private int conectado;
 
 	public UserMetaData() {
-		this("", "", "", "", Calendar.getInstance().getTime(), Calendar.getInstance().getTime(), 0);
+		this("", "", "", "", "", Calendar.getInstance().getTime(), Calendar.getInstance().getTime(), 0);
 	}
 
-	public UserMetaData(String nickName, String passWord, String apyn, String mail, Date fechaAlta,
-			Date fechaNacimiento, int conectado) {
+	public UserMetaData(String nickName, String passWord, String apyn, String mail, String tel, Date fechaAlta, Date fechaNacimiento, int conectado) {
 		this.user = nickName;
 		this.password = passWord;
 		this.apyn = apyn;
 		this.mail = mail;
+		this.telefono = tel;
 		this.fechaAlta = fechaAlta;
 		this.fechaNacimiento = fechaNacimiento;
 		this.conectado = conectado;
@@ -37,6 +38,7 @@ public class UserMetaData implements Serializable {
 		this.password = new String(passWord);
 		this.apyn = "";
 		this.mail = "";
+		this.telefono = "";
 		this.fechaAlta = null;
 		this.fechaNacimiento = null;
 		this.conectado = 0;
@@ -66,6 +68,12 @@ public class UserMetaData implements Serializable {
 	public void setMail(String mail) {
 		this.mail = mail;
 	}
+	public String getTelefono() {
+		return telefono;
+	}
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
+	}
 	public Date getFechaAlta() {
 		return fechaAlta;
 	}
@@ -85,15 +93,10 @@ public class UserMetaData implements Serializable {
 		this.conectado = conectado;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
-		return "User [user=" + user + ", password=" + password + ", apyn=" + apyn + ", mail=" + mail
-				+ ", fechaAlta=" + fechaAlta + ", fechaNacimiento=" + fechaNacimiento + ", conectado=" + conectado
-				+ "]";
+		return "UserMetaData [user=" + user + ", password=" + password + ", apyn=" + apyn + ", mail=" + mail + ", telefono="
+				+ telefono + ", fechaAlta=" + fechaAlta + ", fechaNacimiento=" + fechaNacimiento + ", conectado=" + conectado + "]";
 	}
 
 }
