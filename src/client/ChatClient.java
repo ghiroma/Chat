@@ -61,18 +61,12 @@ public class ChatClient {
 		ChatClient.getInstance().go();
 	}
 	private void go() {
-		//interface
+		/* Inicializo GUI de login */
 		UserLogin frontEnd = new UserLogin();
 		frontEnd.mostrar();
-		/* Inicializo GUI de login */ //done
-		// TODO GUI login //done
-		// de algna manera obtengo el socket y username
                
 		/* Lanzo Alive */
 		// TODO alive.start //done se inicia cuando el login es satisfactorio
-
-		/* Lanzo GUI principal */
-		// TODO GUI principal
 	}
 
 
