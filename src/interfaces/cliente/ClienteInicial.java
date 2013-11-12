@@ -35,7 +35,7 @@ public class ClienteInicial extends JFrame {
 		setResizable(false);
 
 		// Modificar esto cuando se vaya a trabajar bien, que datos se lleva y que datos se trae//
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		// Si es necesario que se cierre toda la aplicacion o no//
 
 		setBounds(100, 100, 450, 301);

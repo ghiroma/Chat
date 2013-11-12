@@ -29,7 +29,7 @@ import javax.swing.border.EmptyBorder;
 
 import server.ChatServer;
 
-import common.FriendStatus;
+import common.UserMetaData;
 
 public class Principal extends JFrame {
 
@@ -278,13 +278,12 @@ public class Principal extends JFrame {
 	private void obtenerListaUsuarios() {
 		modelUsuariosConectados = new DefaultListModel();
 		modelUsuariosDesconectados = new DefaultListModel();
-		List<FriendStatus> usuarios = ChatServer.getInstance().obtenerUsuarios();
-		for(FriendStatus usuario : usuarios) {
-			//TODO FRONT : filtrar los usuarios q estan conectados y los q no
-			if(usuario.getEstado()==(-1)) {
-				modelUsuariosDesconectados.addElement(usuario.getUsername());
+		List<UserMetaData> usuarios = ChatServer.getInstance().obtenerUsuarios();
+		for(UserMetaData usuario : usuarios) {
+			if (usuario.getConectado() == 0) {
+				modelUsuariosDesconectados.addElement(usuario.getUser());
 			} else {
-				modelUsuariosConectados.addElement(usuario.getUsername());
+				modelUsuariosConectados.addElement(usuario.getUser());
 			}
 		}
 	}

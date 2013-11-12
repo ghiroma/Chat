@@ -32,7 +32,7 @@ public class Penalizacion extends JFrame {
 	 */
 	public Penalizacion(final String nombreUsuario) {
 		setTitle("Penalizaci\u00F3n");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 423, 250);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -54,8 +54,14 @@ public class Penalizacion extends JFrame {
 		btnPenalizar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!textTiempo.getText().equals("") && !textField.getText().equals("")) {
-					ChatServer.getInstance().penalizar(nombreUsuario, textTiempo.getText(), textField.getText());
-					dispose();
+					try {
+						int horas = Integer.valueOf(textTiempo.getText());
+						ChatServer.getInstance().penalizar(nombreUsuario, horas, textField.getText());
+						dispose();
+					} catch(NumberFormatException ex) {
+						lblNotificacion.setText("<html>"+ "El campo 'HORAS' debe ser numerico" +"</html>");
+						lblNotificacion.setForeground(Color.RED);
+					}
 				} else {
 					lblNotificacion.setText("<html>"+ "Todos los campos son obligatorios" +"</html>");
 					lblNotificacion.setForeground(Color.RED);

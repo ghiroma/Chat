@@ -55,7 +55,7 @@ public class ConnectionListener extends Thread {
 				// Recibo username y password
 				msg = (Mensaje) in.readObject();
 				userMeta = (UserMetaData) msg.getCuerpo();
-				BanInfo bInfo = dataAccess.checkBan(userMeta);
+				BanInfo bInfo = dataAccess.checkBan(userMeta.getUser());
 				// TODO TESTEAR.
 				// chequeo User y PW contra DB
 				if (!dataAccess.checkUser(userMeta)) {

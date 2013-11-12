@@ -1,6 +1,13 @@
 package dataTier;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import common.FriendStatus;
 import common.UserMetaData;
@@ -26,11 +33,19 @@ public final class DataAccess{
 		stat.execute("CREATE TABLE Amigos(User1 varchar(100), User2 varchar(100),Primary Key(User1,User2) ,FOREIGN KEY(User1) references Usuarios(User), Foreign Key(User2) references Usuarios(User))");
 		stat.execute("CREATE TABLE LogLogin(User varchar(100), FechaHoraInicio DateTime,Primary Key(User,FechaHoraInicio),FOREIGN KEY(User) references Usuarios(User))");
 		stat.execute("CREATE TABLE LogPenalizacion(ID int primary key auto_increment, User varchar(100), Descripcion varchar(250), FechaFin DateTime, Foreign key(User) references Usuarios(User))");
-		stat.execute("INSERT INTO Usuarios (User,Password,Mail,FechaAlta,Apyn,FechaNacimiento,Conectado)VALUES('Usuario1','Contrsenia','Mail', '2011-01-01 00:30:00','Perez','1991-01-01',0),('Usuario2','Contrsenia','Mail', '2011-01-01 00:22:00','Lopez', '1991-01-01',1),('Usuario3','Contrsenia','Mail', '2011-01-01 01:30:00','Susana', '1991-01-01',1),('Usuario4','Contrsenia','Mail', '2011-01-01 03:20:00','Mirta', '1991-01-01',1),('Usuario5','Contrsenia','Mail' ,'2011-01-01 04:40:00', 'Cintia','1991-01-01',1),('Usuario6','Contrsenia','Mail', '2011-01-01 05:30:00', 'Jose','1991-01-01',0)");
-		stat.execute("INSERT INTO logLogin(User,FechaHoraInicio) VALUES('Usuario1','2013-10-13 00:30:00'),('Usuario2','2013-10-13 00:22:00'),('Usuario3', '2013-10-13 01:30:00'),('Usuario4', '2013-10-13 03:20:00'),('Usuario5','2013-10-20 04:40:00'),('Usuario6', '2013-10-15 05:30:00')");
+		stat.execute("INSERT INTO Usuarios (User,Password,Mail,FechaAlta,Apyn,FechaNacimiento,Conectado)VALUES" +
+				"('Usuario1','Contrsenia','Mail', '2011-01-01 00:30:00','Perez','1991-01-01',0)," +
+				"('Usuario2','Contrsenia','Mail', '2011-01-01 00:22:00','Lopez', '1991-01-01',1)," +
+				"('Usuario3','Contrsenia','Mail', '2011-01-01 01:30:00','Susana', '1991-01-01',1)," +
+				"('Usuario4','Contrsenia','Mail', '2011-01-01 03:20:00','Mirta', '1991-01-01',1)," +
+				"('Usuario5','Contrsenia','Mail' ,'2011-01-01 04:40:00', 'Cintia','1991-01-01',1)," +
+				"('Usuario6','Contrsenia','Mail', '2011-01-01 05:30:00', 'Jose','1991-01-01',0)");
+		stat.execute("INSERT INTO logLogin(User,FechaHoraInicio) VALUES" +
+				"('Usuario1','2013-10-13 00:30:00'),('Usuario2','2013-10-13 00:22:00')," +
+				"('Usuario3', '2013-10-13 01:30:00'),('Usuario4', '2013-10-13 03:20:00')," +
+				"('Usuario5','2013-10-20 04:40:00'),('Usuario6', '2013-10-15 05:30:00')");
 		stat.execute("INSERT INTO Amigos (User1,User2) VALUES ('Usuario1','Usuario3'),('Usuario1','Usuario4'),('Usuario1','Usuario5'),('Usuario1','Usuario6')");
 		stat.execute("INSERT INTO LogPenalizacion (User,Descripcion,FechaFin) VALUES('Usuario3','Ofensa','2013-10-30')");
-		//
 		}
 		catch(Exception ex)
 		{
@@ -44,19 +59,36 @@ public final class DataAccess{
 		return dataAccessInstance;
 	}
 	
-	/* Metodos */
+	//----------
+	// Metodos
+	//----------
 	/*
 	 * Obtiene todos los usuarios
+	 * ***TESTEADA***
 	 */
-	public ResultSet getAllUsers() {
-		try{
-			return stat.executeQuery("SELECT * FROM USUARIOS");
-		}
-		catch(Exception ex)
-		{
+	public List<UserMetaData> getAllUsers() {
+		List<UserMetaData> listaUsuarios = null;
+		try {
+			ResultSet rs =  stat.executeQuery("SELECT * FROM USUARIOS");
+			listaUsuarios = new ArrayList<UserMetaData>();
+			while(rs.next()) {
+				UserMetaData data = new UserMetaData();
+				data.setUser(rs.getString("User"));
+				data.setPassword(rs.getString("Password"));
+				data.setApyn(rs.getString("Apyn"));
+				data.setMail(rs.getString("Mail"));
+				data.setFechaAlta(rs.getDate("FechaAlta"));
+				data.setFechaNacimiento(rs.getDate("FechaNacimiento"));
+				if(rs.getBoolean("Conectado")==true)
+					data.setConectado(1);
+				else
+					data.setConectado(0);
+				listaUsuarios.add(data);
+			}
+		} catch (Exception ex) {
 			ex.printStackTrace();
-			return null;
 		}
+		return listaUsuarios;
 	}
 	
 	/*
@@ -106,32 +138,77 @@ public final class DataAccess{
 			ex.printStackTrace();
 		}
 	}
-	
-	public UserMetaData getUserByUsername(String user) {
-		try{
-			ResultSet rs =  stat.executeQuery("SELECT * FROM USUARIOS WHERE User='"+user+"'");
-			if(rs.getFetchSize()==0)
-				return null;
-			rs.next();
-			UserMetaData data = new UserMetaData();
-			data.setUser(rs.getString("User"));
-			data.setPassword(rs.getString("Password"));
-			data.setApyn(rs.getString("Apyn"));
-			data.setMail(rs.getString("Mail"));
-			data.setFechaAlta(rs.getDate("FechaAlta"));
-			data.setFechaNacimiento(rs.getDate("FechaNacimiento"));
-			if(rs.getBoolean("Conectado")==true)
-				data.setConectado(1);
-			else
-				data.setConectado(0);
-			return data;
-			
-		}
-		catch(Exception ex)
-		{
+
+	/*
+	 * ***TESTEADA***
+	 */
+	public void blanquearClave(String user, String password) {
+		try {
+			PreparedStatement ps = conn.prepareStatement("UPDATE USUARIOS SET Password = ? WHERE User = ?");
+			ps.setString(1, password);
+			ps.setString(2, user);
+			ps.execute();
+		} catch (Exception ex) {
 			ex.printStackTrace();
-			return null;
 		}
+	}
+
+	/*
+	 * ***TESTEADA***
+	 */
+	public void penalizar(String user, String motivo, long fechaFin) {
+		try {
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO LogPenalizacion (User,Descripcion,FechaFin) VALUES(?,?,?)");
+			ps.setString(1, user);
+			ps.setString(2, motivo);
+			ps.setDate(3, new Date(fechaFin));
+			ps.execute();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/*
+	 * ***TESTEADA***
+	 */
+	public void despenalizar(String user) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(new java.util.Date());
+		c.add(Calendar.DATE, -1);
+		try {
+			PreparedStatement ps = conn.prepareStatement("UPDATE LogPenalizacion SET FechaFin = ? WHERE User = ?");
+			ps.setDate(1, new Date(c.getTime().getTime()));
+			ps.setString(2, user);
+			ps.execute();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	/*
+	 * ***TESTEADA***
+	 */
+	public UserMetaData getUserByUsername(String user) {
+		UserMetaData data = null;
+		try {
+			ResultSet rs = stat.executeQuery("SELECT * FROM USUARIOS WHERE User='" + user + "'");
+			if (rs.next()) {
+				data = new UserMetaData();
+				data.setUser(rs.getString("User"));
+				data.setPassword(rs.getString("Password"));
+				data.setApyn(rs.getString("Apyn"));
+				data.setMail(rs.getString("Mail"));
+				data.setFechaAlta(rs.getDate("FechaAlta"));
+				data.setFechaNacimiento(rs.getDate("FechaNacimiento"));
+				if (rs.getBoolean("Conectado") == true)
+					data.setConectado(1);
+				else
+					data.setConectado(0);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return data;
 	}
 
 	public ResultSet getUsers(UserMetaData user)
@@ -171,19 +248,26 @@ public final class DataAccess{
 			return null;
 		}
 	}
-	
-	public ResultSet getLoginHistory(UserMetaData user)
-	{
-		try{			
-			return stat.executeQuery("SELECT * FROM LOGLOGIN WHERE User ='"+ user.getUser() +"' AND DATEADD(day,15,FECHAHORAINICIO)");
-		}
-		catch(Exception ex)
-		{
+
+	/*
+	 * ***TESTEADA***
+	 */
+	public List<String> getLoginHistory(String user) {
+		List<String> listaLogin = null;
+		try {
+			//TODO reveer query
+			//stat.executeQuery("SELECT * FROM LOGLOGIN WHERE User ='" + user + "' AND DATEADD(day,15,FECHAHORAINICIO)");
+			ResultSet rSet = stat.executeQuery("SELECT * FROM LOGLOGIN WHERE User ='" + user + "'");
+			listaLogin = new ArrayList<String>();
+			while(rSet.next()) {
+				listaLogin.add(rSet.getString("FechaHoraInicio"));
+			}
+		} catch (Exception ex) {
 			ex.printStackTrace();
-			return null;
 		}
+		return listaLogin;
 	}
-	
+
 	public boolean checkUser(UserMetaData user){
 		try{
 			String statement = "SELECT 1 FROM USUARIOS WHERE User='"+ user.getUser()
@@ -198,10 +282,10 @@ public final class DataAccess{
 		return false;
 	}
 	
-	public BanInfo checkBan(UserMetaData user){
+	public BanInfo checkBan(String user){
 		//Devuelve cantidad de dias restantes y descripcion.
 		try{
-			 String statement = "SELECT p.Descripcion, DateDiff('day',CURRENT_DATE(),p.fechafin) as Restantes from LOGPENALIZACION p INNER JOIN USUARIOS u on u.User = p.user WHERE p.User='"+ user.getUser()+"'";
+			 String statement = "SELECT p.Descripcion, DateDiff('day',CURRENT_DATE(),p.fechafin) as Restantes from LOGPENALIZACION p INNER JOIN USUARIOS u on u.User = p.user WHERE p.User='"+ user +"'";
 			 ResultSet rs = stat.executeQuery(statement);
 			 if(!rs.first())
 				 return null;
@@ -220,7 +304,7 @@ public final class DataAccess{
 		UserMetaData data = new UserMetaData();
 		data.setUser("Usuario3");
 		data.setPassword("Contrasenia");
-		BanInfo info = DataAccess.getInstance().checkBan(data);
+		BanInfo info = DataAccess.getInstance().checkBan(data.getUser());
 	}
 
 

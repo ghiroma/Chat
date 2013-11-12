@@ -6,14 +6,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
-import common.FriendStatus;
+import org.h2.constant.SysProperties;
+
 import common.UserMetaData;
+
+import dataTier.DataAccess;
 
 public class ChatServer {
 
@@ -84,13 +87,8 @@ public class ChatServer {
 	//-----------------
 	// Metodos publicos para las pantallas del cliente
 	//-----------------
-	public List<FriendStatus> obtenerUsuarios() {
-		//TODO metodo : ver de obtener todos los usuarios registrados en el sistema
-		List<FriendStatus> usuarios = new ArrayList<FriendStatus>();
-		usuarios.add(new FriendStatus("pepe", -1));
-		usuarios.add(new FriendStatus("grillo", 0));
-		usuarios.add(new FriendStatus("la Martha", 2));
-		return usuarios;
+	public List<UserMetaData> obtenerUsuarios() {
+		return DataAccess.getInstance().getAllUsers();
 	}
 
 	public void enviarAlerta(String textoAlerta, String usuarioDestino) {
@@ -99,29 +97,33 @@ public class ChatServer {
 	}
 
 	public UserMetaData obtenerInfoUsuario(String nombreUsuario) {
-		//TODO metodo : llamar metodo para obtener los datos de un usuario dado
-		return new UserMetaData("pepe", "asd", "Pepe Grillo", "pepe@algo.com", "0810-555-1111", new Date(), new Date(), 1);
+		return DataAccess.getInstance().getUserByUsername(nombreUsuario);
 	}
 
 	public List<String> obtenerHistorialLoginUsuario(String nombreUsuario) {
-		//TODO metodo : llamar metodo para obtener el historial de login de un usuario dado
-		List<String> historialLogin = new ArrayList<String>();
-		historialLogin.add("algun dia");
-		historialLogin.add("algun otro dia");
-		historialLogin.add("algun otro dia mas");
-		return historialLogin;
+		return DataAccess.getInstance().getLoginHistory(nombreUsuario);
 	}
 
 	public void blanquearClave(String nombreUsuario) {
-		//TODO metodo : llamar al metodo que realice el blanqueo de clave. se considera en poner como clave el mismo nombre de usuario
+		DataAccess.getInstance().blanquearClave(nombreUsuario, nombreUsuario);
+		this.logearEvento("Server :: Se blanqueo la clave para el usuario: " + nombreUsuario);
 	}
 
-	public void penalizar(String nombreUsuario, String horas, String motivo) {
-		//TODO metodo : llamar al metodo que realice la penalizacion de un usuario dado
+	public void penalizar(String nombreUsuario, int horas, String motivo) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date());
+		c.add(Calendar.HOUR_OF_DAY, horas);
+		DataAccess.getInstance().penalizar(nombreUsuario, motivo, c.getTime().getTime());
+		this.logearEvento("Server :: Se penalizo al usuario: " + nombreUsuario + " por: " + horas + " hs");
 	}
 
 	public void despenalizar(String nombreUsuario) {
-		//TODO metodo : llamar al metodo que realice la despenalizacion de un usuario dado
+		if(DataAccess.getInstance().checkBan(nombreUsuario) != null){
+			DataAccess.getInstance().despenalizar(nombreUsuario);
+			this.logearEvento("Server :: Se despenalizo al usuario: " + nombreUsuario);
+		} else {
+			this.logearEvento("Server :: El usuario "+ nombreUsuario +" no se encuentra penalizado");
+		}
 	}
 
 	public void desconectarUsuario(String nombreUsuario) {
