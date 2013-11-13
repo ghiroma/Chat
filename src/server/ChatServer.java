@@ -29,7 +29,7 @@ public class ChatServer {
 	/* Constructor */
 	private ChatServer() {
 		handlerList = new HashMap<String, ClientHandler>();
-		/* Cargo properties */
+		/* Cargo properties */ 
 		loadProperties();
 		chatServerInstance = this;
 	}
@@ -51,9 +51,11 @@ public class ChatServer {
 		/* Informacion del startup a la consola */
 		//TODO console.write();
 
-		/* Thread de espera y manejo de clientes */
-		// Thread que espera las conexiones
-		new ConnectionListener(port, handlerList).run();
+		/* Espera de conexiones */
+		new ConnectionAccepter(port).run();	
+		
+		//Los connection listener son lanzados por el Accepter
+		//new ConnectionListener(port, handlerList).run();
 	}
 
 
@@ -140,4 +142,12 @@ public class ChatServer {
 		this.frontEnd.logearEvento(mensaje);
 	}
 
+	
+	//-----------------
+	// Getters & Setters
+	//-----------------	
+	public HashMap<String, ClientHandler> getHandlerList(){
+		return handlerList;
+	}
+	
 }
