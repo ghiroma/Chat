@@ -1,16 +1,14 @@
 package server;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
 import common.Mensaje;
 import common.UserMetaData;
+
 import dataTier.BanInfo;
 import dataTier.DataAccess;
 
@@ -27,13 +25,13 @@ public class ConnectionListener extends Thread {
 	ObjectOutputStream out;
 
 	// Constructores	
-	public ConnectionListener(Socket client, String clientIP) throws IOException{
-		this.client = client;
+	public ConnectionListener(Socket client, String clientIP, ObjectInputStream in, ObjectOutputStream out) throws IOException {
 		dataAccess = DataAccess.getInstance();
 		handlerList = ChatServer.getInstance().getHandlerList();
+		this.client = client;
 		this.clientIP = clientIP;
-		in = new ObjectInputStream(client.getInputStream());
-		out = new ObjectOutputStream(client.getOutputStream());
+		this.in = in;
+		this.out = out;
 	}
 
 	// Metodos 
@@ -48,11 +46,11 @@ public class ConnectionListener extends Thread {
 				msg = (Mensaje) in.readObject();
 				msgID = msg.getId();
 				
-				if(Mensaje.ALTA_USUARIO == msgID){
-					//TODO ejecuto alta de usuario 
-				}
-				
-				if(Mensaje.LOG_IN == msgID){
+				if(msgID == Mensaje.ALTA_USUARIO){
+					this.altaUsuario((UserMetaData)msg.getCuerpo());
+				} else if (msgID == Mensaje.VERIFICAR_USUARIO) {
+					this.verificarUsuario((String)msg.getCuerpo());
+				} else if(msgID == Mensaje.LOG_IN){
 					//TODO ejecuto validacion de login + loggedin = true + lanzo Client Handler
 					userMeta = (UserMetaData) msg.getCuerpo();
 					BanInfo bInfo = dataAccess.checkBan(userMeta.getUser());
@@ -90,12 +88,21 @@ public class ConnectionListener extends Thread {
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		
-		
-
 	}
-	
-	
+
+	private void altaUsuario(UserMetaData user) {
+		dataAccess.insertUser(user);
+	}
+
+	private void verificarUsuario(String nombreUsuario) {
+		Mensaje msg;
+		try {
+			msg = new Mensaje(Mensaje.VERIFICAR_USUARIO, dataAccess.getUserByUsername(nombreUsuario) == null);
+			out.writeObject(msg);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	//VIEJO RUN
 /*	public void run() { 

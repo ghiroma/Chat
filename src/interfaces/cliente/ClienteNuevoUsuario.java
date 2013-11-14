@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -15,6 +16,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+
+import common.UserMetaData;
 
 import client.ChatClient;
 
@@ -127,7 +130,9 @@ public class ClienteNuevoUsuario extends JFrame {
 				if(ChatClient.getInstance().verificarNombreUsuario(txtUsername.getText())){
 					if(!txtNyA.getText().equals("") && !txtEmail.getText().equals("") && !txtTel.getText().equals("")) {
 						if(verificarPassword(txtPass1.getPassword(),txtPass2.getPassword())) {
-							ChatClient.getInstance().altaNuevoUsuario();
+							UserMetaData user = new UserMetaData(txtUsername.getText(), txtPass1.getText(), txtNyA.getText(), 
+									txtEmail.getText(), txtTel.getText(), new Date(), new Date(), 0);
+							ChatClient.getInstance().altaNuevoUsuario(user);
 							setVisible(false);
 						} else {
 							lblValidez.setText("<html>"+ "El campo password esta vacio o no coinciden" +"</html>");

@@ -29,7 +29,7 @@ public class ClienteConversacion extends JFrame {
 	 */
 	public ClienteConversacion(String nombreDeAmigo) {
 		this.nombreAmigo = nombreDeAmigo;
-		setTitle("Conversaci\u00F3n");
+		setTitle("Conversaci\u00F3n con: " +nombreDeAmigo);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 600, 577);
 		contentPane = new JPanel();

@@ -23,7 +23,8 @@ public class Mensaje implements Serializable {
 	public static final int LOG_IN = 10;
 	public static final int READY = 13;
 	public static final int ALIVE = 14;
-
+	public static final int ALERTA = 15;
+	public static final int VERIFICAR_USUARIO = 16;
 
 	private int id;
 	private Object cuerpo;

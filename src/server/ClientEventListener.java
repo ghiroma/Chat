@@ -40,6 +40,7 @@ public class ClientEventListener implements EventListener {
 
 	private void setFriendsOnline(){
 		//Cargo los amigos online en una lista
+		friendsOnline = new ArrayList<ClientHandler>();
 		ArrayList<FriendStatus> friendList = DataAccess.getInstance().getFriends(user);
 		Iterator<FriendStatus> itFriend = friendList.iterator();
 

@@ -1,5 +1,7 @@
 package client;
 
+import interfaces.cliente.ClienteConversacion;
+import interfaces.cliente.ClienteInicial;
 import interfaces.cliente.UserLogin;
 
 import java.io.FileInputStream;
@@ -11,7 +13,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import common.FriendStatus;
@@ -28,13 +32,17 @@ public class ChatClient {
 	private ObjectOutputStream salida;
 	private Socket socket;
 	private static ChatClient chatClientInstance;
-	//alive
+	private Map<Integer, Object> mapMensajes;
+	// alive
 	private Alive alive;
 
 	// User
 	private UserMetaData usuarioLogeado;
 	private ArrayList<FriendStatus> amigos;
 
+	// Front
+	private ClienteInicial frontEnd;
+	private Map<String, ClienteConversacion> mapaConversaciones;
 
 	/* Constructor */
 	private ChatClient() {
@@ -51,6 +59,7 @@ public class ChatClient {
 			e.printStackTrace();
 		}
 	}
+
 	public static ChatClient getInstance() {
 		if (chatClientInstance == null)
 			chatClientInstance = new ChatClient();
@@ -60,19 +69,19 @@ public class ChatClient {
 	public static void main(String args[]) {
 		ChatClient.getInstance().go();
 	}
+
 	private void go() {
 		/* Inicializo GUI de login */
 		UserLogin frontEnd = new UserLogin();
 		frontEnd.mostrar();
-               
+
 		/* Lanzo Alive */
 		// TODO alive.start //done se inicia cuando el login es satisfactorio
 	}
 
-
-	//-----------------
+	// -----------------
 	// Metodos privados
-	//-----------------
+	// -----------------
 	private void loadProperties() {
 		Properties prop = new Properties();
 		try {
@@ -88,8 +97,7 @@ public class ChatClient {
 			} catch (IOException e2) {
 				e2.printStackTrace();
 			}
-		}
-		catch (Exception e3) {
+		} catch (Exception e3) {
 			e3.printStackTrace();
 		}
 	}
@@ -102,51 +110,59 @@ public class ChatClient {
 		}
 	}
 
+	private void mostrarAlerta(String txtAlerta){
+		this.frontEnd.mostrarAlerta(txtAlerta);
+	}
 
-	//-----------------
+	// -----------------
 	// Metodos publicos para las pantallas del cliente
-	//-----------------
-	synchronized public boolean login(UserMetaData userData){
-		//agregar metodo de verificacion contra la base para realizar el login
-		//si la conexion es buena se inicia el alive;
+	// -----------------
+	synchronized public ClienteInicial login(UserMetaData userData) {
+		// agregar metodo de verificacion contra la base para realizar el login
+		// si la conexion es buena se inicia el alive;
 		Mensaje msg = new Mensaje(Mensaje.LOG_IN, userData);
 		if (true) {
 			// alive.start??
 			// TODO: metodo : login
-			// this.enviarAlServer(msg);
+			this.enviarAlServer(msg);
 			amigos = new ArrayList<FriendStatus>();
 			amigos.add(new FriendStatus("pepe", 1));
 			amigos.add(new FriendStatus("grillo", 0));
 			amigos.add(new FriendStatus("la Martha", 2));
 			usuarioLogeado = new UserMetaData("pepe", "asd", "Pepe Grillo", "pepe@algo.com", "0810-555-1111", new Date(), new Date(), 1);
-			return true;
+
+			this.mapaConversaciones = new HashMap<String ,ClienteConversacion>();
+			this.frontEnd = new ClienteInicial();
+			return frontEnd;
 		} else
-			return false;
+			return null;
 	}
 
-	synchronized public boolean verificarNombreUsuario(String nombre) {
-		Mensaje msg = new Mensaje();
-		enviarAlServer(msg);
+	public boolean verificarNombreUsuario(String nombre) {
+		Mensaje msg = new Mensaje(Mensaje.VERIFICAR_USUARIO, nombre);
 		try {
-			//TODO metodo : validar que "nombre" este disponible para una nueva ALTA
-			msg = (Mensaje) entrada.readObject();
-			//return (Boolean)msg.getCuerpo();
+			enviarAlServer(msg);
+			synchronized(mapMensajes){
+				mapMensajes.wait();
+				return (Boolean)mapMensajes.remove(Mensaje.VERIFICAR_USUARIO);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	public void altaNuevoUsuario() {
-		//TODO metodo : llamar al alta del nuevo usuario 
+	public void altaNuevoUsuario(UserMetaData user) {
+		Mensaje msg = new Mensaje(Mensaje.ALTA_USUARIO, user);
+		enviarAlServer(msg);
 	}
 
 	public void modificarUsuario() {
-		//TODO metodo : llamar a la modificacion del usuario 
+		// TODO metodo : llamar a la modificacion del usuario
 	}
 
 	synchronized public List<String> buscarAmigoPorTexto(String texto) {
-		//TODO metodo : llamar a la busqueda de contactos conectados que ya no sean amigos segun texto ingresado
+		// TODO metodo : llamar a la busqueda de contactos conectados que ya no sean amigos segun texto ingresado
 		List<String> listaFiltrada = new ArrayList<String>();
 		listaFiltrada.add("Martha");
 		listaFiltrada.add("Wanda");
@@ -154,37 +170,47 @@ public class ChatClient {
 	}
 
 	public void invitarAmigo(String contacto) {
-		//TODO metodo : llamar a la invitacion de un amigo
+		// TODO metodo : llamar a la invitacion de un amigo
 	}
 
 	public void enviarMensajeChat(String amigo, String texto) {
-		//TODO metodo : llamar al envio de mensajes de una conversacion
+		// TODO metodo : llamar al envio de mensajes de una conversacion
 	}
-
-
 
 	// Thread de escucha de mensajes del server
 	class ListenFromServer extends Thread {
-		synchronized public void run() {
+		public void run() {
+			mapMensajes = new HashMap<Integer, Object>();
 			while (true) {
 				try {
-					//TODO aca se debe se filtrar segun tipo de mensaje recibido
-					System.out.println((Mensaje) entrada.readObject());
-					System.out.print("> ");
+					// TODO aca se debe se filtrar segun tipo de mensaje recibido
+					Mensaje msg = (Mensaje) entrada.readObject();
+					if (msg.getId() == Mensaje.ALERTA) {
+						mostrarAlerta((String)msg.getCuerpo());
+					} else {
+						synchronized(mapMensajes){
+							mapMensajes.put(msg.getId(), msg.getCuerpo());
+							mapMensajes.notify();
+						}
+					}
 				} catch (IOException e) {
 					System.out.println("El servidor ha finalizado la conexión.");
 					System.exit(1);
-				} catch (ClassNotFoundException e2) {}
+				} catch (ClassNotFoundException e2) {
+				}
 			}
 		}
 	}
 
-	//Getters and Setters
+	// Getters and Setters
 	public UserMetaData getUsuarioLogeado() {
 		return usuarioLogeado;
 	}
 	public ArrayList<FriendStatus> getAmigos() {
 		return amigos;
+	}
+	public Map<String, ClienteConversacion> getMapaConversaciones() {
+		return mapaConversaciones;
 	}
 
 }

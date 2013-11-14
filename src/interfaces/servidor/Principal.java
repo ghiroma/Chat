@@ -219,7 +219,7 @@ public class Principal extends JFrame {
 					robot.mousePress(InputEvent.BUTTON1_MASK);
 					robot.mouseRelease(InputEvent.BUTTON1_MASK);
 				} catch (AWTException ae) {
-					System.out.println(ae);
+					ae.printStackTrace();
 				}
 			}
 		}

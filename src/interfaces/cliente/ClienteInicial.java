@@ -12,12 +12,12 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import common.FriendStatus;
-
 import client.ChatClient;
-import javax.swing.SwingConstants;
+
+import common.FriendStatus;
 
 public class ClienteInicial extends JFrame {
 
@@ -25,7 +25,6 @@ public class ClienteInicial extends JFrame {
 
 	private JPanel contentPane;
 	private JLabel lblNotificacion;
-
 
 	/**
 	 * Create the frame.
@@ -97,13 +96,9 @@ public class ClienteInicial extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 
 				// Inicializo una nueva Conversacion//
-				JList lista=(JList)contentPane.getComponent(0);
-				if(lista.getSelectedValue() != null) {
-					//TODO FRONT (FERNANDO): controlar que las ventanas no esten abiertas previamente
-					ClienteConversacion nuevaConversacion = new ClienteConversacion((String)lista.getSelectedValue());
-					nuevaConversacion.setTitle((String)lista.getSelectedValue());
-					nuevaConversacion.setVisible(true);
-					lblNotificacion.setText("");
+				String nombreUsuario=(String)((JList)contentPane.getComponent(0)).getSelectedValue();
+				if(nombreUsuario != null) {
+					getNuevaConversacion(nombreUsuario);
 				} else {
 					lblNotificacion.setText("<html>"+ "Debe seleccionar un amigo" +"</html>");
 					lblNotificacion.setForeground(Color.RED);
@@ -120,14 +115,33 @@ public class ClienteInicial extends JFrame {
 		contentPane.add(lblNotificacion);
 	}
 
+	private ClienteConversacion getNuevaConversacion(String nombreUsuario) {
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
+
+		if (nuevaConversacion == null) {
+			nuevaConversacion = new ClienteConversacion(nombreUsuario);
+			nuevaConversacion.setVisible(true);
+			lblNotificacion.setText("");
+			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
+		} else {
+			nuevaConversacion.toFront();
+		}
+		return nuevaConversacion;
+	}
+
 	private DefaultListModel obtenerListaAmigos() {
 		DefaultListModel modelAmigos = new DefaultListModel();
 		List<FriendStatus> amigos = ChatClient.getInstance().getAmigos();
-		for(FriendStatus amigo : amigos) {
-			//TODO FRONT : filtrar los amigos q estan conectados
+		for (FriendStatus amigo : amigos) {
+			// TODO FRONT : filtrar los amigos q estan conectados
 			modelAmigos.addElement(amigo.getUsername());
 		}
 		return modelAmigos;
+	}
+
+	public void mostrarAlerta(String txtAlerta) {
+		lblNotificacion.setText("<html>" + txtAlerta + "</html>");
+		lblNotificacion.setForeground(Color.BLUE);
 	}
 
 }

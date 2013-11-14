@@ -46,8 +46,8 @@ public class UserLogin {
 
 				if(!textField.getText().equals("") && textField_1.getPassword().length != 0){
 					UserMetaData userData = new UserMetaData(textField.getText(), textField_1.getPassword());
-					if(ChatClient.getInstance().login(userData)){
-						ClienteInicial nuevoCliente = new ClienteInicial();
+					ClienteInicial nuevoCliente=ChatClient.getInstance().login(userData);
+					if(nuevoCliente!=null){
 						nuevoCliente.setVisible(true);
 						frmIngreso.dispose();
 					} else {

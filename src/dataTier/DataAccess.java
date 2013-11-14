@@ -37,8 +37,8 @@ public final class DataAccess{
 				"('Usuario1','Contrsenia','Mail', '2011-01-01 00:30:00','Perez','1991-01-01',0)," +
 				"('Usuario2','Contrsenia','Mail', '2011-01-01 00:22:00','Lopez', '1991-01-01',1)," +
 				"('Usuario3','Contrsenia','Mail', '2011-01-01 01:30:00','Susana', '1991-01-01',1)," +
-				"('Usuario4','Contrsenia','Mail', '2011-01-01 03:20:00','Mirta', '1991-01-01',1)," +
-				"('Usuario5','Contrsenia','Mail' ,'2011-01-01 04:40:00', 'Cintia','1991-01-01',1)," +
+				"('Usuario4','Contrsenia','Mail', '2011-01-01 03:20:00','Martha', '1991-01-01',1)," +
+				"('Usuario5','Contrsenia','Mail' ,'2011-01-01 04:40:00', 'Wanda','1991-01-01',1)," +
 				"('Usuario6','Contrsenia','Mail', '2011-01-01 05:30:00', 'Jose','1991-01-01',0)");
 		stat.execute("INSERT INTO logLogin(User,FechaHoraInicio) VALUES" +
 				"('Usuario1','2013-10-13 00:30:00'),('Usuario2','2013-10-13 00:22:00')," +
@@ -90,22 +90,23 @@ public final class DataAccess{
 		}
 		return listaUsuarios;
 	}
-	
+
 	/*
 	 * Inserta usuarios a la base de datos
+	 * ***TESTEADA***
 	 */
 	public void insertUser(UserMetaData user) {
-		try{
-			stat.execute("INSERT INTO USUARIOS VALUES('"+user.getUser()
-				+"','"+user.getPassword()
-				+"','"+user.getApyn()
-				+"','"+user.getMail()
-				+"',"+user.getFechaAlta()
-				+","+user.getFechaNacimiento()
-				+","+user.getConectado()
-				+ ")");
-		}
-		catch(Exception ex){
+		try {
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO USUARIOS(User,Password,Mail,Apyn,FechaNacimiento,FechaAlta,Conectado) VALUES(?,?,?,?,?,?,?)");
+			ps.setString(1, user.getUser());
+			ps.setString(2, user.getPassword());
+			ps.setString(3, user.getMail());
+			ps.setString(4, user.getApyn());
+			ps.setDate(5, new Date(user.getFechaNacimiento().getTime()));
+			ps.setDate(6, new Date(user.getFechaAlta().getTime()));
+			ps.setInt(7, user.getConectado());
+			ps.execute();
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}

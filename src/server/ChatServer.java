@@ -10,9 +10,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-
-import org.h2.constant.SysProperties;
 
 import common.UserMetaData;
 
@@ -29,7 +28,7 @@ public class ChatServer {
 	/* Constructor */
 	private ChatServer() {
 		handlerList = new HashMap<String, ClientHandler>();
-		/* Cargo properties */ 
+		/* Cargo properties */
 		loadProperties();
 		chatServerInstance = this;
 	}
@@ -47,9 +46,6 @@ public class ChatServer {
 		/*  Lanzamiento de handler de manejo de informacion de GUI */
 		frontEnd = new Principal();
 		frontEnd.setVisible(true);
-
-		/* Informacion del startup a la consola */
-		//TODO console.write();
 
 		/* Espera de conexiones */
 		new ConnectionAccepter(port).run();	
@@ -95,7 +91,17 @@ public class ChatServer {
 
 	public void enviarAlerta(String textoAlerta, String usuarioDestino) {
 		//Se debe tomar q si el usuarioDestino es null entonces es una alerta general
-		//TODO metodo : llamar metodo de alerta
+		if(usuarioDestino == null) {
+			this.logearEvento("Server :: Alerta general: " + textoAlerta);
+			for(Map.Entry<String, ClientHandler> entry : this.handlerList.entrySet()) {
+				ClientHandler client = (ClientHandler)entry.getValue();
+				client.enviarAlerta(textoAlerta);
+			}
+		} else {
+			//TODO probar
+			this.logearEvento("Server :: Alerta para " + usuarioDestino + ": " + textoAlerta);
+			this.handlerList.get(usuarioDestino).enviarAlerta(textoAlerta);
+		}
 	}
 
 	public UserMetaData obtenerInfoUsuario(String nombreUsuario) {
@@ -129,12 +135,23 @@ public class ChatServer {
 	}
 
 	public void desconectarUsuario(String nombreUsuario) {
-		//TODO metodo : llamar al metodo que realice la desconexion de un usuario dado
+		this.logearEvento("Server :: Se desconecta al usuario " + nombreUsuario);
+		//TODO probar
+		this.handlerList.get(nombreUsuario).close();
 	}
 
 	public boolean cerrarServer() {
-		//TODO metodo : llamar metodo de cerrar server
-		return true;
+		//TODO probar
+		this.logearEvento("Server :: Se cierra el servidor");
+		try {
+			for(Map.Entry<String, ClientHandler> entry : this.handlerList.entrySet()) {
+				ClientHandler client = (ClientHandler)entry.getValue();
+				client.close();
+			}
+			return true;
+		} catch(Exception e) {
+			return false;
+		}
 	}
 
 	public void logearEvento(String mensaje) {
@@ -142,12 +159,12 @@ public class ChatServer {
 		this.frontEnd.logearEvento(mensaje);
 	}
 
-	
+
 	//-----------------
 	// Getters & Setters
 	//-----------------	
 	public HashMap<String, ClientHandler> getHandlerList(){
 		return handlerList;
 	}
-	
+
 }
