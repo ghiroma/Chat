@@ -217,6 +217,18 @@ public class ChatClient {
 		enviarAlServer(msg);
 	}
 
+	public void close(){
+		enviarAlServer(new Mensaje(Mensaje.CERRAR_SESION,null));
+		try {
+			entrada.close();
+			salida.close();
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.exit(0);
+	}
+	
 	// Thread de escucha de mensajes del server
 	class ListenFromServer extends Thread {
 		public void run() {
@@ -233,6 +245,8 @@ public class ChatClient {
 					} else if(msg.getId() == Mensaje.INVITAR_USUARIO) {
 						MensajeInvitacion msgInvitacion = (MensajeInvitacion)msg.getCuerpo();		
 						frontEnd.mostrarPopUpInvitacion(msgInvitacion);
+					} else if(msg.getId() == Mensaje.CAMBIO_ESTADO){
+						frontEnd.friendStatusChanged(((FriendStatus)msg.getCuerpo()).getUsername(),((FriendStatus)msg.getCuerpo()).getEstado());
 					} else {
 						synchronized(mapMensajes){
 							mapMensajes.put(msg.getId(), msg.getCuerpo());

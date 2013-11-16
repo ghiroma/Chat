@@ -136,6 +136,7 @@ public class ChatServer {
 	public void desconectarUsuario(String nombreUsuario) {
 		this.logearEvento("Server :: Se desconecta al usuario " + nombreUsuario);
 		this.handlerList.get(nombreUsuario).close();
+		removerUsuario(nombreUsuario);
 	}
 
 	public boolean cerrarServer() {
@@ -155,7 +156,9 @@ public class ChatServer {
 		this.frontEnd.logearEvento(mensaje);
 	}
 
-
+	public void removerUsuario(String username){
+		//TODO quita usuario de la lista del frontend
+	}
 	//-----------------
 	// Getters & Setters
 	//-----------------	

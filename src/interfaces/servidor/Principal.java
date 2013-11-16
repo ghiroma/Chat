@@ -292,5 +292,6 @@ public class Principal extends JFrame {
 		logEventos.append(msg + "\n");
 		System.out.println(msg);
 	}
+	
 
 }

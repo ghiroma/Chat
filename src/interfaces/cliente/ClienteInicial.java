@@ -3,6 +3,8 @@ package interfaces.cliente;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -10,13 +12,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import client.ChatClient;
-
 import common.FriendStatus;
 import common.MensajeInvitacion;
 
@@ -34,9 +36,24 @@ public class ClienteInicial extends JFrame {
 		setTitle("Chat Principal");
 		setResizable(false);
 
-		// Modificar esto cuando se vaya a trabajar bien, que datos se lleva y que datos se trae//
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		// Si es necesario que se cierre toda la aplicacion o no//
+		/* Seteo del cierre del Frame */
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter()
+		{
+		    public void windowClosing(WindowEvent e)
+		    {
+		    	JFrame frame = (JFrame)e.getSource();
+
+		        int result = JOptionPane.showConfirmDialog(
+		            frame,
+		            "Esta seguro que quiere salir?",
+		            "Salir",
+		            JOptionPane.YES_NO_OPTION);
+
+		        if (result == JOptionPane.YES_OPTION)
+		            ChatClient.getInstance().close();
+		    }
+		});
 
 		setBounds(100, 100, 450, 301);
 		contentPane = new JPanel();
@@ -170,4 +187,7 @@ public class ClienteInicial extends JFrame {
 		
 	}
 
+	public void friendStatusChanged(String user, int estado){
+		//TODO: agregar/quitar de la lista de conectados en el front-end el user recibido por parametro.
+	}
 }

@@ -25,6 +25,7 @@ public class Mensaje implements Serializable {
 	public static final int ALERTA = 15;
 	public static final int VERIFICAR_USUARIO = 16;
 	public static final int ACEPTACION_INVITACION_AMIGO = 17;
+	public static final int CERRAR_SESION = 18;
 
 	private int id;
 	private Object cuerpo;

@@ -27,10 +27,6 @@ public class ClientEventListener implements EventListener {
 
 	/* Metodos */
 	public void statusChanged(StatusChangedEvent e){
-		//TODO Nico: Avisa a todos los amigos conectados
-		//TODO cambiar el mensaje q se logea por algo mas descriptivo
-		ChatServer.getInstance().logearEvento(e.getUsername());
-
 		/* A cada handler de amigo conectado le envio senial de cambio de estado */
 		Iterator<ClientHandler> it = friendsOnline.iterator();
 		while(it.hasNext()) {

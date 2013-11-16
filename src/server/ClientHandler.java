@@ -50,6 +50,7 @@ public class ClientHandler extends Thread {
 			//client.setSoTimeout(10000); // 10 seg, el alive tira cada 5 una senial
 			/* evento de inicio sesion */
 			dispatchEvent(new StatusChangedEvent(this, user, estado));
+			ChatServer.getInstance().logearEvento("Server :: " + user + " inicio sesion.");
 			/* Inicio escucha al cliente */
 			while (client.isConnected()) {
 				// se traba aca hasta que hay mensaje
@@ -59,38 +60,47 @@ public class ClientHandler extends Thread {
 				switch (msg.getId()) {
 				case Mensaje.MODIFICACION_USUARIO:
 					modificacionUsuario((UserMetaData)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: " + user + " cambio su informacion.");
 					break;
 				case Mensaje.ENVIAR_MENSAJE:
 					enviarMensajeChat((MensajeChat)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: " + user + " envio mensaje a " + ((MensajeChat)msg.getCuerpo()).getDestinatario());
 					break;
 				case Mensaje.BUSCAR_USUARIO:
 					buscarUsuarios((String)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: " + user + " busco: " + (String)msg.getCuerpo());
 					break;
 				case Mensaje.INVITAR_USUARIO:
 					invitarUsuario((MensajeInvitacion)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: " + user + " solicito amistad a: " + ((MensajeInvitacion)msg.getCuerpo()).getInvitado());
 					break;
 				case Mensaje.ACEPTACION_INVITACION_AMIGO:
 					aceptacionInvitacionAmistad((MensajeInvitacion)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: " + user + " acepto amistad a: " + ((MensajeInvitacion)msg.getCuerpo()).getInvitado());
 					break;
 				case Mensaje.OBTENER_USUARIO:
 					obtenerUsuario((String)msg.getCuerpo());
+					break;
+				case Mensaje.CERRAR_SESION:
+					ChatServer.getInstance().logearEvento("Server :: " + user + " cerro sesion.");
+					cerrarSesion();
 					break;
 				}
 
 			}
 		} catch (SocketException se) {
-			ChatServer.getInstance().logearEvento("El usuario " + user + " se ha desconectado");
+			ChatServer.getInstance().logearEvento("Server :: "+ user + " se ha desconectado");
 		} catch (IOException ioe) {
-			ioe.printStackTrace(System.err);
+			ChatServer.getInstance().logearEvento("Server :: "+ user + " se ha desconectado");
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("Exception no manejada en ClientHandler");
-			// removeUser(out);
 		} finally {
-			// TODO Remover el usuario de la lista.
+			ChatServer.getInstance().removerUsuario(user);
 		}
 	}
 
+	/* Metodos privados */
 	private void obtenerUsuario(String nombreUsuario) {
 		try {
 			out.writeObject(new Mensaje(Mensaje.OBTENER_USUARIO, DataAccess.getInstance().getUserByUsername(nombreUsuario)));
@@ -121,6 +131,19 @@ public class ClientHandler extends Thread {
 		client.recibirInvitacion(msgInvitacion);
 	}
 
+	private void cerrarSesion(){
+		try {
+			in.close();
+			out.close();
+			client.close();
+			/* Avisa a todos que se desconecta el user */
+			dispatchEvent(new StatusChangedEvent(this, user, 0));
+		} catch (IOException e) {
+			System.err.println("Error al cerrar sesion de " + user);
+		}
+	}
+
+	/* Metodos publicos */
 	public void enviarAlerta(String textoAlerta){
 		try {
 			Mensaje msg=new Mensaje(Mensaje.ALERTA, textoAlerta);
