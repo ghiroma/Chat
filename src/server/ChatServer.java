@@ -98,7 +98,6 @@ public class ChatServer {
 				client.enviarAlerta(textoAlerta);
 			}
 		} else {
-			//TODO probar
 			this.logearEvento("Server :: Alerta para " + usuarioDestino + ": " + textoAlerta);
 			this.handlerList.get(usuarioDestino).enviarAlerta(textoAlerta);
 		}
@@ -136,12 +135,10 @@ public class ChatServer {
 
 	public void desconectarUsuario(String nombreUsuario) {
 		this.logearEvento("Server :: Se desconecta al usuario " + nombreUsuario);
-		//TODO probar
 		this.handlerList.get(nombreUsuario).close();
 	}
 
 	public boolean cerrarServer() {
-		//TODO probar
 		this.logearEvento("Server :: Se cierra el servidor");
 		try {
 			for(Map.Entry<String, ClientHandler> entry : this.handlerList.entrySet()) {
@@ -155,7 +152,6 @@ public class ChatServer {
 	}
 
 	public void logearEvento(String mensaje) {
-		//TODO realizar el llamado al metodo cada vez q haya q logear algo
 		this.frontEnd.logearEvento(mensaje);
 	}
 

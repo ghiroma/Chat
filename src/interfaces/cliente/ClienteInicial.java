@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 import client.ChatClient;
 
 import common.FriendStatus;
+import common.MensajeInvitacion;
 
 public class ClienteInicial extends JFrame {
 
@@ -115,7 +116,7 @@ public class ClienteInicial extends JFrame {
 		contentPane.add(lblNotificacion);
 	}
 
-	private ClienteConversacion getNuevaConversacion(String nombreUsuario) {
+	public ClienteConversacion getNuevaConversacion(String nombreUsuario) {
 		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
 
 		if (nuevaConversacion == null) {
@@ -124,11 +125,29 @@ public class ClienteInicial extends JFrame {
 			lblNotificacion.setText("");
 			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
 		} else {
+			nuevaConversacion.setVisible(true);
 			nuevaConversacion.toFront();
 		}
 		return nuevaConversacion;
 	}
 
+	public ClienteConversacion getNuevaConversacion(String nombreUsuario,String texto) {
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
+
+		if (nuevaConversacion == null) {
+			nuevaConversacion = new ClienteConversacion(nombreUsuario);
+			nuevaConversacion.setVisible(true);
+			
+			lblNotificacion.setText("");
+			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
+		} else {
+			nuevaConversacion.setVisible(true);
+			nuevaConversacion.toFront();
+		}
+		nuevaConversacion.mostrarMensajeDeAmigo(texto);
+		return nuevaConversacion;
+	}
+	
 	private DefaultListModel obtenerListaAmigos() {
 		DefaultListModel modelAmigos = new DefaultListModel();
 		List<FriendStatus> amigos = ChatClient.getInstance().getAmigos();
@@ -138,10 +157,17 @@ public class ClienteInicial extends JFrame {
 		}
 		return modelAmigos;
 	}
-
+	
 	public void mostrarAlerta(String txtAlerta) {
 		lblNotificacion.setText("<html>" + txtAlerta + "</html>");
 		lblNotificacion.setForeground(Color.BLUE);
+	}
+
+	public void mostrarPopUpInvitacion(MensajeInvitacion msgInvitacion) {
+		AlertaSolicitudAmistad popUp = new AlertaSolicitudAmistad(msgInvitacion);
+		popUp.setVisible(true);
+		popUp.toFront();
+		
 	}
 
 }

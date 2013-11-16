@@ -4,14 +4,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
+import java.net.SocketException;
 import java.util.EventObject;
 
 import javax.swing.event.EventListenerList;
 
 import common.FriendStatus;
 import common.Mensaje;
+import common.MensajeChat;
+import common.MensajeInvitacion;
+import common.UserMetaData;
 
+import dataTier.DataAccess;
 import events.StatusChangedEvent;
 
 public class ClientHandler extends Thread {
@@ -43,7 +47,7 @@ public class ClientHandler extends Thread {
 	@Override
 	public void run() {
 		try {
-			client.setSoTimeout(10000); // 10 seg, el alive tira cada 5 una senial
+			//client.setSoTimeout(10000); // 10 seg, el alive tira cada 5 una senial
 			/* evento de inicio sesion */
 			dispatchEvent(new StatusChangedEvent(this, user, estado));
 			/* Inicio escucha al cliente */
@@ -51,36 +55,59 @@ public class ClientHandler extends Thread {
 				// se traba aca hasta que hay mensaje
 				msg = (Mensaje) in.readObject();
 
-				//TODO: switch con cada constante de mensaje ENVIADA POR EL CLIENTE que ejecute un metodo privado.
+				//Switch con cada constante de mensaje ENVIADA POR EL CLIENTE que ejecute un metodo privado.
 				switch (msg.getId()) {
+				case Mensaje.MODIFICACION_USUARIO:
+					modificacionUsuario((UserMetaData)msg.getCuerpo());
+					break;
 				case Mensaje.ENVIAR_MENSAJE:
+					enviarMensajeChat((MensajeChat)msg.getCuerpo());
 					break;
 				case Mensaje.BUSCAR_USUARIO:
+					buscarUsuarios((String)msg.getCuerpo());
 					break;
 				case Mensaje.INVITAR_USUARIO:
+					invitarUsuario((MensajeInvitacion)msg.getCuerpo());
+					break;
+				case Mensaje.ACEPTACION_INVITACION_AMIGO:
+					aceptacionInvitacionAmistad((MensajeInvitacion)msg.getCuerpo());
 					break;
 				}
 
 			}
-		}
-
-		catch (SocketTimeoutException e) {
-			// TODO connection lost!
-		}
-
-		catch (IOException ioe) {
+		} catch (SocketException se) {
+			ChatServer.getInstance().logearEvento("El usuario " + user + " se ha desconectado");
+		} catch (IOException ioe) {
 			ioe.printStackTrace(System.err);
-		}
-
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			System.err.println("Exception no manejada en ClientHandler");
 			// removeUser(out);
-		}
-
-		finally {
+		} finally {
 			// TODO Remover el usuario de la lista.
 		}
+	}
+
+	private void modificacionUsuario(UserMetaData user) {
+		DataAccess.getInstance().modifyUser(user);
+	}
+
+	private void buscarUsuarios(String txtBusqueda) {
+		try {
+			out.writeObject(new Mensaje(Mensaje.BUSCAR_USUARIO, DataAccess.getInstance().getUsers(txtBusqueda)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void enviarMensajeChat(MensajeChat msgChat) {
+		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgChat.getDestinatario());
+		client.enviarMensajeChat(user, msgChat.getTexto());
+	}
+
+	private void invitarUsuario(MensajeInvitacion msgInvitacion) {
+		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgInvitacion.getInvitado());
+		client.recibirInvitacion(msgInvitacion);
 	}
 
 	/* Metodos de update (Son llamados desde los ClientEventListener)*/
@@ -100,6 +127,26 @@ public class ClientHandler extends Thread {
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void enviarMensajeChat(String emisor, String texto) {
+		try {
+			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE, new MensajeChat(emisor, texto)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void recibirInvitacion(MensajeInvitacion msgInvitacion) {
+		try {
+			out.writeObject(new Mensaje(Mensaje.INVITAR_USUARIO, msgInvitacion));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void aceptacionInvitacionAmistad(MensajeInvitacion msgInvitacion) {
+		DataAccess.getInstance().insertAmigos(msgInvitacion.getInvitado(), msgInvitacion.getSolicitante());
 	}
 
 	/* Desconectar al cliente */

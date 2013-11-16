@@ -126,6 +126,7 @@ public class ClienteNuevoUsuario extends JFrame {
 
 		JButton button = new JButton("Guardar");
 		button.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent e) {
 				if(ChatClient.getInstance().verificarNombreUsuario(txtUsername.getText())){
 					if(!txtNyA.getText().equals("") && !txtEmail.getText().equals("") && !txtTel.getText().equals("")) {
@@ -133,7 +134,7 @@ public class ClienteNuevoUsuario extends JFrame {
 							UserMetaData user = new UserMetaData(txtUsername.getText(), txtPass1.getText(), txtNyA.getText(), 
 									txtEmail.getText(), txtTel.getText(), new Date(), new Date(), 0);
 							ChatClient.getInstance().altaNuevoUsuario(user);
-							setVisible(false);
+							dispose();
 						} else {
 							lblValidez.setText("<html>"+ "El campo password esta vacio o no coinciden" +"</html>");
 							lblValidez.setForeground(Color.RED);

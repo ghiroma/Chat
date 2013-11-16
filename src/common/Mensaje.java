@@ -14,8 +14,6 @@ public class Mensaje implements Serializable {
 	/* Client */
 	public static final int ALTA_USUARIO = 1;
 	public static final int MODIFICACION_USUARIO = 2;
-		public static final int BAJA_USUARIO = 3;		//TODO este va?
-		public static final int REINICIO_CLAVE = 4;		//TODO   ^
 	public static final int CAMBIO_ESTADO = 5;
 	public static final int ENVIAR_MENSAJE = 6;
 	public static final int BUSCAR_USUARIO = 7; 
@@ -25,6 +23,7 @@ public class Mensaje implements Serializable {
 	public static final int ALIVE = 14;
 	public static final int ALERTA = 15;
 	public static final int VERIFICAR_USUARIO = 16;
+	public static final int ACEPTACION_INVITACION_AMIGO = 17;
 
 	private int id;
 	private Object cuerpo;

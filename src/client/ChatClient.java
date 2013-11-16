@@ -20,6 +20,8 @@ import java.util.Properties;
 
 import common.FriendStatus;
 import common.Mensaje;
+import common.MensajeChat;
+import common.MensajeInvitacion;
 import common.UserMetaData;
 
 public class ChatClient {
@@ -34,13 +36,14 @@ public class ChatClient {
 	private static ChatClient chatClientInstance;
 	private Map<Integer, Object> mapMensajes;
 	// alive
-	private Alive alive;
+	//private Alive alive;
 
 	// User
 	private UserMetaData usuarioLogeado;
 	private ArrayList<FriendStatus> amigos;
 
 	// Front
+	private UserLogin frontEndLogIn;
 	private ClienteInicial frontEnd;
 	private Map<String, ClienteConversacion> mapaConversaciones;
 
@@ -72,11 +75,11 @@ public class ChatClient {
 
 	private void go() {
 		/* Inicializo GUI de login */
-		UserLogin frontEnd = new UserLogin();
-		frontEnd.mostrar();
+		frontEndLogIn = new UserLogin();
+		frontEndLogIn.mostrar();
 
 		/* Lanzo Alive */
-		// TODO alive.start //done se inicia cuando el login es satisfactorio
+		// alive.start //se inicia cuando el login es satisfactorio
 	}
 
 	// -----------------
@@ -117,25 +120,29 @@ public class ChatClient {
 	// -----------------
 	// Metodos publicos para las pantallas del cliente
 	// -----------------
-	synchronized public ClienteInicial login(UserMetaData userData) {
-		// agregar metodo de verificacion contra la base para realizar el login
+	@SuppressWarnings("unchecked")
+	public ClienteInicial login(UserMetaData userData) {
+		// metodo de verificacion contra la base para realizar el login
 		// si la conexion es buena se inicia el alive;
 		Mensaje msg = new Mensaje(Mensaje.LOG_IN, userData);
-		if (true) {
-			// alive.start??
-			// TODO: metodo : login
+		try {
 			this.enviarAlServer(msg);
-			amigos = new ArrayList<FriendStatus>();
-			amigos.add(new FriendStatus("pepe", 1));
-			amigos.add(new FriendStatus("grillo", 0));
-			amigos.add(new FriendStatus("la Martha", 2));
-			usuarioLogeado = new UserMetaData("pepe", "asd", "Pepe Grillo", "pepe@algo.com", "0810-555-1111", new Date(), new Date(), 1);
-
-			this.mapaConversaciones = new HashMap<String ,ClienteConversacion>();
-			this.frontEnd = new ClienteInicial();
-			return frontEnd;
-		} else
-			return null;
+			synchronized(mapMensajes){
+				mapMensajes.wait();
+				msg=(Mensaje)mapMensajes.remove(Mensaje.LOG_IN);
+			}
+			if (msg.getId()==Mensaje.ACCEPTED) {
+				// alive.start??
+				amigos = (ArrayList<FriendStatus>)msg.getCuerpo();
+	
+				this.mapaConversaciones = new HashMap<String ,ClienteConversacion>();
+				this.frontEnd = new ClienteInicial();
+				return frontEnd;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public boolean verificarNombreUsuario(String nombre) {
@@ -157,24 +164,43 @@ public class ChatClient {
 		enviarAlServer(msg);
 	}
 
-	public void modificarUsuario() {
-		// TODO metodo : llamar a la modificacion del usuario
+	public void modificarUsuario(String nombre, String email, String tel, String pass) {
+		usuarioLogeado.setApyn(nombre);
+		usuarioLogeado.setMail(email);
+		usuarioLogeado.setTelefono(tel);
+		usuarioLogeado.setPassword(pass);
+		Mensaje msg = new Mensaje(Mensaje.MODIFICACION_USUARIO, usuarioLogeado);
+		enviarAlServer(msg);
 	}
 
-	synchronized public List<String> buscarAmigoPorTexto(String texto) {
-		// TODO metodo : llamar a la busqueda de contactos conectados que ya no sean amigos segun texto ingresado
-		List<String> listaFiltrada = new ArrayList<String>();
-		listaFiltrada.add("Martha");
-		listaFiltrada.add("Wanda");
-		return listaFiltrada;
+	@SuppressWarnings("unchecked")
+	public List<String> buscarAmigoPorTexto(String texto) {
+		Mensaje msg = new Mensaje(Mensaje.BUSCAR_USUARIO, texto);
+		try {
+			enviarAlServer(msg);
+			synchronized(mapMensajes){
+				mapMensajes.wait();
+				return (List<String>)mapMensajes.remove(Mensaje.BUSCAR_USUARIO);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<String>();
 	}
 
 	public void invitarAmigo(String contacto) {
-		// TODO metodo : llamar a la invitacion de un amigo
+		Mensaje msg = new Mensaje(Mensaje.INVITAR_USUARIO, new MensajeInvitacion(getUsuarioLogeado().getUser(), contacto));
+		enviarAlServer(msg);
 	}
 
 	public void enviarMensajeChat(String amigo, String texto) {
-		// TODO metodo : llamar al envio de mensajes de una conversacion
+		Mensaje msg = new Mensaje(Mensaje.ENVIAR_MENSAJE, new MensajeChat(amigo, texto));
+		enviarAlServer(msg);
+	}
+
+	public void aceptacionInvitacionAmigo(MensajeInvitacion msgInvitacion) {
+		Mensaje msg = new Mensaje(Mensaje.ACEPTACION_INVITACION_AMIGO, msgInvitacion);
+		enviarAlServer(msg);
 	}
 
 	// Thread de escucha de mensajes del server
@@ -183,10 +209,16 @@ public class ChatClient {
 			mapMensajes = new HashMap<Integer, Object>();
 			while (true) {
 				try {
-					// TODO aca se debe se filtrar segun tipo de mensaje recibido
+					// Aca se debe se filtrar segun tipo de mensaje recibido
 					Mensaje msg = (Mensaje) entrada.readObject();
 					if (msg.getId() == Mensaje.ALERTA) {
 						mostrarAlerta((String)msg.getCuerpo());
+					} else if(msg.getId() == Mensaje.ENVIAR_MENSAJE) {
+						MensajeChat msgChat=(MensajeChat)msg.getCuerpo();		
+						frontEnd.getNuevaConversacion(msgChat.getDestinatario(),msgChat.getTexto());
+					} else if(msg.getId() == Mensaje.INVITAR_USUARIO) {
+						MensajeInvitacion msgInvitacion = (MensajeInvitacion)msg.getCuerpo();		
+						frontEnd.mostrarPopUpInvitacion(msgInvitacion);
 					} else {
 						synchronized(mapMensajes){
 							mapMensajes.put(msg.getId(), msg.getCuerpo());
@@ -204,6 +236,9 @@ public class ChatClient {
 
 	// Getters and Setters
 	public UserMetaData getUsuarioLogeado() {
+		if(usuarioLogeado == null)
+			//TODO obtener el usuario
+			usuarioLogeado = new UserMetaData("pepe", "asd", "Pepe Grillo", "pepe@algo.com", "0810-555-1111", new Date(), new Date(), 1);
 		return usuarioLogeado;
 	}
 	public ArrayList<FriendStatus> getAmigos() {

@@ -125,10 +125,12 @@ public class ClienteDatosPersonales extends JFrame {
 
 		JButton btnGuardar = new JButton("Guardar");
 		btnGuardar.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent e) {
 				if(!txtNombre.getText().equals("") && !txtEmail.getText().equals("") && !txtTel.getText().equals("")) {
 					if(verificarPassword(txtPass.getPassword(),txtPass2.getPassword())) {
-						ChatClient.getInstance().modificarUsuario();
+						ChatClient.getInstance().modificarUsuario(txtNombre.getText(), txtEmail.getText(),
+								txtTel.getText(), txtPass.getText());
 						dispose();
 					} else {
 						lblValidez.setText("<html>"+ "El campo password esta vacio o no coinciden" +"</html>");

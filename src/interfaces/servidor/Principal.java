@@ -92,7 +92,7 @@ public class Principal extends JFrame {
 		btnCerrarServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(ChatServer.getInstance().cerrarServer())
-					dispose();
+					System.exit(0);
 			}
 		});
 		logEventos = new JTextArea();

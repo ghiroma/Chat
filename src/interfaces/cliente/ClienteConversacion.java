@@ -30,7 +30,7 @@ public class ClienteConversacion extends JFrame {
 	public ClienteConversacion(String nombreDeAmigo) {
 		this.nombreAmigo = nombreDeAmigo;
 		setTitle("Conversaci\u00F3n con: " +nombreDeAmigo);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 100, 600, 577);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -48,6 +48,8 @@ public class ClienteConversacion extends JFrame {
 				if(!txtMensaje.getText().equals("")) {
 					ChatClient.getInstance().enviarMensajeChat(nombreAmigo, txtMensaje.getText());
 					textArea.append("Tu : " + txtMensaje.getText() + "\n");
+					txtMensaje.setText("");
+					
 				}
 			}
 		});
@@ -70,8 +72,8 @@ public class ClienteConversacion extends JFrame {
 	}
 
 	public void mostrarMensajeDeAmigo(String texto) {
-		//TODO FRONT (FERNANDO): validar si este metodo se deberia de llamar desde el chatClient para mostrar los mensajes que le llegen de este amigo
 		textArea.append(">> "+ nombreAmigo +" : "+ texto + "\n");
+		
 	}
 
 }

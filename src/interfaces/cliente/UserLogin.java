@@ -106,4 +106,5 @@ public class UserLogin {
 		lblValidez.setBounds(10, 92, 411, 26);
 		frmIngreso.getContentPane().add(lblValidez);
 	}
+	
 }

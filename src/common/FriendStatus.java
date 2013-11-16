@@ -1,6 +1,11 @@
 package common;
 
-public class FriendStatus {
+import java.io.Serializable;
+
+public class FriendStatus implements Serializable {
+	
+	private static final long serialVersionUID = 6924714071045481202L;
+
 	private String username;
 	private int estado;
 	 
