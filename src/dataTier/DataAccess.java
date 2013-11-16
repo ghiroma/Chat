@@ -25,28 +25,8 @@ public final class DataAccess {
 		Class.forName("org.h2.Driver");
 		//Para testeo se hara una base de datos en memoria.
 		//TODO cambiar a servidor embebido para produccion.
-//		conn = DriverManager.getConnection("jdbc:h2:~/test","sa","");
-		conn = DriverManager.getConnection("jdbc:h2:mem:");
+		conn = DriverManager.getConnection("jdbc:h2:~/test","sa","");
 		stat = conn.createStatement();
-		
-		//Solo para base de datos en memoria.
-		stat.execute("CREATE TABLE Usuarios(User varchar(100) primary key, Password varchar(100), Mail varchar(100), Apyn varchar(100), FechaNacimiento DateTime, FechaAlta DateTime, Conectado bit)");
-		stat.execute("CREATE TABLE Amigos(User1 varchar(100), User2 varchar(100),Primary Key(User1,User2) ,FOREIGN KEY(User1) references Usuarios(User), Foreign Key(User2) references Usuarios(User))");
-		stat.execute("CREATE TABLE LogLogin(User varchar(100), FechaHoraInicio DateTime,Primary Key(User,FechaHoraInicio),FOREIGN KEY(User) references Usuarios(User))");
-		stat.execute("CREATE TABLE LogPenalizacion(ID int primary key auto_increment, User varchar(100), Descripcion varchar(250), FechaFin DateTime, Foreign key(User) references Usuarios(User))");
-		stat.execute("INSERT INTO Usuarios (User,Password,Mail,FechaAlta,Apyn,FechaNacimiento,Conectado)VALUES" +
-				"('pepe','pepe','Mail', '2011-01-01 00:30:00','Perez','1991-01-01',0)," +
-				"('Usuario2','asd','Mail', '2011-01-01 00:22:00','Lopez', '1991-01-01',1)," +
-				"('Usuario3','asd','Mail', '2011-01-01 01:30:00','Susana', '1991-01-01',1)," +
-				"('Usuario4','asd','Mail', '2011-01-01 03:20:00','Martha', '1991-01-01',1)," +
-				"('Usuario5','asd','Mail' ,'2011-01-01 04:40:00', 'Wanda','1991-01-01',1)," +
-				"('Usuario6','asd','Mail', '2011-01-01 05:30:00', 'Jose','1991-01-01',0)");
-		stat.execute("INSERT INTO logLogin(User,FechaHoraInicio) VALUES" +
-				"('pepe','2013-10-13 00:30:00'),('Usuario2','2013-10-13 00:22:00')," +
-				"('Usuario3', '2013-10-13 01:30:00'),('Usuario4', '2013-10-13 03:20:00')," +
-				"('Usuario5','2013-10-20 04:40:00'),('Usuario6', '2013-10-15 05:30:00')");
-		stat.execute("INSERT INTO Amigos (User1,User2) VALUES ('pepe','Usuario3'),('pepe','Usuario4'),('pepe','Usuario5'),('pepe','Usuario6')");
-		stat.execute("INSERT INTO LogPenalizacion (User,Descripcion,FechaFin) VALUES('Usuario3','Ofensa','2013-10-30')");
 		}
 		catch(Exception ex)
 		{
@@ -315,4 +295,78 @@ public final class DataAccess {
 		}
 	}
 
+	public void addUserToPuntaje(String user)
+	{
+		try{
+			String statement = "INSERT INTO Puntaje VALUES('"+user+"',0,0,0);";
+			stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public void addVictory(String user)
+	{
+		try{
+			String statement = "UPDATE Puntaje SET GANADOS = (SELECT GANADOS+1 FROM PUNTAJE WHERE USER ='"+user+"') WHERE USER ='"+user+"'";
+			stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public void addDraw(String user)
+	{
+		try{
+			String statement = "UPDATE Puntaje SET EMPATADOS =(SELECT EMPATADOS+1 FROM PUNTAJE WHERE USER='"+user+"') WHERE USER ='"+user+"'";
+			stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public void addDefeat(String user)
+	{
+		try{
+			String statement = "UPDATE Puntaje SET PERDIDOS = (SELECT PERDIDOS+1 FROM PUNTAJE WHERE USER='"+user+"') WHERE USER = '"+user+"'";
+			stat.executeQuery(statement);
+			}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public ResultSet getPuntajes()
+	{
+		try{
+			String statement ="SELECT * FROM PUNTAJE";
+			return stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			return null;
+		}
+	}
+	
+	public ResultSet getPuntajeByUser(String user)
+	{
+		try{
+			String statement = "SELECT * FROM PUNTAJE WHERE USER ='"+user+"'";
+			return stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			return null;
+		}
+	}
+		
 }
