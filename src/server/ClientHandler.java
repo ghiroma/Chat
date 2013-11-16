@@ -72,6 +72,9 @@ public class ClientHandler extends Thread {
 				case Mensaje.ACEPTACION_INVITACION_AMIGO:
 					aceptacionInvitacionAmistad((MensajeInvitacion)msg.getCuerpo());
 					break;
+				case Mensaje.OBTENER_USUARIO:
+					obtenerUsuario((String)msg.getCuerpo());
+					break;
 				}
 
 			}
@@ -85,6 +88,14 @@ public class ClientHandler extends Thread {
 			// removeUser(out);
 		} finally {
 			// TODO Remover el usuario de la lista.
+		}
+	}
+
+	private void obtenerUsuario(String nombreUsuario) {
+		try {
+			out.writeObject(new Mensaje(Mensaje.OBTENER_USUARIO, DataAccess.getInstance().getUserByUsername(nombreUsuario)));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -108,16 +119,6 @@ public class ClientHandler extends Thread {
 	private void invitarUsuario(MensajeInvitacion msgInvitacion) {
 		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgInvitacion.getInvitado());
 		client.recibirInvitacion(msgInvitacion);
-	}
-
-	/* Metodos de update (Son llamados desde los ClientEventListener)*/
-	public void friendStatusUpdate(String user, int estado){
-		try {  
-			out.writeObject(new Mensaje(Mensaje.CAMBIO_ESTADO, new FriendStatus(user, estado)));
-		} catch(IOException e) {
-			e.printStackTrace();
-			System.err.println("Error al enviar cambio de estado al cliente.");
-		}
 	}
 
 	public void enviarAlerta(String textoAlerta){
@@ -147,6 +148,16 @@ public class ClientHandler extends Thread {
 
 	public void aceptacionInvitacionAmistad(MensajeInvitacion msgInvitacion) {
 		DataAccess.getInstance().insertAmigos(msgInvitacion.getInvitado(), msgInvitacion.getSolicitante());
+	}
+
+	/* Metodos de update (Son llamados desde los ClientEventListener)*/
+	public void friendStatusUpdate(String user, int estado){
+		try {  
+			out.writeObject(new Mensaje(Mensaje.CAMBIO_ESTADO, new FriendStatus(user, estado)));
+		} catch(IOException e) {
+			e.printStackTrace();
+			System.err.println("Error al enviar cambio de estado al cliente.");
+		}
 	}
 
 	/* Desconectar al cliente */

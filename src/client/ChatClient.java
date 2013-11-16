@@ -12,7 +12,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +116,20 @@ public class ChatClient {
 		this.frontEnd.mostrarAlerta(txtAlerta);
 	}
 
+	private UserMetaData obtenerUsuario(UserMetaData usuarioVacio) {
+		Mensaje msg = new Mensaje(Mensaje.OBTENER_USUARIO, usuarioVacio.getUser());
+		try {
+			enviarAlServer(msg);
+			synchronized(mapMensajes){
+				mapMensajes.wait();
+				return (UserMetaData)mapMensajes.remove(Mensaje.OBTENER_USUARIO);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return usuarioVacio;
+	}
+
 	// -----------------
 	// Metodos publicos para las pantallas del cliente
 	// -----------------
@@ -134,6 +147,7 @@ public class ChatClient {
 			if (msg.getId()==Mensaje.ACCEPTED) {
 				// alive.start??
 				amigos = (ArrayList<FriendStatus>)msg.getCuerpo();
+				usuarioLogeado = obtenerUsuario(userData);
 	
 				this.mapaConversaciones = new HashMap<String ,ClienteConversacion>();
 				this.frontEnd = new ClienteInicial();
@@ -236,9 +250,6 @@ public class ChatClient {
 
 	// Getters and Setters
 	public UserMetaData getUsuarioLogeado() {
-		if(usuarioLogeado == null)
-			//TODO obtener el usuario
-			usuarioLogeado = new UserMetaData("pepe", "asd", "Pepe Grillo", "pepe@algo.com", "0810-555-1111", new Date(), new Date(), 1);
 		return usuarioLogeado;
 	}
 	public ArrayList<FriendStatus> getAmigos() {

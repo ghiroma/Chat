@@ -14,6 +14,7 @@ public class Mensaje implements Serializable {
 	/* Client */
 	public static final int ALTA_USUARIO = 1;
 	public static final int MODIFICACION_USUARIO = 2;
+	public static final int OBTENER_USUARIO = 3;
 	public static final int CAMBIO_ESTADO = 5;
 	public static final int ENVIAR_MENSAJE = 6;
 	public static final int BUSCAR_USUARIO = 7; 
