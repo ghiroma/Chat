@@ -88,6 +88,7 @@ public class ConnectionListener extends Thread {
 
 	private void altaUsuario(UserMetaData user) {
 		dataAccess.insertUser(user);
+		dataAccess.addUserToPuntaje(user);
 	}
 
 	private void verificarUsuario(String nombreUsuario) {
