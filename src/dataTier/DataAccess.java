@@ -34,6 +34,7 @@ public final class DataAccess {
 		stat.execute("CREATE TABLE Amigos(User1 varchar(100), User2 varchar(100),Primary Key(User1,User2) ,FOREIGN KEY(User1) references Usuarios(User), Foreign Key(User2) references Usuarios(User))");
 		stat.execute("CREATE TABLE LogLogin(User varchar(100), FechaHoraInicio DateTime,Primary Key(User,FechaHoraInicio),FOREIGN KEY(User) references Usuarios(User))");
 		stat.execute("CREATE TABLE LogPenalizacion(ID int primary key auto_increment, User varchar(100), Descripcion varchar(250), FechaFin DateTime, Foreign key(User) references Usuarios(User))");
+		stat.execute("Create table Puntaje( User varchar(100) Primary Key, Ganados int ,Empatados int,Perdidos int, Foreign Key(User) references Usuarios(User))");
 		stat.execute("INSERT INTO Usuarios (User,Password,Mail,FechaAlta,Apyn,FechaNacimiento,Conectado)VALUES" +
 				"('pepe','pepe','Mail', '2011-01-01 00:30:00','Perez','1991-01-01',0)," +
 				"('Usuario2','asd','Mail', '2011-01-01 00:22:00','Lopez', '1991-01-01',1)," +
@@ -41,6 +42,13 @@ public final class DataAccess {
 				"('Usuario4','asd','Mail', '2011-01-01 03:20:00','Martha', '1991-01-01',1)," +
 				"('Usuario5','asd','Mail' ,'2011-01-01 04:40:00', 'Wanda','1991-01-01',1)," +
 				"('Usuario6','asd','Mail', '2011-01-01 05:30:00', 'Jose','1991-01-01',0)");
+		stat.execute("INSERT INTO Puntaje values "
+				+ "('pepe',0,0,0),"
+				+ "('Usuario2',0,0,0),"
+				+ "('Usuario3',0,0,0),"
+				+ "('Usuario4',0,0,0),"
+				+ "('Usuario5',0,0,0),"
+				+ "('Usuario6',0,0,0)");
 		stat.execute("INSERT INTO logLogin(User,FechaHoraInicio) VALUES" +
 				"('pepe','2013-10-13 00:30:00'),('Usuario2','2013-10-13 00:22:00')," +
 				"('Usuario3', '2013-10-13 01:30:00'),('Usuario4', '2013-10-13 03:20:00')," +
