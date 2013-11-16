@@ -315,4 +315,78 @@ public final class DataAccess {
 		}
 	}
 
+	public void addUserToPuntaje(String user)
+	{
+		try{
+			String statement = "INSERT INTO Puntaje VALUES('"+user+"',0,0,0);";
+			stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public void addVictory(String user)
+	{
+		try{
+			String statement = "UPDATE Puntaje SET GANADOS = (SELECT GANADOS+1 FROM PUNTAJE WHERE USER ='"+user+"') WHERE USER ='"+user+"'";
+			stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public void addDraw(String user)
+	{
+		try{
+			String statement = "UPDATE Puntaje SET EMPATADOS =(SELECT EMPATADOS+1 FROM PUNTAJE WHERE USER='"+user+"') WHERE USER ='"+user+"'";
+			stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public void addDefeat(String user)
+	{
+		try{
+			String statement = "UPDATE Puntaje SET PERDIDOS = (SELECT PERDIDOS+1 FROM PUNTAJE WHERE USER='"+user+"') WHERE USER = '"+user+"'";
+			stat.executeQuery(statement);
+			}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public ResultSet getPuntajes()
+	{
+		try{
+			String statement ="SELECT * FROM PUNTAJE";
+			return stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			return null;
+		}
+	}
+	
+	public ResultSet getPuntajeByUser(String user)
+	{
+		try{
+			String statement = "SELECT * FROM PUNTAJE WHERE USER ='"+user+"'";
+			return stat.executeQuery(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			return null;
+		}
+	}
+		
 }
