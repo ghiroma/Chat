@@ -87,7 +87,7 @@ public class ClientHandler extends Thread {
 					break;
 				}
 
-			}
+			} 
 		} catch (SocketException se) {
 			ChatServer.getInstance().logearEvento("Server :: "+ user + " se ha desconectado");
 		} catch (IOException ioe) {
@@ -97,6 +97,10 @@ public class ClientHandler extends Thread {
 			System.err.println("Exception no manejada en ClientHandler");
 		} finally {
 			ChatServer.getInstance().removerUsuario(user);
+			// Actualizo en la DB el estado
+			UserMetaData userMeta = DataAccess.getInstance().getUserByUsername(user);
+			userMeta.setConectado(0);
+			DataAccess.getInstance().modifyUser(userMeta);
 		}
 	}
 

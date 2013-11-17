@@ -90,7 +90,7 @@ public class ClienteInicial extends JFrame {
 		btnDesconectar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				dispose();
+				ChatClient.getInstance().close();
 			}
 		});
 		btnDesconectar.setBounds(289, 0, 145, 46);
