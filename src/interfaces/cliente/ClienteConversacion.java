@@ -3,6 +3,8 @@ package interfaces.cliente;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -41,7 +43,32 @@ public class ClienteConversacion extends JFrame {
 		txtMensaje.setBounds(10, 483, 460, 43);
 		contentPane.add(txtMensaje);
 		txtMensaje.setColumns(10);
+		txtMensaje.addKeyListener(new KeyListener(){
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyChar()=='\n')
+					if(!txtMensaje.getText().equals("")) {
+						ChatClient.getInstance().enviarMensajeChat(nombreAmigo, txtMensaje.getText());
+						textArea.append("Tu : " + txtMensaje.getText() + "\n");
+						txtMensaje.setText("");
+					}
+			}
 
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+
+		
 		JButton btnNewButton = new JButton("Enviar");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -63,7 +90,7 @@ public class ClienteConversacion extends JFrame {
 		textArea.setColumns(1);
 		textArea.setBounds(10, 113, 460, 359);
 		contentPane.add(textArea);
-
+				
 		JLabel lblNombreDeUsuario = new JLabel(nombreAmigo);
 		lblNombreDeUsuario.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNombreDeUsuario.setFont(new Font("Tahoma", Font.PLAIN, 28));

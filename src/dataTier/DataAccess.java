@@ -372,5 +372,16 @@ public final class DataAccess {
 			return null;
 		}
 	}
-		
+
+	public void insertLogLogin(UserMetaData user)
+	{
+		try{
+			String statement = "INSERT INTO LOGLOGIN VALUES('"+user.getUser()+ "',now())";
+			stat.execute(statement);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
 }

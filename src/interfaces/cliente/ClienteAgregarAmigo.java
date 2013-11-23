@@ -18,6 +18,8 @@ import client.ChatClient;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.List;
 
 public class ClienteAgregarAmigo extends JFrame {
@@ -56,6 +58,21 @@ public class ClienteAgregarAmigo extends JFrame {
 		textField.setBounds(140, 23, 184, 30);
 		contentPane.add(textField);
 		textField.setColumns(10);
+		textField.addFocusListener(new FocusListener(){
+
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				textField.setText("");
+				
+			}
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 
 		list = new JList();
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -114,5 +131,6 @@ public class ClienteAgregarAmigo extends JFrame {
 		}
 		return listaContactos;
 	}
+	
 
 }
