@@ -158,6 +158,7 @@ public class ChatServer {
 		this.frontEnd.logearEvento(mensaje);
 	}
 
+
 	public void actualizarUsuarios() {
 		this.frontEnd.actualizarListaUsuarios();
 	}

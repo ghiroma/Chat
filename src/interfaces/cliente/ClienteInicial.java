@@ -36,29 +36,27 @@ public class ClienteInicial extends JFrame {
 	 * Create the frame.
 	 */
 	public ClienteInicial() {
+
 		setTitle(ChatClient.getInstance().getUsuarioLogeado().getUser().toUpperCase());
 		setResizable(false);
+		setTitle("Chat Principal");
 
 		/* Seteo del cierre del Frame */
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		addWindowListener(new WindowAdapter()
-		{
-		    public void windowClosing(WindowEvent e)
-		    {
-		    	JFrame frame = (JFrame)e.getSource();
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				JFrame frame = (JFrame) e.getSource();
 
-		        int result = JOptionPane.showConfirmDialog(
-		            frame,
-		            "Esta seguro que quiere salir?",
-		            "Salir",
-		            JOptionPane.YES_NO_OPTION);
+				int result = JOptionPane.showConfirmDialog(frame,
+						"Esta seguro que quiere salir?", "Salir",
+						JOptionPane.YES_NO_OPTION);
 
-		        if (result == JOptionPane.YES_OPTION)
-		            ChatClient.getInstance().close();
-		    }
+				if (result == JOptionPane.YES_OPTION)
+					ChatClient.getInstance().close();
+			}
 		});
 
-		setBounds(100, 100, 450, 301);
+		setBounds(100, 100, 442, 301);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -71,7 +69,8 @@ public class ClienteInicial extends JFrame {
 				// Instancio un nuevo panel para agregar los Amigos//
 				ClienteAgregarAmigo agregarAmigos = new ClienteAgregarAmigo();
 				agregarAmigos.setVisible(true);
-				//TODO FRONT : ver como vamos a recargar la lista de amigos conectados luego de haber mandado invitaciones en la pantalla
+				// TODO FRONT : ver como vamos a recargar la lista de amigos
+				// conectados luego de haber mandado invitaciones en la pantalla
 			}
 		});
 		btnNewButton.setBounds(1, 0, 145, 46);
@@ -117,18 +116,21 @@ public class ClienteInicial extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 
 				// Inicializo una nueva Conversacion//
-				String nombreUsuario=(String)((JList)contentPane.getComponent(0)).getSelectedValue();
-				if(nombreUsuario != null) {
+				String nombreUsuario = (String) ((JList) contentPane
+						.getComponent(0)).getSelectedValue();
+				if (nombreUsuario != null) {
 					getNuevaConversacion(nombreUsuario);
 				} else {
-					lblNotificacion.setText("<html>"+ "Debe seleccionar un amigo" +"</html>");
+					lblNotificacion.setText("<html>"
+							+ "Debe seleccionar un amigo" + "</html>");
 					lblNotificacion.setForeground(Color.RED);
 				}
-				
+
 			}
 		});
-		btnIniciarChat.setBounds(281, 77, 114, 42);
+		btnIniciarChat.setBounds(221, 57, 95, 42);
 		contentPane.add(btnIniciarChat);
+
 		
 		// TODO Diego
 		/* Boton Iniciar Juego */
@@ -150,18 +152,32 @@ public class ClienteInicial extends JFrame {
 		
 		lblNotificacion = new JLabel("");
 		lblNotificacion.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNotificacion.setBounds(229, 130, 205, 116);
+		lblNotificacion.setBounds(221, 124, 205, 116);
 		contentPane.add(lblNotificacion);
+
+		JButton btnIngresarGrupo = new JButton("Grupos");
+		btnIngresarGrupo.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+
+				ClienteRequerirIngresoChatGrupal clienteReqIngChatGrupal = new ClienteRequerirIngresoChatGrupal();
+				clienteReqIngChatGrupal.setVisible(true);
+			}
+		});
+		btnIngresarGrupo.setBounds(326, 57, 95, 42);
+		contentPane.add(btnIngresarGrupo);
 	}
 
 	public ClienteConversacion getNuevaConversacion(String nombreUsuario) {
-		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance()
+				.getMapaConversaciones().get(nombreUsuario);
 
 		if (nuevaConversacion == null) {
 			nuevaConversacion = new ClienteConversacion(nombreUsuario);
 			nuevaConversacion.setVisible(true);
 			lblNotificacion.setText("");
-			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
+			ChatClient.getInstance().getMapaConversaciones()
+					.put(nombreUsuario, nuevaConversacion);
 		} else {
 			nuevaConversacion.setVisible(true);
 			nuevaConversacion.toFront();
@@ -169,15 +185,18 @@ public class ClienteInicial extends JFrame {
 		return nuevaConversacion;
 	}
 
-	public ClienteConversacion getNuevaConversacion(String nombreUsuario,String texto) {
-		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
+	public ClienteConversacion getNuevaConversacion(String nombreUsuario,
+			String texto) {
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance()
+				.getMapaConversaciones().get(nombreUsuario);
 
 		if (nuevaConversacion == null) {
 			nuevaConversacion = new ClienteConversacion(nombreUsuario);
 			nuevaConversacion.setVisible(true);
-			
+
 			lblNotificacion.setText("");
-			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
+			ChatClient.getInstance().getMapaConversaciones()
+					.put(nombreUsuario, nuevaConversacion);
 		} else {
 			nuevaConversacion.setVisible(true);
 			nuevaConversacion.toFront();
@@ -185,7 +204,7 @@ public class ClienteInicial extends JFrame {
 		nuevaConversacion.mostrarMensajeDeAmigo(texto);
 		return nuevaConversacion;
 	}
-	
+
 	private DefaultListModel obtenerListaAmigos() {
 		DefaultListModel modelAmigos = new DefaultListModel();
 		List<FriendStatus> amigos = ChatClient.getInstance().getAmigos();
@@ -195,7 +214,7 @@ public class ClienteInicial extends JFrame {
 		}
 		return modelAmigos;
 	}
-	
+
 	public void mostrarAlerta(String txtAlerta) {
 		lblNotificacion.setText("<html>" + txtAlerta + "</html>");
 		lblNotificacion.setForeground(Color.BLUE);
@@ -205,8 +224,9 @@ public class ClienteInicial extends JFrame {
 		AlertaSolicitudAmistad popUp = new AlertaSolicitudAmistad(msgInvitacion);
 		popUp.setVisible(true);
 		popUp.toFront();
-		
+
 	}
+
 	
 	// TODO Diego
 	public void mostrarPopUpInvitacionJuego(Mensaje msg) {
@@ -221,5 +241,7 @@ public class ClienteInicial extends JFrame {
 	
 	public void friendStatusChanged(String user, int estado){
 		//TODO: agregar/quitar de la lista de conectados en el front-end el user recibido por parametro.
+
+
 	}
 }
