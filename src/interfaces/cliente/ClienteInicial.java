@@ -36,9 +36,8 @@ public class ClienteInicial extends JFrame {
 	 * Create the frame.
 	 */
 	public ClienteInicial() {
-		setTitle("Chat Principal");
+		setTitle(ChatClient.getInstance().getUsuarioLogeado().getUser().toUpperCase());
 		setResizable(false);
-
 		/* Seteo del cierre del Frame */
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter()
