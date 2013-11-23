@@ -277,6 +277,8 @@ public class ChatClient {
 					{
 						banInfo = (BanInfo)msg.getCuerpo();
 						System.out.println(banInfo.getDias() + " "+banInfo.getMotivo());
+					} else if (msg.getId() == Mensaje.USUARIO_CONECTADO){
+						//TODO devuelve un mensaje de error explicando que el usuario esta conectado
 					}
 					else {
 						synchronized(mapMensajes){

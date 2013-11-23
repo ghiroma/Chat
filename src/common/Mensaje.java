@@ -10,6 +10,7 @@ public class Mensaje implements Serializable {
 	public static final int BANNED = 9; 
 	public static final int ACCEPTED = 11;
 	public static final int DENIED = 12;
+	public static final int USUARIO_CONECTADO = 22;
 
 	/* Client */
 	public static final int ALTA_USUARIO = 1;

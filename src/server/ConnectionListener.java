@@ -61,6 +61,12 @@ public class ConnectionListener extends Thread {
 						msg.setCuerpo(mensajeLogIn);
 						out.writeObject(msg);
 					}
+					/* Check si el user esta conectado */
+					if(1 == dataAccess.getUserByUsername(userMeta.getUser()).getConectado()){
+						msg = new Mensaje(Mensaje.USUARIO_CONECTADO,userMeta.getUser());
+						out.writeObject(msg);
+					}
+					
 					/* Check contra ban list */
 					else if (bInfo!=null && bInfo.getDias() > 0) {
 						msg = new Mensaje(Mensaje.BANNED, bInfo);
