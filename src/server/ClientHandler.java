@@ -79,7 +79,7 @@ public class ClientHandler extends Thread {
 					break;
 				case Mensaje.ACEPTACION_INVITACION_AMIGO:
 					aceptacionInvitacionAmistad((MensajeInvitacion)msg.getCuerpo());
-					ChatServer.getInstance().logearEvento("Server :: " + user + " acepto amistad a: " + ((MensajeInvitacion)msg.getCuerpo()).getInvitado());
+					ChatServer.getInstance().logearEvento("Server :: " + user + " acepto amistad a: " + ((MensajeInvitacion)msg.getCuerpo()).getSolicitante());
 					break;
 				case Mensaje.OBTENER_USUARIO:
 					obtenerUsuario((String)msg.getCuerpo());
@@ -222,6 +222,8 @@ public class ClientHandler extends Thread {
 
 	public void aceptacionInvitacionAmistad(MensajeInvitacion msgInvitacion) {
 		DataAccess.getInstance().insertAmigos(msgInvitacion.getInvitado(), msgInvitacion.getSolicitante());
+		//TODO ver si aca no corresponderia enviar un evento avisando de actualizar la lista de amigos del frontEnd
+		//dispatchEvent(new StatusChangedEvent(this, user, 1));
 	}
 
 	/* Metodos de update (Son llamados desde los ClientEventListener)*/
