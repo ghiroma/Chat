@@ -225,12 +225,18 @@ public class ClientHandler extends Thread {
 
 	/* Metodos de update (Son llamados desde los ClientEventListener)*/
 	public void friendStatusUpdate(String user, int estado){
-		try {  
+		try { 
 			out.writeObject(new Mensaje(Mensaje.CAMBIO_ESTADO, new FriendStatus(user, estado)));
-		} catch(IOException e) {
+			
+		}
+		catch(SocketException e1)
+		{
+			
+		}
+		catch(IOException e) {
 			e.printStackTrace();
 			System.err.println("Error al enviar cambio de estado al cliente.");
-		}
+		}		
 	}
 
 	/* Desconectar al cliente */

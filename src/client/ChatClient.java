@@ -60,6 +60,7 @@ public class ChatClient {
 			entrada = new ObjectInputStream(socket.getInputStream());
 			new ListenFromServer().start();
 
+			banInfo = new BanInfo(0,"");
 			chatClientInstance = this;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -14,6 +14,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import common.FriendStatus;
+
 import client.ChatClient;
 
 import java.awt.event.ActionListener;
@@ -102,7 +104,7 @@ public class ClienteAgregarAmigo extends JFrame {
 		JButton btnBuscar = new JButton("Buscar");
 		btnBuscar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(!textField.getText().equals("")) {
+				if(!textField.getText().trim().equals("")) {
 					list.setModel(filtrarContactos());
 				} else {
 					lblNotificacion.setText("<html>"+ "Debe completar el texto a buscar" +"</html>");
@@ -126,8 +128,17 @@ public class ClienteAgregarAmigo extends JFrame {
 	private DefaultListModel filtrarContactos() {
 		DefaultListModel listaContactos = new DefaultListModel();
 		List<String> contactos = ChatClient.getInstance().buscarAmigoPorTexto(textField.getText());
+		boolean esAmigo = false;
 		for(String contacto : contactos) {
-			listaContactos.addElement(contacto);
+			if(!ChatClient.getInstance().getUsuarioLogeado().getUser().equalsIgnoreCase(contacto))
+			{
+				for(FriendStatus friend : ChatClient.getInstance().getAmigos())
+					if(friend.getUsername().equalsIgnoreCase(contacto))
+						esAmigo = true;
+			if(esAmigo == false)
+				listaContactos.addElement(contacto);
+			}
+			esAmigo=false;
 		}
 		return listaContactos;
 	}

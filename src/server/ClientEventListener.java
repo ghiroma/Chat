@@ -35,7 +35,7 @@ public class ClientEventListener implements EventListener {
 		Iterator<ClientHandler> it = friendsOnline.iterator();
 		while(it.hasNext()) {
 			ClientHandler clientHandler = it.next();
-			if(e.getUsername() == clientHandler.getUser())
+			if(e.getEstado()==0 && e.getUsername() == clientHandler.getUser())
 				it.remove();
 			else
 				clientHandler.friendStatusUpdate(user.getUser(), e.getEstado());
