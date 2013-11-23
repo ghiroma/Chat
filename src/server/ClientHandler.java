@@ -1,5 +1,7 @@
 package server;
 
+import interfaces.tateti.InvitacionJuego;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,8 +15,9 @@ import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeChat;
 import common.MensajeInvitacion;
+import common.MensajePartida;
+import common.MensajeRespuestaInvitacion;
 import common.UserMetaData;
-
 import dataTier.DataAccess;
 import events.StatusChangedEvent;
 
@@ -85,6 +88,25 @@ public class ClientHandler extends Thread {
 					ChatServer.getInstance().logearEvento("Server :: " + user + " cerro sesion.");
 					cerrarSesion();
 					break;
+				// TODO Diego
+				case Mensaje.INVITACION_JUEGO:
+					enviarInvitacionJuego((MensajeInvitacion)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: " + user + " invito a jugar a " + ((MensajeInvitacion)msg.getCuerpo()).getInvitado() + ".");
+					break;
+				case Mensaje.RESPUESTA_INVITACION_JUEGO:
+					String invitado = ((MensajeRespuestaInvitacion)msg.getCuerpo()).getInvitado();
+					String solicitante = ((MensajeRespuestaInvitacion)msg.getCuerpo()).getSolicitante();
+					ChatServer.getInstance().logearEvento("Server :: " + invitado + (((MensajeRespuestaInvitacion)msg.getCuerpo()).isAcepto()?" acepto ":" no acepto ") + " jugar con " + solicitante);
+					if(((MensajeRespuestaInvitacion)msg.getCuerpo()).isAcepto()) {
+						// TODO ejecutarPartida();
+						iniciarPartida(solicitante,invitado);
+						System.out.println("Ejecutar partida");
+					}					
+					break;
+				case Mensaje.INICIO_PARTIDA:
+					//ejecutarJuego()
+					break;
+				//	
 				}
 
 			} 
@@ -129,7 +151,31 @@ public class ClientHandler extends Thread {
 		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgChat.getDestinatario());
 		client.enviarMensajeChat(user, msgChat.getTexto());
 	}
-
+	
+	// TODO Diego
+	private void enviarInvitacionJuego(MensajeInvitacion inv) {
+		ClientHandler client = ChatServer.getInstance().getHandlerList().get(inv.getInvitado());
+		client.recibirInvitacionJuego(new Mensaje(Mensaje.INVITACION_JUEGO,inv));
+	}
+	
+	private void recibirInvitacionJuego(Mensaje inv) {
+		try {
+			out.writeObject(inv);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void iniciarPartida(String s, String i) {
+		try {
+			out.writeObject(new Mensaje(Mensaje.INICIO_PARTIDA,new MensajePartida(s,i)));
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Fin TODO Diego
+	
 	private void invitarUsuario(MensajeInvitacion msgInvitacion) {
 		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgInvitacion.getInvitado());
 		client.recibirInvitacion(msgInvitacion);

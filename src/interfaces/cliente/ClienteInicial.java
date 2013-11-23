@@ -1,5 +1,7 @@
 package interfaces.cliente;
 
+import interfaces.tateti.InvitacionJuego;
+
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,6 +22,7 @@ import javax.swing.border.EmptyBorder;
 
 import client.ChatClient;
 import common.FriendStatus;
+import common.Mensaje;
 import common.MensajeInvitacion;
 
 public class ClienteInicial extends JFrame {
@@ -127,6 +130,24 @@ public class ClienteInicial extends JFrame {
 		btnIniciarChat.setBounds(281, 77, 114, 42);
 		contentPane.add(btnIniciarChat);
 		
+		// TODO Diego
+		/* Boton Iniciar Juego */
+		JButton btnIniciarJuego = new JButton("Iniciar Juego");
+		btnIniciarJuego.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String nombreUsuario=(String)((JList)contentPane.getComponent(0)).getSelectedValue();
+				if(nombreUsuario != null) {
+					ChatClient.getInstance().invitarAmigoAJugar(nombreUsuario);
+				} else {
+					lblNotificacion.setText("<html>"+ "Debe seleccionar un amigo" +"</html>");
+					lblNotificacion.setForeground(Color.RED);
+				}
+			}
+		});
+		btnIniciarJuego.setBounds(281, 125, 114, 42);
+		contentPane.add(btnIniciarJuego);
+		
 		lblNotificacion = new JLabel("");
 		lblNotificacion.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNotificacion.setBounds(229, 130, 205, 116);
@@ -186,7 +207,18 @@ public class ClienteInicial extends JFrame {
 		popUp.toFront();
 		
 	}
-
+	
+	// TODO Diego
+	public void mostrarPopUpInvitacionJuego(Mensaje msg) {
+		InvitacionJuego inv = new InvitacionJuego();
+		inv.setUsuarioOrigen(((MensajeInvitacion)msg.getCuerpo()).getSolicitante());
+		inv.setUsuarioDestino(((MensajeInvitacion)msg.getCuerpo()).getInvitado());
+		inv.setJLblInformacion(inv.getUsuarioOrigen() + " desea jugar con usted " + inv.getUsuarioDestino());
+		inv.setVisible(true);
+		inv.toFront();
+	}
+	//
+	
 	public void friendStatusChanged(String user, int estado){
 		//TODO: agregar/quitar de la lista de conectados en el front-end el user recibido por parametro.
 	}

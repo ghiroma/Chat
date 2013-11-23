@@ -27,7 +27,7 @@ public class ChatClient {
 	// Config
 	private int port;
 	private String serverIP;
-
+	
 	// Conexion / Auxiliar
 	private ObjectInputStream entrada;
 	private ObjectOutputStream salida;
@@ -207,6 +207,16 @@ public class ChatClient {
 		enviarAlServer(msg);
 	}
 
+	// TODO Diego
+	public void invitarAmigoAJugar(String contacto) {
+		Mensaje msg = new Mensaje(Mensaje.INVITACION_JUEGO, new MensajeInvitacion(getUsuarioLogeado().getUser(), contacto));
+		enviarAlServer(msg);
+	}
+
+	public void aceptacionInvitacionJuego(Mensaje msg) {
+		enviarAlServer(msg);
+	}
+	//
 	public void enviarMensajeChat(String amigo, String texto) {
 		Mensaje msg = new Mensaje(Mensaje.ENVIAR_MENSAJE, new MensajeChat(amigo, texto));
 		enviarAlServer(msg);
@@ -247,6 +257,8 @@ public class ChatClient {
 						frontEnd.mostrarPopUpInvitacion(msgInvitacion);
 					} else if(msg.getId() == Mensaje.CAMBIO_ESTADO){
 						frontEnd.friendStatusChanged(((FriendStatus)msg.getCuerpo()).getUsername(),((FriendStatus)msg.getCuerpo()).getEstado());
+					} /* TODO Diego */ else if(msg.getId() == Mensaje.INVITACION_JUEGO){
+						frontEnd.mostrarPopUpInvitacionJuego(msg);
 					} else {
 						synchronized(mapMensajes){
 							mapMensajes.put(msg.getId(), msg.getCuerpo());
@@ -272,5 +284,6 @@ public class ChatClient {
 	public Map<String, ClienteConversacion> getMapaConversaciones() {
 		return mapaConversaciones;
 	}
+
 
 }

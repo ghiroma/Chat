@@ -137,8 +137,8 @@ public class ChatServer {
 		this.logearEvento("Server :: Se desconecta al usuario " + nombreUsuario);
 		this.handlerList.get(nombreUsuario).close();
 		removerUsuario(nombreUsuario);
-	}
-
+	}	
+	
 	public boolean cerrarServer() {
 		this.logearEvento("Server :: Se cierra el servidor");
 		try {
