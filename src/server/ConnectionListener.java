@@ -63,8 +63,7 @@ public class ConnectionListener extends Thread {
 					}
 					/* Check contra ban list */
 					else if (bInfo!=null && bInfo.getDias() > 0) {
-						mensajeLogIn = new Mensaje(Mensaje.BANNED, bInfo.getMotivo());
-						msg.setCuerpo(mensajeLogIn);
+						msg = new Mensaje(Mensaje.BANNED, bInfo);
 						out.writeObject(msg);
 					} else {// si no esta penalizado
 						/* Envia lista de amigos */

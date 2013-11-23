@@ -2,6 +2,8 @@ package interfaces.cliente;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -13,7 +15,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import client.ChatClient;
-
 import common.UserMetaData;
 
 public class UserLogin {
@@ -98,11 +99,56 @@ public class UserLogin {
 		textField_1.setColumns(10);
 		textField_1.setBounds(153, 61, 103, 20);
 		frmIngreso.getContentPane().add(textField_1);
+		textField_1.addKeyListener(new KeyListener(){
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				if(e.getKeyChar()=='\n')
+				{
+					if(!textField.getText().equals("") && textField_1.getPassword().length != 0){
+						UserMetaData userData = new UserMetaData(textField.getText(), textField_1.getPassword());
+						ClienteInicial nuevoCliente=ChatClient.getInstance().login(userData);
+						if(nuevoCliente!=null){
+							if(ChatClient.getInstance().getBanInfo().getDias()>0)
+								//TODO imprimo mensaje de ban mas baninfo. Eliminar System.out
+								System.out.println("Esta baneado.");
+							else
+							{
+							nuevoCliente.setVisible(true);
+							frmIngreso.dispose();
+							}
+						} else {
+							lblValidez.setText("<html>"+ "La combinacion de usuario y password no se encuentra registrada o fue bloqueada" +"</html>");
+							lblValidez.setForeground(Color.RED);
+							textField.setText("");
+							textField_1.setText("");
+						}
+					} else {
+						lblValidez.setText("Los campos no pueden estar vacios");
+						lblValidez.setForeground(Color.RED);
+					}
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 		
 		lblValidez = new JLabel();
 		lblValidez.setForeground(Color.BLUE);
 		lblValidez.setHorizontalAlignment(SwingConstants.CENTER);
-		lblValidez.setText("Ingrese su usuario y contraseÃ±a o dese de alta, si no tiene usuario.");
+		lblValidez.setText("Ingrese su usuario y contraseña o dese de alta, si no tiene usuario.");
 		lblValidez.setBounds(10, 92, 411, 26);
 		frmIngreso.getContentPane().add(lblValidez);
 	}

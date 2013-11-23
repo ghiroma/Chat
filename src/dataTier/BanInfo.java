@@ -1,6 +1,8 @@
 package dataTier;
 
-public class BanInfo {
+import java.io.Serializable;
+
+public class BanInfo implements Serializable{
 	private String motivo;
 	private int dias;
 	

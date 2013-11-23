@@ -22,11 +22,15 @@ import common.Mensaje;
 import common.MensajeChat;
 import common.MensajeInvitacion;
 import common.UserMetaData;
+import dataTier.BanInfo;
 
 public class ChatClient {
 	// Config
 	private int port;
 	private String serverIP;
+	
+	//Negrada
+	private BanInfo banInfo;
 	
 	// Conexion / Auxiliar
 	private ObjectInputStream entrada;
@@ -144,6 +148,7 @@ public class ChatClient {
 				mapMensajes.wait();
 				msg=(Mensaje)mapMensajes.remove(Mensaje.LOG_IN);
 			}
+			//TODO agregar control cuando uno esta baneado.
 			if (msg.getId()==Mensaje.ACCEPTED) {
 				// alive.start??
 				amigos = (ArrayList<FriendStatus>)msg.getCuerpo();
@@ -153,6 +158,12 @@ public class ChatClient {
 				this.frontEnd = new ClienteInicial();
 				return frontEnd;
 			}
+			else
+				if(msg.getId()==Mensaje.BANNED)
+				{
+					banInfo = (BanInfo)msg.getCuerpo();
+					return null;
+				}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -247,6 +258,7 @@ public class ChatClient {
 				try {
 					// Aca se debe se filtrar segun tipo de mensaje recibido
 					Mensaje msg = (Mensaje) entrada.readObject();
+					System.out.println(msg.getId());
 					if (msg.getId() == Mensaje.ALERTA) {
 						mostrarAlerta((String)msg.getCuerpo());
 					} else if(msg.getId() == Mensaje.ENVIAR_MENSAJE) {
@@ -258,15 +270,21 @@ public class ChatClient {
 					} else if(msg.getId() == Mensaje.CAMBIO_ESTADO){
 						frontEnd.friendStatusChanged(((FriendStatus)msg.getCuerpo()).getUsername(),((FriendStatus)msg.getCuerpo()).getEstado());
 					} /* TODO Diego */ else if(msg.getId() == Mensaje.INVITACION_JUEGO){
-						frontEnd.mostrarPopUpInvitacionJuego(msg);
-					} else {
+						frontEnd.mostrarPopUpInvitacionJuego(msg);						
+					}
+					else if(msg.getId() == Mensaje.BANNED)
+					{
+						banInfo = (BanInfo)msg.getCuerpo();
+						System.out.println(banInfo.getDias() + " "+banInfo.getMotivo());
+					}
+					else {
 						synchronized(mapMensajes){
 							mapMensajes.put(msg.getId(), msg.getCuerpo());
 							mapMensajes.notify();
 						}
 					}
 				} catch (IOException e) {
-					System.out.println("El servidor ha finalizado la conexiÃ³n.");
+					System.out.println("El servidor ha finalizado la conexión.");
 					System.exit(1);
 				} catch (ClassNotFoundException e2) {
 				}
@@ -285,5 +303,13 @@ public class ChatClient {
 		return mapaConversaciones;
 	}
 
-
+	public BanInfo getBanInfo()
+	{
+		return this.banInfo;
+	}
+	
+	public void setBanInfo(BanInfo value)
+	{
+		this.banInfo = value;
+	}
 }
