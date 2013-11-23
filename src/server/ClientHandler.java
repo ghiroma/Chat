@@ -123,7 +123,7 @@ public class ClientHandler extends Thread {
 			UserMetaData userMeta = DataAccess.getInstance().getUserByUsername(user);
 			userMeta.setConectado(0);
 			DataAccess.getInstance().modifyUser(userMeta);
-		}
+		} 
 	}
 
 	/* Metodos privados */
