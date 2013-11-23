@@ -1,7 +1,5 @@
 package server;
 
-import interfaces.tateti.InvitacionJuego;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,6 +16,7 @@ import common.MensajeInvitacion;
 import common.MensajePartida;
 import common.MensajeRespuestaInvitacion;
 import common.UserMetaData;
+
 import dataTier.DataAccess;
 import events.StatusChangedEvent;
 
@@ -54,6 +53,7 @@ public class ClientHandler extends Thread {
 			/* evento de inicio sesion */
 			dispatchEvent(new StatusChangedEvent(this, user, estado));
 			ChatServer.getInstance().logearEvento("Server :: " + user + " inicio sesion.");
+			ChatServer.getInstance().actualizarUsuarios();
 			/* Inicio escucha al cliente */
 			while (client.isConnected()) {
 				// se traba aca hasta que hay mensaje
@@ -118,11 +118,11 @@ public class ClientHandler extends Thread {
 			e.printStackTrace();
 			System.err.println("Exception no manejada en ClientHandler");
 		} finally {
-			ChatServer.getInstance().removerUsuario(user);
 			// Actualizo en la DB el estado
 			UserMetaData userMeta = DataAccess.getInstance().getUserByUsername(user);
 			userMeta.setConectado(0);
 			DataAccess.getInstance().modifyUser(userMeta);
+			ChatServer.getInstance().actualizarUsuarios();
 		} 
 	}
 
@@ -151,7 +151,12 @@ public class ClientHandler extends Thread {
 		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgChat.getDestinatario());
 		client.enviarMensajeChat(user, msgChat.getTexto());
 	}
-	
+
+	private void invitarUsuario(MensajeInvitacion msgInvitacion) {
+		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgInvitacion.getInvitado());
+		client.recibirInvitacion(msgInvitacion);
+	}
+
 	// TODO Diego
 	private void enviarInvitacionJuego(MensajeInvitacion inv) {
 		ClientHandler client = ChatServer.getInstance().getHandlerList().get(inv.getInvitado());
@@ -173,15 +178,12 @@ public class ClientHandler extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
 	// Fin TODO Diego
-	
-	private void invitarUsuario(MensajeInvitacion msgInvitacion) {
-		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgInvitacion.getInvitado());
-		client.recibirInvitacion(msgInvitacion);
-	}
 
-	private void cerrarSesion(){
+
+
+	/* Metodos publicos */
+	public void cerrarSesion() {
 		try {
 			in.close();
 			out.close();
@@ -193,7 +195,6 @@ public class ClientHandler extends Thread {
 		}
 	}
 
-	/* Metodos publicos */
 	public void enviarAlerta(String textoAlerta){
 		try {
 			Mensaje msg=new Mensaje(Mensaje.ALERTA, textoAlerta);
@@ -225,23 +226,13 @@ public class ClientHandler extends Thread {
 
 	/* Metodos de update (Son llamados desde los ClientEventListener)*/
 	public void friendStatusUpdate(String user, int estado){
-		try { 
+		try {
 			out.writeObject(new Mensaje(Mensaje.CAMBIO_ESTADO, new FriendStatus(user, estado)));
-			
-		}
-		catch(SocketException e1)
-		{
-			
-		}
-		catch(IOException e) {
+		} catch(SocketException e1) {
+		} catch(IOException e) {
 			e.printStackTrace();
 			System.err.println("Error al enviar cambio de estado al cliente.");
-		}		
-	}
-
-	/* Desconectar al cliente */
-	public void close() {
-		// TODO: almacenar la informacion, y desconectar al cliente del servidor.
+		}
 	}
 
 	/* Eventos */

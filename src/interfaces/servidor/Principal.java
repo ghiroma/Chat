@@ -288,6 +288,19 @@ public class Principal extends JFrame {
 		}
 	}
 
+	public void actualizarListaUsuarios() {
+		modelUsuariosDesconectados.clear();
+		modelUsuariosConectados.clear();
+		List<UserMetaData> usuarios = ChatServer.getInstance().obtenerUsuarios();
+		for(UserMetaData usuario : usuarios) {
+			if (usuario.getConectado() == 0) {
+				modelUsuariosDesconectados.addElement(usuario.getUser());
+			} else {
+				modelUsuariosConectados.addElement(usuario.getUser());
+			}
+		}
+	}
+
 	public void logearEvento(String msg) {
 		logEventos.append(msg + "\n");
 		System.out.println(msg);

@@ -53,22 +53,14 @@ public class ClienteConversacion extends JFrame {
 						txtMensaje.setText("");
 					}
 			}
-
 			@Override
 			public void keyReleased(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
-
 			@Override
 			public void keyTyped(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
-		
 
-		
 		JButton btnNewButton = new JButton("Enviar");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

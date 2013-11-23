@@ -2,7 +2,10 @@ package dataTier;
 
 import java.io.Serializable;
 
-public class BanInfo implements Serializable{
+public class BanInfo implements Serializable {
+
+	private static final long serialVersionUID = -1227225839196885102L;
+
 	private String motivo;
 	private int dias;
 	

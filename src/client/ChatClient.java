@@ -149,7 +149,6 @@ public class ChatClient {
 				mapMensajes.wait();
 				msg=(Mensaje)mapMensajes.remove(Mensaje.LOG_IN);
 			}
-			//TODO agregar control cuando uno esta baneado.
 			if (msg.getId()==Mensaje.ACCEPTED) {
 				// alive.start??
 				amigos = (ArrayList<FriendStatus>)msg.getCuerpo();
@@ -158,13 +157,13 @@ public class ChatClient {
 				this.mapaConversaciones = new HashMap<String ,ClienteConversacion>();
 				this.frontEnd = new ClienteInicial();
 				return frontEnd;
+			} else if(msg.getId()==Mensaje.BANNED) {
+				banInfo = (BanInfo)msg.getCuerpo();
+				return null;
+			} else if(msg.getId()==Mensaje.USUARIO_CONECTADO) {
+				//TODO devuelve un mensaje de error explicando que el usuario esta conectado
+				return null;
 			}
-			else
-				if(msg.getId()==Mensaje.BANNED)
-				{
-					banInfo = (BanInfo)msg.getCuerpo();
-					return null;
-				}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -259,7 +258,6 @@ public class ChatClient {
 				try {
 					// Aca se debe se filtrar segun tipo de mensaje recibido
 					Mensaje msg = (Mensaje) entrada.readObject();
-					System.out.println(msg.getId());
 					if (msg.getId() == Mensaje.ALERTA) {
 						mostrarAlerta((String)msg.getCuerpo());
 					} else if(msg.getId() == Mensaje.ENVIAR_MENSAJE) {
@@ -268,26 +266,19 @@ public class ChatClient {
 					} else if(msg.getId() == Mensaje.INVITAR_USUARIO) {
 						MensajeInvitacion msgInvitacion = (MensajeInvitacion)msg.getCuerpo();		
 						frontEnd.mostrarPopUpInvitacion(msgInvitacion);
-					} else if(msg.getId() == Mensaje.CAMBIO_ESTADO){
+					} else if(msg.getId() == Mensaje.CAMBIO_ESTADO) {
 						frontEnd.friendStatusChanged(((FriendStatus)msg.getCuerpo()).getUsername(),((FriendStatus)msg.getCuerpo()).getEstado());
-					} /* TODO Diego */ else if(msg.getId() == Mensaje.INVITACION_JUEGO){
-						frontEnd.mostrarPopUpInvitacionJuego(msg);						
-					}
-					else if(msg.getId() == Mensaje.BANNED)
-					{
-						banInfo = (BanInfo)msg.getCuerpo();
-						System.out.println(banInfo.getDias() + " "+banInfo.getMotivo());
-					} else if (msg.getId() == Mensaje.USUARIO_CONECTADO){
-						//TODO devuelve un mensaje de error explicando que el usuario esta conectado
-					}
-					else {
+					} else if(msg.getId() == Mensaje.INVITACION_JUEGO) {
+						/* TODO Diego */
+						frontEnd.mostrarPopUpInvitacionJuego(msg);
+					} else {
 						synchronized(mapMensajes){
 							mapMensajes.put(msg.getId(), msg.getCuerpo());
 							mapMensajes.notify();
 						}
 					}
 				} catch (IOException e) {
-					System.out.println("El servidor ha finalizado la conexión.");
+					System.out.println("El servidor ha finalizado la conexion.");
 					System.exit(1);
 				} catch (ClassNotFoundException e2) {
 				}
@@ -295,7 +286,7 @@ public class ChatClient {
 		}
 	}
 
-	// Getters and Setters
+	// Getters
 	public UserMetaData getUsuarioLogeado() {
 		return usuarioLogeado;
 	}
@@ -305,14 +296,8 @@ public class ChatClient {
 	public Map<String, ClienteConversacion> getMapaConversaciones() {
 		return mapaConversaciones;
 	}
-
-	public BanInfo getBanInfo()
-	{
+	public BanInfo getBanInfo() {
 		return this.banInfo;
 	}
-	
-	public void setBanInfo(BanInfo value)
-	{
-		this.banInfo = value;
-	}
+
 }

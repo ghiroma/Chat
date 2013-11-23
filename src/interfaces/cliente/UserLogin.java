@@ -44,23 +44,7 @@ public class UserLogin {
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-
-				if(!textField.getText().equals("") && textField_1.getPassword().length != 0){
-					UserMetaData userData = new UserMetaData(textField.getText(), textField_1.getPassword());
-					ClienteInicial nuevoCliente=ChatClient.getInstance().login(userData);
-					if(nuevoCliente!=null){
-						nuevoCliente.setVisible(true);
-						frmIngreso.dispose();
-					} else {
-						lblValidez.setText("<html>"+ "La combinacion de usuario y password no se encuentra registrada o fue bloqueada" +"</html>");
-						lblValidez.setForeground(Color.RED);
-						textField.setText("");
-						textField_1.setText("");
-					}
-				} else {
-					lblValidez.setText("Los campos no pueden estar vacios");
-					lblValidez.setForeground(Color.RED);
-				}
+				realizarLogin();
 			}
 		});
 		btnNewButton.setBounds(304, 26, 117, 23);
@@ -100,57 +84,50 @@ public class UserLogin {
 		textField_1.setBounds(153, 61, 103, 20);
 		frmIngreso.getContentPane().add(textField_1);
 		textField_1.addKeyListener(new KeyListener(){
-
 			@Override
 			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
-				if(e.getKeyChar()=='\n')
-				{
-					if(!textField.getText().equals("") && textField_1.getPassword().length != 0){
-						UserMetaData userData = new UserMetaData(textField.getText(), textField_1.getPassword());
-						ClienteInicial nuevoCliente=ChatClient.getInstance().login(userData);
-						if(nuevoCliente!=null){
-							if(ChatClient.getInstance().getBanInfo().getDias()>0)
-								//TODO imprimo mensaje de ban mas baninfo. Eliminar System.out
-								System.out.println("Esta baneado.");
-							else
-							{
-							nuevoCliente.setVisible(true);
-							frmIngreso.dispose();
-							}
-						} else {
-							lblValidez.setText("<html>"+ "La combinacion de usuario y password no se encuentra registrada o fue bloqueada" +"</html>");
-							lblValidez.setForeground(Color.RED);
-							textField.setText("");
-							textField_1.setText("");
-						}
-					} else {
-						lblValidez.setText("Los campos no pueden estar vacios");
-						lblValidez.setForeground(Color.RED);
-					}
+				if(e.getKeyChar()=='\n') {
+					realizarLogin();
 				}
 			}
-
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
-
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
-			
 		});
 		
 		lblValidez = new JLabel();
 		lblValidez.setForeground(Color.BLUE);
 		lblValidez.setHorizontalAlignment(SwingConstants.CENTER);
-		lblValidez.setText("Ingrese su usuario y contraseña o dese de alta, si no tiene usuario.");
+		lblValidez.setText("Ingrese su usuario y contrase\u00F1a o dese de alta, si no tiene usuario.");
 		lblValidez.setBounds(10, 92, 411, 26);
 		frmIngreso.getContentPane().add(lblValidez);
 	}
-	
+
+	private void realizarLogin() {
+		if(!textField.getText().equals("") && textField_1.getPassword().length != 0){
+			UserMetaData userData = new UserMetaData(textField.getText(), textField_1.getPassword());
+			ClienteInicial nuevoCliente=ChatClient.getInstance().login(userData);
+			if(nuevoCliente != null) {
+				nuevoCliente.setVisible(true);
+				frmIngreso.dispose();
+			} else if(ChatClient.getInstance().getBanInfo().getDias()>0) {
+				lblValidez.setText("<html>"+ "El usuario se encuentra baneado por: " + ChatClient.getInstance().getBanInfo().getDias() +" dias.</html>");
+				lblValidez.setForeground(Color.RED);
+				textField.setText("");
+				textField_1.setText("");
+			} else {
+				lblValidez.setText("<html>"+ "La combinacion de usuario y password no se encuentra registrada o fue bloqueada" +"</html>");
+				lblValidez.setForeground(Color.RED);
+				textField.setText("");
+				textField_1.setText("");
+			}
+		} else {
+			lblValidez.setText("Los campos no pueden estar vacios");
+			lblValidez.setForeground(Color.RED);
+		}
+	}
+
 }

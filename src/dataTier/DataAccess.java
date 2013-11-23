@@ -205,10 +205,10 @@ public final class DataAccess {
 	public List<String> getUsers(String textoBusqueda) {
 		List<String> listaUsuarios = null;
 		try {
-			ResultSet rs = stat.executeQuery("SELECT User FROM USUARIOS WHERE UPPER(User) like " 
+			ResultSet rs = stat.executeQuery("SELECT User FROM USUARIOS WHERE Conectado=1 AND UPPER(User) like " 
 					+ " '%"+textoBusqueda.toUpperCase() 
 					+"%' or UPPER(Apyn) like '%"+ textoBusqueda.toUpperCase()
-					+"%' or UPPER(Mail) like '%"+ textoBusqueda.toUpperCase() +"%' AND Conectado=1");
+					+"%' or UPPER(Mail) like '%"+ textoBusqueda.toUpperCase() +"%'");
 			listaUsuarios = new ArrayList<String>();
 			while(rs.next())
 				listaUsuarios.add(rs.getString("User"));
@@ -376,7 +376,8 @@ public final class DataAccess {
 	public void insertLogLogin(UserMetaData user)
 	{
 		try{
-			String statement = "INSERT INTO LOGLOGIN VALUES('"+user.getUser()+ "',now())";
+			String statement = "INSERT INTO LOGLOGIN VALUES('"+user.getUser()+ "',now()); ";
+			statement += " UPDATE USUARIOS SET Conectado=1 WHERE User='" + user.getUser() + "'; ";
 			stat.execute(statement);
 		}
 		catch(Exception ex)

@@ -135,16 +135,16 @@ public class ChatServer {
 
 	public void desconectarUsuario(String nombreUsuario) {
 		this.logearEvento("Server :: Se desconecta al usuario " + nombreUsuario);
-		this.handlerList.get(nombreUsuario).close();
-		removerUsuario(nombreUsuario);
+		this.handlerList.get(nombreUsuario).cerrarSesion();
+		actualizarUsuarios();
 	}	
-	
+
 	public boolean cerrarServer() {
 		this.logearEvento("Server :: Se cierra el servidor");
 		try {
 			for(Map.Entry<String, ClientHandler> entry : this.handlerList.entrySet()) {
 				ClientHandler client = (ClientHandler)entry.getValue();
-				client.close();
+				client.cerrarSesion();
 			}
 			return true;
 		} catch(Exception e) {
@@ -156,9 +156,10 @@ public class ChatServer {
 		this.frontEnd.logearEvento(mensaje);
 	}
 
-	public void removerUsuario(String username){
-		//TODO quita usuario de la lista del frontend
+	public void actualizarUsuarios() {
+		this.frontEnd.actualizarListaUsuarios();
 	}
+
 	//-----------------
 	// Getters & Setters
 	//-----------------	

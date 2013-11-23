@@ -38,6 +38,7 @@ public class ClienteInicial extends JFrame {
 	public ClienteInicial() {
 		setTitle(ChatClient.getInstance().getUsuarioLogeado().getUser().toUpperCase());
 		setResizable(false);
+
 		/* Seteo del cierre del Frame */
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter()
@@ -189,8 +190,8 @@ public class ClienteInicial extends JFrame {
 		DefaultListModel modelAmigos = new DefaultListModel();
 		List<FriendStatus> amigos = ChatClient.getInstance().getAmigos();
 		for (FriendStatus amigo : amigos) {
-			// TODO FRONT : filtrar los amigos q estan conectados
-			modelAmigos.addElement(amigo.getUsername());
+			if(amigo.getEstado() == 1)
+				modelAmigos.addElement(amigo.getUsername());
 		}
 		return modelAmigos;
 	}

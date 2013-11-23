@@ -62,14 +62,15 @@ public class ConnectionListener extends Thread {
 						out.writeObject(msg);
 					}
 					/* Check si el user esta conectado */
-					if(1 == dataAccess.getUserByUsername(userMeta.getUser()).getConectado()){
-						msg = new Mensaje(Mensaje.USUARIO_CONECTADO,userMeta.getUser());
+					else if(dataAccess.getUserByUsername(userMeta.getUser()).getConectado() == 1) {
+						mensajeLogIn = new Mensaje(Mensaje.USUARIO_CONECTADO, userMeta.getUser());
+						msg.setCuerpo(mensajeLogIn);
 						out.writeObject(msg);
 					}
-					
 					/* Check contra ban list */
 					else if (bInfo!=null && bInfo.getDias() > 0) {
-						msg = new Mensaje(Mensaje.BANNED, bInfo);
+						mensajeLogIn = new Mensaje(Mensaje.BANNED, bInfo);
+						msg.setCuerpo(mensajeLogIn);
 						out.writeObject(msg);
 					} else {// si no esta penalizado
 						/* Envia lista de amigos */
@@ -96,6 +97,7 @@ public class ConnectionListener extends Thread {
 	private void altaUsuario(UserMetaData user) {
 		dataAccess.insertUser(user);
 		dataAccess.addUserToPuntaje(user);
+		ChatServer.getInstance().logearEvento("Server :: "+ user.getUser() + " se ha dado de alta");
 	}
 
 	private void verificarUsuario(String nombreUsuario) {

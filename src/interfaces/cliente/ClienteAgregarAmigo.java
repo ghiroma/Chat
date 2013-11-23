@@ -61,19 +61,13 @@ public class ClienteAgregarAmigo extends JFrame {
 		contentPane.add(textField);
 		textField.setColumns(10);
 		textField.addFocusListener(new FocusListener(){
-
 			@Override
 			public void focusGained(FocusEvent arg0) {
 				textField.setText("");
-				
 			}
-
 			@Override
 			public void focusLost(FocusEvent arg0) {
-				// TODO Auto-generated method stub
-				
 			}
-			
 		});
 
 		list = new JList();
