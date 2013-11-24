@@ -30,6 +30,9 @@ public class Mensaje implements Serializable {
 	public static final int INVITACION_JUEGO = 19;
 	public static final int RESPUESTA_INVITACION_JUEGO = 20;
 	public static final int INICIO_PARTIDA = 21;
+	
+	/* Grupos */
+	public static final int CREAR_GRUPO = 100; 
 
 	private int id;
 	private Object cuerpo;

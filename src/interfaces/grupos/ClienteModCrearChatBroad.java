@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ClienteModCrearChatBroad extends JFrame {
 
@@ -71,6 +73,11 @@ public class ClienteModCrearChatBroad extends JFrame {
 		contentPane.add(lblSeleccionarAmigos);
 		
 		JButton btnCrearSala = new JButton("Crear Sala");
+		btnCrearSala.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+			}
+		});
 		btnCrearSala.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
