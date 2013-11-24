@@ -110,7 +110,7 @@ public class ClienteInicial extends JFrame {
 		lblAmigosOnline.setBounds(11, 67, 183, 21);
 		contentPane.add(lblAmigosOnline);
 
-		JButton btnIniciarChat = new JButton("Iniciar Chat");
+		JButton btnIniciarChat = new JButton("Iniciar");
 		btnIniciarChat.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
