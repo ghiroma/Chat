@@ -1,5 +1,7 @@
 package interfaces.grupos;
 
+import groups.Grupo;
+
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,15 +14,23 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+
+import client.ChatClient;
+
+import common.MensajeGrupo;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.List;
+import javax.swing.JList;
+import javax.swing.JTable;
 
 public class ClienteModCrearChatBroad extends JFrame {
 
 	private static final long serialVersionUID = -6815140153895535755L;
 
 	private JPanel contentPane;
-	private JTextField textField;
+	private JTextField txtNombreGrupo;
 
 	/**
 	 * Create the frame.
@@ -41,10 +51,6 @@ public class ClienteModCrearChatBroad extends JFrame {
 		lblCrearGrupoDe.setBounds(10, 11, 461, 47);
 		contentPane.add(lblCrearGrupoDe);
 		
-		JEditorPane editorPane = new JEditorPane();
-		editorPane.setBounds(10, 149, 191, 238);
-		contentPane.add(editorPane);
-		
 		JButton btnNewButton = new JButton("->");
 		btnNewButton.setBounds(211, 186, 48, 33);
 		contentPane.add(btnNewButton);
@@ -53,18 +59,14 @@ public class ClienteModCrearChatBroad extends JFrame {
 		button.setBounds(211, 230, 48, 33);
 		contentPane.add(button);
 		
-		JEditorPane editorPane_1 = new JEditorPane();
-		editorPane_1.setBounds(269, 149, 191, 238);
-		contentPane.add(editorPane_1);
-		
 		JLabel lblNombreDelGrupo = new JLabel("NOMBRE DEL GRUPO: ");
 		lblNombreDelGrupo.setBounds(10, 69, 191, 14);
 		contentPane.add(lblNombreDelGrupo);
 		
-		textField = new JTextField();
-		textField.setBounds(269, 66, 191, 20);
-		contentPane.add(textField);
-		textField.setColumns(10);
+		txtNombreGrupo = new JTextField();
+		txtNombreGrupo.setBounds(269, 66, 191, 20);
+		contentPane.add(txtNombreGrupo);
+		txtNombreGrupo.setColumns(10);
 		
 		JLabel lblSeleccionarAmigos = new JLabel("SELECCIONAR AMIGOS");
 		lblSeleccionarAmigos.setHorizontalAlignment(SwingConstants.CENTER);
@@ -78,11 +80,27 @@ public class ClienteModCrearChatBroad extends JFrame {
 				
 			}
 		});
+		JList listAmigos = new JList();
+		listAmigos.setBounds(20, 149, 181, 245);
+		contentPane.add(listAmigos);
+		
+		JList listAmigosAgregados = new JList();
+		listAmigosAgregados.setBounds(269, 149, 191, 245);
+		contentPane.add(listAmigosAgregados);
+		
 		btnCrearSala.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				ClienteModSalaDeChat salaDeChat = new ClienteModSalaDeChat();
-				salaDeChat.setVisible(true);
+				String nombre = txtNombreGrupo.getText();
+				String emisor = ChatClient.getInstance().getUsuarioLogeado().getUser();
+				List<String> usuarios = null;
+				//TODO: hacer que tome el listado de amigos que estan en listAmigosAgregados y guardarlos en usuarios
+				Grupo grupo = new Grupo(nombre, usuarios);
+				MensajeGrupo mensaje = new MensajeGrupo(grupo, emisor, "");
+				//if(!usuarios.isEmpty() && !nombre.isEmpty()){
+					ClienteModSalaDeChat salaDeChat = new ClienteModSalaDeChat();
+					salaDeChat.setVisible(true);	
+				//}
 			}
 		});
 		btnCrearSala.setBounds(251, 419, 107, 23);
@@ -97,5 +115,9 @@ public class ClienteModCrearChatBroad extends JFrame {
 		});
 		btnCancelar.setBounds(368, 419, 89, 23);
 		contentPane.add(btnCancelar);
+		
+		
+		
+		
 	}
 }

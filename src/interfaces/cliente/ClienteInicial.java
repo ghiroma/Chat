@@ -1,5 +1,6 @@
 package interfaces.cliente;
 
+import interfaces.grupos.ClienteModCrearChatBroad;
 import interfaces.tateti.InvitacionJuego;
 
 import java.awt.Color;
@@ -147,25 +148,35 @@ public class ClienteInicial extends JFrame {
 				}
 			}
 		});
-		btnIniciarJuego.setBounds(281, 125, 114, 42);
+		btnIniciarJuego.setBounds(221, 125, 95, 42);
 		contentPane.add(btnIniciarJuego);
 		
 		lblNotificacion = new JLabel("");
 		lblNotificacion.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNotificacion.setBounds(221, 124, 205, 116);
+		lblNotificacion.setBounds(221, 182, 205, 80);
 		contentPane.add(lblNotificacion);
 
 		JButton btnIngresarGrupo = new JButton("Grupos");
 		btnIngresarGrupo.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-
 				ClienteRequerirIngresoChatGrupal clienteReqIngChatGrupal = new ClienteRequerirIngresoChatGrupal();
 				clienteReqIngChatGrupal.setVisible(true);
 			}
 		});
 		btnIngresarGrupo.setBounds(326, 57, 95, 42);
 		contentPane.add(btnIngresarGrupo);
+		
+		JButton btnCrearGrupo = new JButton("Crear Grupo");
+		btnCrearGrupo.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				ClienteModCrearChatBroad clienteModCrearChatBroad = new ClienteModCrearChatBroad();
+				clienteModCrearChatBroad.setVisible(true);
+			}
+		});
+		btnCrearGrupo.setBounds(326, 125, 95, 42);
+		contentPane.add(btnCrearGrupo);
 	}
 
 	public ClienteConversacion getNuevaConversacion(String nombreUsuario) {
