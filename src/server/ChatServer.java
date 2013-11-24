@@ -12,7 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
+import groups.Grupo;
+import common.MensajeGrupo;
 import common.UserMetaData;
 
 import dataTier.DataAccess;
@@ -21,6 +22,7 @@ public class ChatServer {
 
 	private static ChatServer chatServerInstance;
 	private HashMap<String, ClientHandler> handlerList;
+	private HashMap<String, Grupo> grupoMap;
 	private int port;
 	private String serverName;
 	private Principal frontEnd;
@@ -167,4 +169,27 @@ public class ChatServer {
 		return handlerList;
 	}
 
+	/**
+	 * Grupos
+	 */
+	
+	public void crearGrupo(MensajeGrupo mensajeGrupo) {
+		// TODO Auto-generated method stub
+		Grupo grupo = mensajeGrupo.getGrupo();
+		grupoMap.put(grupo.getNombre(), grupo);
+		for (String usuario : grupo.getUsuarios()) {
+			ClientHandler handler=handlerList.get(usuario);
+			handler.enviarMensajeChat(grupo.getNombre(), grupo.getModerador()+" ha creado la sala de chat.");
+		}
+	}
+	
+	public void enviarMensajeGrupo(MensajeGrupo mensajeGrupo) {
+		// TODO Auto-generated method stub
+		Grupo grupo = mensajeGrupo.getGrupo();
+		grupoMap.put(grupo.getNombre(), grupo);
+		for (String usuario : grupo.getUsuarios()) {
+			ClientHandler handler=handlerList.get(usuario);
+			handler.enviarMensajeChat(grupo.getNombre(), mensajeGrupo.getEmisor()+": " + mensajeGrupo.getMensaje());
+		}
+	}
 }

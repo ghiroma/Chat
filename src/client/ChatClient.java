@@ -21,8 +21,12 @@ import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeChat;
 import common.MensajeInvitacion;
+import common.MensajeGrupo;
 import common.UserMetaData;
+
 import dataTier.BanInfo;
+
+import groups.Grupo;
 
 public class ChatClient {
 	// Config
@@ -299,5 +303,12 @@ public class ChatClient {
 	public BanInfo getBanInfo() {
 		return this.banInfo;
 	}
-
+	
+	//Metodos Grupos
+	
+	public void crearGrupo(Grupo grupo){
+		grupo.setModerador(usuarioLogeado.getUser());
+		Mensaje msg = new Mensaje(Mensaje.CREAR_GRUPO, new MensajeGrupo(grupo,getUsuarioLogeado().getUser(),""));
+		enviarAlServer(msg);
+	}
 }
