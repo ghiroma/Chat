@@ -25,7 +25,7 @@ public final class DataAccess {
 		Class.forName("org.h2.Driver");
 		//Para testeo se hara una base de datos en memoria.
 		//TODO cambiar a servidor embebido para produccion.
-		conn = DriverManager.getConnection("jdbc:h2:lib\\Chat","sa","");
+		conn = DriverManager.getConnection("jdbc:h2:~/test","sa","");
 		stat = conn.createStatement();
 		}
 		catch(Exception ex)
