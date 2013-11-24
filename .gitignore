@@ -1,11 +1,5 @@
-.gitignore
 .classpath
 .project
 /bin
-
 /.settings
 /ServerConfig.properties
-
-
-
-

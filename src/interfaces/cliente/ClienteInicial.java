@@ -38,9 +38,8 @@ public class ClienteInicial extends JFrame {
 	 */
 	public ClienteInicial() {
 
-		setTitle(ChatClient.getInstance().getUsuarioLogeado().getUser().toUpperCase());
+		setTitle("Menu principal - " + ChatClient.getInstance().getUsuarioLogeado().getUser().toUpperCase());
 		setResizable(false);
-		setTitle("Chat Principal");
 
 		/* Seteo del cierre del Frame */
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -111,19 +110,17 @@ public class ClienteInicial extends JFrame {
 		lblAmigosOnline.setBounds(11, 67, 183, 21);
 		contentPane.add(lblAmigosOnline);
 
-		JButton btnIniciarChat = new JButton("Iniciar");
+		JButton btnIniciarChat = new JButton("Chatear");
 		btnIniciarChat.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
 				// Inicializo una nueva Conversacion//
-				String nombreUsuario = (String) ((JList) contentPane
-						.getComponent(0)).getSelectedValue();
+				String nombreUsuario = (String) ((JList)contentPane.getComponent(0)).getSelectedValue();
 				if (nombreUsuario != null) {
 					getNuevaConversacion(nombreUsuario);
 				} else {
-					lblNotificacion.setText("<html>"
-							+ "Debe seleccionar un amigo" + "</html>");
+					lblNotificacion.setText("<html>" + "Debe seleccionar un amigo" + "</html>");
 					lblNotificacion.setForeground(Color.RED);
 				}
 
@@ -180,15 +177,13 @@ public class ClienteInicial extends JFrame {
 	}
 
 	public ClienteConversacion getNuevaConversacion(String nombreUsuario) {
-		ClienteConversacion nuevaConversacion = ChatClient.getInstance()
-				.getMapaConversaciones().get(nombreUsuario);
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
 
 		if (nuevaConversacion == null) {
 			nuevaConversacion = new ClienteConversacion(nombreUsuario);
 			nuevaConversacion.setVisible(true);
 			lblNotificacion.setText("");
-			ChatClient.getInstance().getMapaConversaciones()
-					.put(nombreUsuario, nuevaConversacion);
+			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
 		} else {
 			nuevaConversacion.setVisible(true);
 			nuevaConversacion.toFront();
@@ -196,18 +191,16 @@ public class ClienteInicial extends JFrame {
 		return nuevaConversacion;
 	}
 
-	public ClienteConversacion getNuevaConversacion(String nombreUsuario,
-			String texto) {
-		ClienteConversacion nuevaConversacion = ChatClient.getInstance()
-				.getMapaConversaciones().get(nombreUsuario);
+	public ClienteConversacion getNuevaConversacion(String nombreUsuario, String texto) {
+
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
 
 		if (nuevaConversacion == null) {
 			nuevaConversacion = new ClienteConversacion(nombreUsuario);
 			nuevaConversacion.setVisible(true);
 
 			lblNotificacion.setText("");
-			ChatClient.getInstance().getMapaConversaciones()
-					.put(nombreUsuario, nuevaConversacion);
+			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
 		} else {
 			nuevaConversacion.setVisible(true);
 			nuevaConversacion.toFront();

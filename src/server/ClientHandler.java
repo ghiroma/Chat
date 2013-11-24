@@ -108,7 +108,7 @@ public class ClientHandler extends Thread {
 					//ejecutarJuego()
 					break;
 				case Mensaje.CREAR_GRUPO:
-					//TODO: logear la creaciòn del grupo
+					//TODO: logear la creacion del grupo
 					crearGrupo((MensajeGrupo)msg.getCuerpo());
 					break;
 				}
