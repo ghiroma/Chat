@@ -12,6 +12,7 @@ import javax.swing.event.EventListenerList;
 import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeChat;
+import common.MensajeGrupo;
 import common.MensajeInvitacion;
 import common.MensajePartida;
 import common.MensajeRespuestaInvitacion;
@@ -108,7 +109,7 @@ public class ClientHandler extends Thread {
 					break;
 				case Mensaje.CREAR_GRUPO:
 					//TODO: logear la creaciòn del grupo
-					//crearGrupo((MensajeGrupo)msg.getCuerpo());
+					crearGrupo((MensajeGrupo)msg.getCuerpo());
 					break;
 				}
 
@@ -183,8 +184,14 @@ public class ClientHandler extends Thread {
 	}
 	// Fin TODO Diego
 
+	/* Grupos */
+	
+	private void crearGrupo(MensajeGrupo mensajeGrupo) {
+		ChatServer.getInstance().crearGrupo(mensajeGrupo);
+	}
 
-
+	/* Fin Grupos */ 
+	
 	/* Metodos publicos */
 	public void cerrarSesion() {
 		try {
