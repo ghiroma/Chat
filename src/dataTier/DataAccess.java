@@ -276,7 +276,7 @@ public final class DataAccess {
 	public BanInfo checkBan(String user){
 		//Devuelve cantidad de dias restantes y descripcion.
 		try{
-			 String statement = "SELECT p.Descripcion, DateDiff('day',CURRENT_DATE(),p.fechafin) as Restantes from LOGPENALIZACION p INNER JOIN USUARIOS u on u.User = p.user WHERE p.User='"+ user +"' order by ID desc";
+			String statement = "SELECT top 1 p.Descripcion, DateDiff('day',CURRENT_DATE(),p.fechafin) as Restantes from LOGPENALIZACION p INNER JOIN USUARIOS u on u.User = p.user WHERE p.User='"+user+"' order by Restantes desc";
 			 ResultSet rs = stat.executeQuery(statement);
 			 if(rs.first())
 				 return new BanInfo(rs.getInt("Restantes"),rs.getString("Descripcion"));
