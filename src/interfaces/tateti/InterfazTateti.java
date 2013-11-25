@@ -2,19 +2,24 @@ package interfaces.tateti;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.Serializable;
 import java.util.StringTokenizer;
 
 import javax.swing.*;
 
+import common.Mensaje;
+import common.MensajeMovimiento;
+import client.ChatClient;
+
 //import Control.Controller;
 
-public class InterfazTateti extends JFrame implements ActionListener {
+public class InterfazTateti extends JFrame implements ActionListener, Serializable {
 
 	/* Atributos */
 		
 		/* Clases y variables utiles */
 		//private Controller controlador = null;
-		private Blackboard bb = null;
+		//private Blackboard bb = null;
 		private InvitacionJuego invitacion = null;
 		//private NuevaPartida nuevaPartida = null;
 		private static final long serialVersionUID = 1L;
@@ -86,7 +91,7 @@ public class InterfazTateti extends JFrame implements ActionListener {
 			public void windowActivated(WindowEvent arg0) {}
 		});		
 		
-		this.bb = new Blackboard();
+		//this.bb = new Blackboard();
 		this.limpiarTablero();
 
 		/* Agrego actionListeners a los botones */
@@ -170,7 +175,9 @@ public class InterfazTateti extends JFrame implements ActionListener {
 	//					No-> Cierro todo y vuelvo a pantalla principal de chat
 	//		No->Cierro todo y voy a la interfaz del chat.
 	
+	
 	public void actualizarEstadoJuego(int i, int j, int id, JButton btn) {
+		/*
 		int aux;
 		setearIcono(jLabel2,(id+1)%2);
 		setearIcono(btn,id);
@@ -185,10 +192,57 @@ public class InterfazTateti extends JFrame implements ActionListener {
 			}
 			jLabel3.setVisible(true);
 		}
+		*/
 	}
-	
+
 	public void actionPerformed(ActionEvent ae) {
-		if(ae.getSource() == jButton1){
+				
+		if(ae.getSource() == jButton1) {
+			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,0,0,jButton1,jLabel2,jLabel3);
+			ChatClient.getInstance().enviarMovimiento(msg);
+		}
+		
+		if(ae.getSource() == jButton2) {
+			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,0,1,jButton2,jLabel2,jLabel3);
+			ChatClient.getInstance().enviarMovimiento(msg);
+		}
+		
+		if(ae.getSource() == jButton3) {
+			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,0,2,jButton3,jLabel2,jLabel3);
+			ChatClient.getInstance().enviarMovimiento(msg);
+		}
+		
+		if(ae.getSource() == jButton4) {
+			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,1,0,jButton4,jLabel2,jLabel3);
+			ChatClient.getInstance().enviarMovimiento(msg);
+		}
+		
+		if(ae.getSource() == jButton5) {
+			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,1,1,jButton5,jLabel2,jLabel3);
+			ChatClient.getInstance().enviarMovimiento(msg);
+		}
+		
+		if(ae.getSource() == jButton6) {
+			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,1,2,jButton6,jLabel2,jLabel3);
+			ChatClient.getInstance().enviarMovimiento(msg);
+		}
+		
+		if(ae.getSource() == jButton7) {
+			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,2,0,jButton7,jLabel2,jLabel3);
+			ChatClient.getInstance().enviarMovimiento(msg);
+		}
+		
+		if(ae.getSource() == jButton8) {
+			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,2,1,jButton8,jLabel2,jLabel3);
+			ChatClient.getInstance().enviarMovimiento(msg);
+		}
+		
+		if(ae.getSource() == jButton9) {
+			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,2,2,jButton9,jLabel2,jLabel3);
+			ChatClient.getInstance().enviarMovimiento(msg);
+		}
+		
+		/*	if(ae.getSource() == jButton1){
 			int iden = bb.nroJugadas%2;
 			int aux;
 			if(bb.inspect(0, 0, iden))							// Si inspect == true puedo realizar movimiento
@@ -288,9 +342,8 @@ public class InterfazTateti extends JFrame implements ActionListener {
 			}
 			textAreaConversacion.setText(mensajeReceptor + "\n");
 		}
-		
+	*/	
 	}
-
 	public void setearIcono(Object obj, int id) {							
 		if(obj instanceof JLabel) {
 			JLabel l = (JLabel) obj;
@@ -305,21 +358,6 @@ public class InterfazTateti extends JFrame implements ActionListener {
 			else
 			b.setIcon(new ImageIcon(getClass().getResource("circuloGrande.png")));
 		}
-	}
-	
-	// TODO ver utilidad de este metodo, posiblemente no sea necesario
-	public boolean jugar(JButton jb, int i, int j) {						// Este metodo se debe ejecutar cuando se carga el frame principal
-		if (!(bb.gameOver)) {
-			//controlador.nextSource(i, j, bb.nroJugadas);
-			setearIcono(jLabel1,bb.nroJugadas);
-		} else {
-			if (bb.nroJugadas == 9)
-				jLabel2.setText("EMPATE");
-			else
-				jLabel2.setText("Ta Te Ti");								// Al label2 le agrega TATETI, alguien gano
-			jLabel2.setVisible(true);
-		}
-		return true;
 	}
 	
 	/* PANEL JUEGO */
@@ -360,7 +398,7 @@ public class InterfazTateti extends JFrame implements ActionListener {
 							public void actionPerformed(java.awt.event.ActionEvent e) {
 							invitacion = new InvitacionJuego();	// Debo enviar este objeto junto con el usuario con el que quiero jugar entonces el servidor se encargara de hacer invitacion.show y esperar por la respuesta escuchando si apreto el boton si o no
 							//invitacion.show();
-							bb = new Blackboard();
+							//bb = new Blackboard();
 							limpiarTablero();
 						}
 					});
@@ -829,6 +867,22 @@ public class InterfazTateti extends JFrame implements ActionListener {
 			}
 		}
 		return textAreaMensajeEmisor;
+	}
+
+	public String getPlayer1() {
+		return player1;
+	}
+
+	public void setPlayer1(String player1) {
+		this.player1 = player1;
+	}
+
+	public String getPlayer2() {
+		return player2;
+	}
+
+	public void setPlayer2(String player2) {
+		this.player2 = player2;
 	}
 	
 	/* FIN PANEL CHAT */
