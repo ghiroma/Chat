@@ -205,10 +205,10 @@ public final class DataAccess {
 	public List<String> getUsers(String textoBusqueda) {
 		List<String> listaUsuarios = null;
 		try {
-			ResultSet rs = stat.executeQuery("SELECT User FROM USUARIOS WHERE Conectado=1 "
-					+" AND (UPPER(User) like '%" + textoBusqueda.toUpperCase() 
-					+"%' or UPPER(Apyn) like '%" + textoBusqueda.toUpperCase()
-					+"%' or UPPER(Mail) like '%" + textoBusqueda.toUpperCase() +"%')");
+			ResultSet rs = stat.executeQuery("SELECT User FROM USUARIOS WHERE Conectado=1 AND UPPER(User) like " 
+					+ " '%"+textoBusqueda.toUpperCase() 
+					+"%' or UPPER(Apyn) like '%"+ textoBusqueda.toUpperCase()
+					+"%' or UPPER(Mail) like '%"+ textoBusqueda.toUpperCase() +"%'");
 			listaUsuarios = new ArrayList<String>();
 			while(rs.next())
 				listaUsuarios.add(rs.getString("User"));
