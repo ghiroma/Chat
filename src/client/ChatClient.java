@@ -3,6 +3,7 @@ package client;
 import interfaces.cliente.ClienteConversacion;
 import interfaces.cliente.ClienteInicial;
 import interfaces.cliente.UserLogin;
+import interfaces.tateti.InterfazTateti;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -55,7 +56,8 @@ public class ChatClient {
 	private UserLogin frontEndLogIn;
 	private ClienteInicial frontEnd;
 	private Map<String, ClienteConversacion> mapaConversaciones;
-
+	private Map<String, InterfazTateti> mapaTaTeTi;
+	
 	/* Constructor */
 	private ChatClient() {
 		try {
@@ -161,6 +163,7 @@ public class ChatClient {
 				usuarioLogeado = obtenerUsuario(userData);
 	
 				this.mapaConversaciones = new HashMap<String ,ClienteConversacion>();
+				this.mapaTaTeTi = new HashMap<String, InterfazTateti>();
 				this.frontEnd = new ClienteInicial();
 				return frontEnd;
 			} else if(msg.getId()==Mensaje.BANNED) {
@@ -264,6 +267,12 @@ public class ChatClient {
 		enviarAlServer(msg);
 	}
 
+	public void enviarMensajeChatTaTeTi(String amigo, String texto)
+	{
+		Mensaje msg = new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(amigo,texto));
+		enviarAlServer(msg);
+	}
+	
 	public void aceptacionInvitacionAmigo(MensajeInvitacion msgInvitacion) {
 		Mensaje msg = new Mensaje(Mensaje.ACEPTACION_INVITACION_AMIGO, msgInvitacion);
 		enviarAlServer(msg);
@@ -314,7 +323,11 @@ public class ChatClient {
 					} else if(msg.getId() == Mensaje.ENVIO_PIZARRA) {
 						enviarPizarra(msg);
 					} else if(msg.getId() == Mensaje.ACTUALIZACION_PIZARRA) {
-						
+						//TODO Diego.
+					}else if(msg.getId() == Mensaje.ENVIAR_MENSAJE_TATETI){
+						//TODO Guille.
+						MensajeChat msgChat = (MensajeChat)msg.getCuerpo();
+						frontEnd.getNuevaConversacionTateti(msgChat.getDestinatario(), msgChat.getTexto());
 					} else {
 						synchronized(mapMensajes){
 							mapMensajes.put(msg.getId(), msg.getCuerpo());
@@ -339,6 +352,10 @@ public class ChatClient {
 	}
 	public Map<String, ClienteConversacion> getMapaConversaciones() {
 		return mapaConversaciones;
+	}
+	
+	public Map<String, InterfazTateti> getMapaTateti(){
+		return mapaTaTeTi;
 	}
 	public BanInfo getBanInfo() {
 		return this.banInfo;

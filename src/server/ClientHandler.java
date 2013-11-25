@@ -83,6 +83,10 @@ public class ClientHandler extends Thread {
 					enviarMensajeChat((MensajeChat)msg.getCuerpo());
 					ChatServer.getInstance().logearEvento("Server :: " + user + " envio mensaje a " + ((MensajeChat)msg.getCuerpo()).getDestinatario());
 					break;
+				case Mensaje.ENVIAR_MENSAJE_TATETI:
+					enviarMensajeChatTaTeTi((MensajeChat)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: "+user + " envio mensaje en el tateti a "+ ((MensajeChat)msg.getCuerpo()).getDestinatario());
+					break;
 				case Mensaje.BUSCAR_USUARIO:
 					buscarUsuarios((String)msg.getCuerpo());
 					ChatServer.getInstance().logearEvento("Server :: " + user + " busco: " + (String)msg.getCuerpo());
@@ -169,6 +173,11 @@ public class ClientHandler extends Thread {
 			DataAccess.getInstance().modifyUser(userMeta);
 			ChatServer.getInstance().actualizarUsuarios();
 		} 
+	}
+
+	private void enviarMensajeChatTaTeTi(MensajeChat msgChat) {
+		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgChat.getDestinatario());
+		client.enviarMensajeChatTaTeTi(user, msgChat.getTexto());
 	}
 
 	/* Metodos privados */
@@ -457,6 +466,16 @@ public class ClientHandler extends Thread {
 		}
 	}
 
+	public void enviarMensajeChatTaTeTi(String emisor, String texto){
+		try{
+			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(emisor,texto)));
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
 	public void recibirInvitacion(MensajeInvitacion msgInvitacion) {
 		try {
 			out.writeObject(new Mensaje(Mensaje.INVITAR_USUARIO, msgInvitacion));
