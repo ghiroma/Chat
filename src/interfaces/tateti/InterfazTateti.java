@@ -114,11 +114,8 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 					String mensajeEmisor = textAreaMensajeEmisor.getText();								// TODO enviarselo al server para que lo cargue en el textAreaConversacion
 					String mensajeReceptor = textAreaConversacion.getText();
 					String aux = "";
-					//TODO sacar el hardcodeo.
-					System.out.println("Estoy enviando un mensaje");
-					//ChatClient.getInstance().enviarMensajeChatTaTeTi("ghiroma", mensajeEmisor);
 					ChatClient.getInstance().enviarMensajeChatTaTeTi(player2, mensajeEmisor);
-					textAreaConversacion.append("Tu: "+mensajeEmisor+"\n");
+					textAreaConversacion.append("Tu: "+mensajeEmisor);
 					StringTokenizer palabras= new StringTokenizer(mensajeEmisor," ");					// Copio todo el mensaje y lo cargo en un vector de palabras
 					textAreaMensajeEmisor.setText("");
 					String linea = "";
@@ -131,7 +128,6 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 						} else
 							mensajeReceptor = mensajeReceptor + aux;
 					}
-					textAreaConversacion.setText(mensajeReceptor);
 				}
 			}}); 
 		
@@ -893,7 +889,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 	/* FIN PANEL CHAT */
 	
 	public void mostrarMensajeDeRival(String mensaje){
-		textAreaConversacion.append(">> " +player2+": "+mensaje+"\n" );
+		textAreaConversacion.append(">> " +player2+": "+mensaje );
 	}
 	
 }
