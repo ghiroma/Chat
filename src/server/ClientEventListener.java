@@ -26,10 +26,14 @@ public class ClientEventListener implements EventListener {
 	}
 
 	/* Metodos */
-	public void statusChanged(StatusChangedEvent e){
-		/* Actualizo la lista de amigos en el server para este usuario */
+	public void statusChanged(StatusChangedEvent e) {
+
+		// Quito al usuario de la lista de clientes si se desconecta
 		if(0 == e.getEstado())
-			handlerList.remove(e.getUsername()).cerrarSesion();
+			handlerList.remove(e.getUsername());
+
+		/* Actualizo la lista de amigos en el server para este usuario */
+		setFriendsOnline();
 
 		/* A cada handler de amigo conectado le envio senial de cambio de estado */
 		Iterator<ClientHandler> it = friendsOnline.iterator();

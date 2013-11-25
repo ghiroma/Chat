@@ -23,7 +23,11 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import client.ChatClient;
-import common.*;
+
+import common.FriendStatus;
+import common.Mensaje;
+import common.MensajeInvitacion;
+import common.MensajePartida;
 
 public class ClienteInicial extends JFrame {
 
@@ -31,6 +35,7 @@ public class ClienteInicial extends JFrame {
 
 	private JPanel contentPane;
 	private JLabel lblNotificacion;
+	private DefaultListModel modelAmigos;
 
 	/**
 	 * Create the frame.
@@ -222,13 +227,22 @@ public class ClienteInicial extends JFrame {
 	}
 	
 	private DefaultListModel obtenerListaAmigos() {
-		DefaultListModel modelAmigos = new DefaultListModel();
+		modelAmigos = new DefaultListModel();
 		List<FriendStatus> amigos = ChatClient.getInstance().getAmigos();
 		for (FriendStatus amigo : amigos) {
 			if(amigo.getEstado() == 1)
 				modelAmigos.addElement(amigo.getUsername());
 		}
 		return modelAmigos;
+	}
+
+	public void friendStatusChanged(String user, int estado){
+		if (estado==1) {
+			if(!modelAmigos.contains(user))
+				modelAmigos.addElement(user);
+		} else {
+			modelAmigos.removeElement(user);
+		}
 	}
 
 	public void mostrarAlerta(String txtAlerta) {
@@ -242,6 +256,8 @@ public class ClienteInicial extends JFrame {
 
 	}
 
+
+	// Inicio: TATETI
 	public void mostrarPopUpInvitacionJuego(Mensaje msg) {
 		InvitacionJuego inv = new InvitacionJuego();
 		inv.setUsuarioOrigen(((MensajeInvitacion)msg.getCuerpo()).getSolicitante());
@@ -250,7 +266,7 @@ public class ClienteInicial extends JFrame {
 		inv.setVisible(true);
 		inv.toFront();
 	}
-		
+
 	public InterfazTateti mostrarTateti(Mensaje msg) {
 		InterfazTateti tateti = new InterfazTateti();
 		//TODO utilizar cuerpo de mensaje para cargar informacion necesaria en la pantalla
@@ -264,11 +280,6 @@ public class ClienteInicial extends JFrame {
 		tateti.toFront();
 		return tateti;		
 	}
+	// Fin: TATETI
 
-	
-	public void friendStatusChanged(String user, int estado){
-		//TODO: agregar/quitar de la lista de conectados en el front-end el user recibido por parametro.
-
-
-	}
 }

@@ -1,5 +1,8 @@
 package server;
 
+import interfaces.tateti.Blackboard;
+import interfaces.tateti.InterfazTateti;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,15 +20,15 @@ import javax.swing.event.EventListenerList;
 import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeChat;
+import common.MensajeConsulta;
 import common.MensajeGrupo;
 import common.MensajeInvitacion;
 import common.MensajeMovimiento;
 import common.MensajePartida;
 import common.MensajePizarra;
 import common.MensajeRespuestaInvitacion;
-import common.MensajeConsulta;
 import common.UserMetaData;
-import interfaces.tateti.*;
+
 import dataTier.DataAccess;
 import events.StatusChangedEvent;
 
@@ -115,7 +118,8 @@ public class ClientHandler extends Thread {
 					String solicitante = ((MensajeRespuestaInvitacion)msg.getCuerpo()).getSolicitante();
 					ChatServer.getInstance().logearEvento("Server :: " + invitado + (((MensajeRespuestaInvitacion)msg.getCuerpo()).isAcepto()?" acepto ":" no acepto ") + " jugar con " + solicitante);
 					if(((MensajeRespuestaInvitacion)msg.getCuerpo()).isAcepto()) {
-						if(partidas.size() < 3) {									// Verifico que no este jugando mas de 3 partidas
+						// Verifico que no este jugando mas de 3 partidas
+						if(partidas.size() < 3) {
 							MensajeConsulta mc = new MensajeConsulta(solicitante,invitado,false,this.cantpartidas);
 							consultarCantidadPartidasRival(new Mensaje(Mensaje.CANTIDAD_PARTIDAS_VALIDA,mc));							
 						} else {
@@ -124,20 +128,23 @@ public class ClientHandler extends Thread {
 					}					
 					break;
 				case Mensaje.INICIO_PARTIDA:
-					agregarInterfaz(msg);					// Debo enviar la partida creada a mi rival
+					// Debo enviar la partida creada a mi rival
+					agregarInterfaz(msg);
 					break;			
 				case Mensaje.ENVIO_PARTIDA:
 					agregarInterfaz(msg);
 					break;
 				case Mensaje.RESPUESTA_CONSULTA_PARTIDAS:
 					if(partidas.size() < 3) {
-						String inv = ((MensajeConsulta)msg.getCuerpo()).getSolicitante();	// Cuando respondo con mi cantidad de partidas para crear la pizzara yo soy el invitado
+						// Cuando respondo con mi cantidad de partidas para crear la pizzara yo soy el invitado
+						String inv = ((MensajeConsulta)msg.getCuerpo()).getSolicitante();
 						String sol = ((MensajeConsulta)msg.getCuerpo()).getInvitado();
 						int id = ((MensajeConsulta)msg.getCuerpo()).getIdPizzaraSolicitante();
 						MensajePartida mp = new MensajePartida(sol,inv,null);
 						iniciarPartida(new Mensaje(Mensaje.INICIO_PARTIDA,mp));
 						MensajePizarra mpi = new MensajePizarra(sol,inv,crearPizarraDePartida(sol, inv, this.cantpartidas,id));
-						enviarPizarraARival(mpi);				// Le paso la id de la partida a crear
+						// Le paso la id de la partida a crear
+						enviarPizarraARival(mpi);
 					} else {
 						// TODO rival no puede jugar ya que se encuentra al limite de partidas permitidas
 					}
@@ -146,8 +153,9 @@ public class ClientHandler extends Thread {
 					vincularPizarra(msg);
 					break;
 				case Mensaje.MOVIMIENTO:
-					if(verificarMovimiento(msg)) 
-							actualizarMovimiento(msg);			// Debo actualizarlo en ambas interfaces
+					// Debo actualizarlo en ambas interfaces
+					if(verificarMovimiento(msg))
+						actualizarMovimiento(msg);
 					break;
 				case Mensaje.RESPUESTA_ACTUALIZACION_PIZARRA:
 					actualizarMovimiento(msg);
@@ -157,7 +165,6 @@ public class ClientHandler extends Thread {
 					crearGrupo((MensajeGrupo)msg.getCuerpo());
 					break;
 				}
-
 			} 
 		} catch (SocketException se) {
 			ChatServer.getInstance().logearEvento("Server :: "+ user + " se ha desconectado");
@@ -211,6 +218,93 @@ public class ClientHandler extends Thread {
 		client.recibirInvitacion(msgInvitacion);
 	}
 
+	/* Metodos publicos */
+	public void cerrarSesion() {
+		try {
+			in.close();
+			out.close();
+			client.close();
+			/* Avisa a todos que se desconecta el user */
+			dispatchEvent(new StatusChangedEvent(this, user, 0));
+		} catch (IOException e) {
+			System.err.println("Error al cerrar sesion de " + user);
+		}
+	}
+
+	public void enviarAlerta(String textoAlerta){
+		try {
+			Mensaje msg=new Mensaje(Mensaje.ALERTA, textoAlerta);
+			out.writeObject(msg);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void enviarMensajeChat(String emisor, String texto) {
+		try {
+			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE, new MensajeChat(emisor, texto)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void recibirInvitacion(MensajeInvitacion msgInvitacion) {
+		try {
+			out.writeObject(new Mensaje(Mensaje.INVITAR_USUARIO, msgInvitacion));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void aceptacionInvitacionAmistad(MensajeInvitacion msgInvitacion) {
+		DataAccess.getInstance().insertAmigos(msgInvitacion.getInvitado(), msgInvitacion.getSolicitante());
+		dispatchEvent(new StatusChangedEvent(this, user, 1));
+	}
+
+	/* Metodos de update (Son llamados desde los ClientEventListener)*/
+	public void friendStatusUpdate(String user, int estado){
+		try {
+			out.writeObject(new Mensaje(Mensaje.CAMBIO_ESTADO, new FriendStatus(user, estado)));
+		} catch(SocketException e1) {
+		} catch(IOException e) {
+			e.printStackTrace();
+			System.err.println("Error al enviar cambio de estado al cliente.");
+		}
+	}
+
+	/* Eventos */
+	public void addEventListener(ClientEventListener e) {
+		listenerList.add(ClientEventListener.class, e);
+	}
+
+	public void removeEventListener(ClientEventListener e) {
+		listenerList.remove(ClientEventListener.class, e);
+	}
+
+	private void dispatchEvent(EventObject e) {
+		Object[] listeners = listenerList.getListenerList();
+		for (int i = 0; i < listeners.length; i = i + 2) {
+
+			if (e instanceof StatusChangedEvent) {
+				StatusChangedEvent e1 = (StatusChangedEvent)e;
+				((ClientEventListener) listeners[i+1]).statusChanged(e1);
+			}
+
+//			if(e instanceof TuEvento)
+//				((ClientEventListener) listeners[i+1]).tuMetodo(e);
+		}
+	}
+
+	/* Getters & Setters */
+	public String getUser() {
+		return user;
+	}
+	public String getIP() {
+		return IP;
+	}
+
+
+	// Inicio: TATETI
 	// TODO Diego
 	private void enviarInvitacionJuego(MensajeInvitacion inv) {
 		ClientHandler client = ChatServer.getInstance().getHandlerList().get(inv.getInvitado());
@@ -263,8 +357,9 @@ public class ClientHandler extends Thread {
 		MensajePartida mp = (MensajePartida)msg.getCuerpo();
 		interfaces.add(mp.getPartida());
 	}
-		
-	private Blackboard crearPizarraDePartida(String s, String i, int idPartidas, int idPartidai) {				// Creo pizarra
+
+	// Creo pizarra
+	private Blackboard crearPizarraDePartida(String s, String i, int idPartidas, int idPartidai) {
 		Blackboard pizarra = new Blackboard();
 		pizarra.setJugador1(s);
 		pizarra.setJugador2(i);
@@ -274,18 +369,19 @@ public class ClientHandler extends Thread {
 		partidas.add(pizarra);
 		return pizarra;
 	}
-		
+
+	// Vinculo pizarra del solicitante con la enviada por el invitado
 	private void vincularPizarra(Mensaje msg) {
-		Blackboard pizarra = ((MensajePizarra)msg.getCuerpo()).getPizarra();			// Vinculo pizarra del solicitante con la enviada por el invitado
+		Blackboard pizarra = ((MensajePizarra)msg.getCuerpo()).getPizarra();
 		this.cantpartidas++;
 		partidas.add(pizarra);	
 	}
-	
+
 	private void enviarPizarraARival(MensajePizarra mp) {
 		ClientHandler client = ChatServer.getInstance().getHandlerList().get(mp.getJugador2());
 		client.recibirPizarra(new Mensaje(Mensaje.ENVIO_PIZARRA,mp));
 	}
-		
+
 	private void recibirPizarra(Mensaje msg) {
 		try {
 			out.writeObject(msg);
@@ -293,7 +389,7 @@ public class ClientHandler extends Thread {
 			e.printStackTrace();
 		}
 	}
-		
+
 	private boolean verificarMovimiento(Mensaje msg) {
 		Iterator<Blackboard> i = partidas.iterator();
 		Blackboard pizarra = new Blackboard();
@@ -313,7 +409,7 @@ public class ClientHandler extends Thread {
 		}
 		return false;
 	}
-	
+
 	private void actualizarMovimiento(Mensaje msg) {
 		Iterator<Blackboard> i = partidas.iterator();
 		Blackboard pizarra = new Blackboard();
@@ -340,41 +436,52 @@ public class ClientHandler extends Thread {
 		// Actualizacion pizarra e interfaz de ClientHandler actual
 		JLabel label1 = tateti.getJLabel2();
 		JLabel label2 = tateti.getJLabel3();
-				
-		setearIcono(label1,(pizarra.nroJugadas+1)%2);						// Actualizo label de proximo turno
-			
+
+		// Actualizo label de proximo turno
+		setearIcono(label1,(pizarra.nroJugadas+1)%2);
+
 		// Debo encontrar boton correspondiente en el tateti, 
 		// comparo por referencia ya que lo me envian por mensaje es una referencia 
 		// del boton que fue presionado de determinada interfaz que obtuve anteriormente
 		if(tateti.getJButton1() == boton) {
-			setearIcono(boton,pizarra.nroJugadas);								// Actualizo icono del boton
+			// Actualizo icono del boton
+			setearIcono(boton,pizarra.nroJugadas);
 		}
 		if(tateti.getJButton2() == boton) {
-			setearIcono(boton,pizarra.nroJugadas);								// Actualizo icono del boton
+			// Actualizo icono del boton
+			setearIcono(boton,pizarra.nroJugadas);
 		}
 		if(tateti.getJButton3() == boton) {
-			setearIcono(boton,pizarra.nroJugadas);								// Actualizo icono del boton
+			// Actualizo icono del boton
+			setearIcono(boton,pizarra.nroJugadas);
 		}
 		if(tateti.getJButton4() == boton) {
-			setearIcono(boton,pizarra.nroJugadas);								// Actualizo icono del boton
+			// Actualizo icono del boton
+			setearIcono(boton,pizarra.nroJugadas);
 		}
 		if(tateti.getJButton5() == boton) {
-			setearIcono(boton,pizarra.nroJugadas);								// Actualizo icono del boton
+			// Actualizo icono del boton
+			setearIcono(boton,pizarra.nroJugadas);
 		}
 		if(tateti.getJButton6() == boton) {
-			setearIcono(boton,pizarra.nroJugadas);								// Actualizo icono del boton
+			// Actualizo icono del boton
+			setearIcono(boton,pizarra.nroJugadas);
 		}
 		if(tateti.getJButton7() == boton) {
-			setearIcono(boton,pizarra.nroJugadas);								// Actualizo icono del boton
+			// Actualizo icono del boton
+			setearIcono(boton,pizarra.nroJugadas);
 		}
 		if(tateti.getJButton8() == boton) {
-			setearIcono(boton,pizarra.nroJugadas);								// Actualizo icono del boton
+			// Actualizo icono del boton
+			setearIcono(boton,pizarra.nroJugadas);
 		}
 		if(tateti.getJButton9() == boton) {
-			setearIcono(boton,pizarra.nroJugadas);								// Actualizo icono del boton
+			// Actualizo icono del boton
+			setearIcono(boton,pizarra.nroJugadas);
 		}
-			
-		int aux = pizarra.update(mm.getX(), mm.getY(), pizarra.nroJugadas);			// Actualizo pizarra
+
+		// Actualizo pizarra
+		int aux = pizarra.update(mm.getX(), mm.getY(), pizarra.nroJugadas);
 		// TODO recordar que el update() de la clase blackboard devuelvo un entero corresponediente al resultado de la partida
 		// 1 - Hay Ganador
 		// 0 - Empate 
@@ -389,14 +496,14 @@ public class ClientHandler extends Thread {
 			}
 			label2.setVisible(true);
 		}
-				
+
 		if(msg.getId() == Mensaje.RESPUESTA_ACTUALIZACION_PIZARRA) {
 			// Debo mandar informacion necesaria al client handler del rival para que actualice su pizarra
 			ClientHandler client = ChatServer.getInstance().getHandlerList().get(mm.getJugador2());
 			client.enviarActualizacion(new Mensaje(Mensaje.ACTUALIZACION_PIZARRA,mm));
 		}
 	}
-		 
+
 	private void enviarActualizacion(Mensaje msg) {
 		try {
 			out.writeObject(msg);
@@ -404,8 +511,8 @@ public class ClientHandler extends Thread {
 			e.printStackTrace();
 		}
 	}			
-	
-	public void setearIcono(Object obj, int id) {							
+
+	public void setearIcono(Object obj, int id) {
 		try {
 			if(obj != null) {
 				if(obj instanceof JLabel) {
@@ -427,12 +534,14 @@ public class ClientHandler extends Thread {
 		}
 	}
 	// Fin TODO Diego
+	// Fin: TATETI
 
-	/* Grupos */
-	
+
+	// Inicio: GRUPOS
 	private void crearGrupo(MensajeGrupo mensajeGrupo) {
 		ChatServer.getInstance().crearGrupo(mensajeGrupo);
 	}
+<<<<<<< HEAD
 
 	/* Fin Grupos */ 
 	
@@ -532,5 +641,8 @@ public class ClientHandler extends Thread {
 	public String getIP() {
 		return IP;
 	}
+=======
+	// Fin: GRUPOS
+>>>>>>> branch 'master' of https://github.com/ghiroma/Chat.git
 
 }

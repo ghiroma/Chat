@@ -1,5 +1,6 @@
 package client;
 
+import groups.Grupo;
 import interfaces.cliente.ClienteConversacion;
 import interfaces.cliente.ClienteInicial;
 import interfaces.cliente.UserLogin;
@@ -22,14 +23,14 @@ import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeChat;
 import common.MensajeConsulta;
-import common.MensajeInvitacion;
 import common.MensajeGrupo;
+import common.MensajeInvitacion;
 import common.MensajeMovimiento;
 import common.MensajePartida;
 import common.MensajePizarra;
 import common.UserMetaData;
+
 import dataTier.BanInfo;
-import groups.Grupo;
 
 public class ChatClient {
 	// Config
@@ -222,48 +223,13 @@ public class ChatClient {
 		return new ArrayList<String>();
 	}
 
-	public void invitarAmigo(String contacto) {
-		Mensaje msg = new Mensaje(Mensaje.INVITAR_USUARIO, new MensajeInvitacion(getUsuarioLogeado().getUser(), contacto));
+	public void enviarMensajeChat(String amigo, String texto) {
+		Mensaje msg = new Mensaje(Mensaje.ENVIAR_MENSAJE, new MensajeChat(amigo, texto));
 		enviarAlServer(msg);
 	}
 
-	// TODO Diego
-		public void invitarAmigoAJugar(String contacto) {
-			Mensaje msg = new Mensaje(Mensaje.INVITACION_JUEGO, new MensajeInvitacion(getUsuarioLogeado().getUser(), contacto));
-			enviarAlServer(msg);
-		}
-
-		public void aceptacionInvitacionJuego(Mensaje msg) {
-			enviarAlServer(msg);
-		}
-		
-		public void enviarPizarra(Mensaje msg) {
-			MensajePizarra mp = (MensajePizarra)msg.getCuerpo();
-			//String aux = mp.getJugador1();					// En este caso como estoy enviando pizarra creada por el invitado a jugar al usuario que inicio partida el nombre de los jugadores esta cambiado
-			//mp.setJugador1(mp.getJugador2());
-			//mp.setJugador2(aux);
-			enviarAlServer(new Mensaje(Mensaje.RESPUESTA_PIZARRA,mp));		
-		}
-		
-		public void actualizarPizarra(Mensaje msg) {
-			MensajeMovimiento mm = (MensajeMovimiento)msg.getCuerpo();
-			enviarAlServer(new Mensaje(Mensaje.RESPUESTA_ACTUALIZACION_PIZARRA,mm));
-		}
-		
-		public void enviarMovimiento(MensajeMovimiento msg) {
-			enviarAlServer(new Mensaje(Mensaje.MOVIMIENTO,msg));
-		}
-		
-		public void enviarCantidadPartidas(Mensaje msg) {
-			MensajeConsulta mc = (MensajeConsulta)msg.getCuerpo();
-			//msg.setId(Mensaje.RESPUESTA_CONSULTA_PARTIDAS);
-			//enviarAlServer(new Mensaje(Mensaje.RESPUESTA_CONSULTA_PARTIDAS,msg));
-			enviarAlServer(new Mensaje(Mensaje.RESPUESTA_CONSULTA_PARTIDAS,mc));
-		}
-		//
-		
-	public void enviarMensajeChat(String amigo, String texto) {
-		Mensaje msg = new Mensaje(Mensaje.ENVIAR_MENSAJE, new MensajeChat(amigo, texto));
+	public void invitarAmigo(String contacto) {
+		Mensaje msg = new Mensaje(Mensaje.INVITAR_USUARIO, new MensajeInvitacion(getUsuarioLogeado().getUser(), contacto));
 		enviarAlServer(msg);
 	}
 
@@ -276,10 +242,12 @@ public class ChatClient {
 	public void aceptacionInvitacionAmigo(MensajeInvitacion msgInvitacion) {
 		Mensaje msg = new Mensaje(Mensaje.ACEPTACION_INVITACION_AMIGO, msgInvitacion);
 		enviarAlServer(msg);
+
+		frontEnd.friendStatusChanged(msgInvitacion.getSolicitante(), 1);
 	}
 
 	public void close(){
-		enviarAlServer(new Mensaje(Mensaje.CERRAR_SESION,null));
+		enviarAlServer(new Mensaje(Mensaje.CERRAR_SESION, null));
 		try {
 			entrada.close();
 			salida.close();
@@ -289,7 +257,7 @@ public class ChatClient {
 		}
 		System.exit(0);
 	}
-	
+
 	// Thread de escucha de mensajes del server
 	class ListenFromServer extends Thread {
 		public void run() {
@@ -310,7 +278,7 @@ public class ChatClient {
 						frontEnd.friendStatusChanged(((FriendStatus)msg.getCuerpo()).getUsername(),((FriendStatus)msg.getCuerpo()).getEstado());
 					} else if(msg.getId() == Mensaje.INVITACION_JUEGO) {
 						frontEnd.mostrarPopUpInvitacionJuego(msg);
-					}else if(msg.getId() == Mensaje.INICIO_PARTIDA) {
+					} else if(msg.getId() == Mensaje.INICIO_PARTIDA) {
 						MensajePartida mp = (MensajePartida)msg.getCuerpo();
 						mp.setPartida(frontEnd.mostrarTateti(msg));
 						enviarAlServer(msg);
@@ -360,12 +328,51 @@ public class ChatClient {
 	public BanInfo getBanInfo() {
 		return this.banInfo;
 	}
-	
-	//Metodos Grupos
-	
+
+
+	// Inicio: GRUPOS
 	public void crearGrupo(Grupo grupo){
 		grupo.setModerador(usuarioLogeado.getUser());
 		Mensaje msg = new Mensaje(Mensaje.CREAR_GRUPO, new MensajeGrupo(grupo,getUsuarioLogeado().getUser(),""));
 		enviarAlServer(msg);
 	}
+	// Fin: GRUPOS
+
+
+	// Inicio: TATETI
+	// TODO Diego
+	public void invitarAmigoAJugar(String contacto) {
+		Mensaje msg = new Mensaje(Mensaje.INVITACION_JUEGO, new MensajeInvitacion(getUsuarioLogeado().getUser(), contacto));
+		enviarAlServer(msg);
+	}
+
+	public void aceptacionInvitacionJuego(Mensaje msg) {
+		enviarAlServer(msg);
+	}
+
+	public void enviarPizarra(Mensaje msg) {
+		MensajePizarra mp = (MensajePizarra)msg.getCuerpo();
+		//String aux = mp.getJugador1();					// En este caso como estoy enviando pizarra creada por el invitado a jugar al usuario que inicio partida el nombre de los jugadores esta cambiado
+		//mp.setJugador1(mp.getJugador2());
+		//mp.setJugador2(aux);
+		enviarAlServer(new Mensaje(Mensaje.RESPUESTA_PIZARRA,mp));		
+	}
+
+	public void actualizarPizarra(Mensaje msg) {
+		MensajeMovimiento mm = (MensajeMovimiento)msg.getCuerpo();
+		enviarAlServer(new Mensaje(Mensaje.RESPUESTA_ACTUALIZACION_PIZARRA,mm));
+	}
+
+	public void enviarMovimiento(MensajeMovimiento msg) {
+		enviarAlServer(new Mensaje(Mensaje.MOVIMIENTO,msg));
+	}
+
+	public void enviarCantidadPartidas(Mensaje msg) {
+		MensajeConsulta mc = (MensajeConsulta)msg.getCuerpo();
+		//msg.setId(Mensaje.RESPUESTA_CONSULTA_PARTIDAS);
+		//enviarAlServer(new Mensaje(Mensaje.RESPUESTA_CONSULTA_PARTIDAS,msg));
+		enviarAlServer(new Mensaje(Mensaje.RESPUESTA_CONSULTA_PARTIDAS,mc));
+	}
+	// Fin: TATETI
+
 }

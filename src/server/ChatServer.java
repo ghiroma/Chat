@@ -145,8 +145,7 @@ public class ChatServer {
 		this.logearEvento("Server :: Se cierra el servidor");
 		try {
 			for(Map.Entry<String, ClientHandler> entry : this.handlerList.entrySet()) {
-				ClientHandler client = (ClientHandler)entry.getValue();
-				client.cerrarSesion();
+				this.handlerList.get(entry.getKey()).cerrarSesion();
 			}
 			return true;
 		} catch(Exception e) {

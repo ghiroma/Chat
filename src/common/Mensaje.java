@@ -1,12 +1,12 @@
 package common;
 
-import java.io.*;
+import java.io.Serializable;
 
 public class Mensaje implements Serializable {
 
 	private static final long serialVersionUID = -161453018045089683L;
 
-	/* Server */ 
+	/* Server */
 	public static final int BANNED = 9; 
 	public static final int ACCEPTED = 11;
 	public static final int DENIED = 12;
@@ -27,6 +27,8 @@ public class Mensaje implements Serializable {
 	public static final int VERIFICAR_USUARIO = 16;
 	public static final int ACEPTACION_INVITACION_AMIGO = 17;
 	public static final int CERRAR_SESION = 18;
+
+	// Inicio: TATETI
 	public static final int INVITACION_JUEGO = 19;
 	public static final int RESPUESTA_INVITACION_JUEGO = 20;
 	public static final int INICIO_PARTIDA = 21;
@@ -38,10 +40,19 @@ public class Mensaje implements Serializable {
 	public static final int RESPUESTA_PIZARRA = 27;
 	public static final int ACTUALIZACION_PIZARRA = 28;
 	public static final int RESPUESTA_ACTUALIZACION_PIZARRA = 29;
+<<<<<<< HEAD
 	public static final int ENVIAR_MENSAJE_TATETI = 30;
 	
 	/* Grupos */
 	public static final int CREAR_GRUPO = 100; 
+=======
+	// Fin: TATETI
+
+	// Inicio: GRUPOS
+	public static final int CREAR_GRUPO = 100;
+	// Fin: GRUPOS
+
+>>>>>>> branch 'master' of https://github.com/ghiroma/Chat.git
 
 	private int id;
 	private Object cuerpo;
