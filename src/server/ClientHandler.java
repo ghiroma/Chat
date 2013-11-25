@@ -303,6 +303,16 @@ public class ClientHandler extends Thread {
 		return IP;
 	}
 
+	public void enviarMensajeChatTaTeTi(String emisor, String texto){
+		try{
+			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(emisor,texto)));
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
 
 	// Inicio: TATETI
 	// TODO Diego
@@ -541,108 +551,5 @@ public class ClientHandler extends Thread {
 	private void crearGrupo(MensajeGrupo mensajeGrupo) {
 		ChatServer.getInstance().crearGrupo(mensajeGrupo);
 	}
-<<<<<<< HEAD
-
-	/* Fin Grupos */ 
-	
-	/* Metodos publicos */
-	public void cerrarSesion() {
-		try {
-			in.close();
-			out.close();
-			client.close();
-			/* Avisa a todos que se desconecta el user */
-			dispatchEvent(new StatusChangedEvent(this, user, 0));
-		} catch (IOException e) {
-			System.err.println("Error al cerrar sesion de " + user);
-		}
-	}
-
-	public void enviarAlerta(String textoAlerta){
-		try {
-			Mensaje msg=new Mensaje(Mensaje.ALERTA, textoAlerta);
-			out.writeObject(msg);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void enviarMensajeChat(String emisor, String texto) {
-		try {
-			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE, new MensajeChat(emisor, texto)));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void enviarMensajeChatTaTeTi(String emisor, String texto){
-		try{
-			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(emisor,texto)));
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace();
-		}
-	}
-	
-	public void recibirInvitacion(MensajeInvitacion msgInvitacion) {
-		try {
-			out.writeObject(new Mensaje(Mensaje.INVITAR_USUARIO, msgInvitacion));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void aceptacionInvitacionAmistad(MensajeInvitacion msgInvitacion) {
-		DataAccess.getInstance().insertAmigos(msgInvitacion.getInvitado(), msgInvitacion.getSolicitante());
-		//TODO ver si aca no corresponderia enviar un evento avisando de actualizar la lista de amigos del frontEnd
-		//dispatchEvent(new StatusChangedEvent(this, user, 1));
-	}
-
-	/* Metodos de update (Son llamados desde los ClientEventListener)*/
-	public void friendStatusUpdate(String user, int estado){
-		try {
-			out.writeObject(new Mensaje(Mensaje.CAMBIO_ESTADO, new FriendStatus(user, estado)));
-		} catch(SocketException e1) {
-		} catch(IOException e) {
-			e.printStackTrace();
-			System.err.println("Error al enviar cambio de estado al cliente.");
-		}
-	}
-
-	/* Eventos */
-	public void addEventListener(ClientEventListener e) {
-		listenerList.add(ClientEventListener.class, e);
-	}
-
-	public void removeEventListener(ClientEventListener e) {
-		listenerList.remove(ClientEventListener.class, e);
-	}
-
-	private void dispatchEvent(EventObject e) {
-		Object[] listeners = listenerList.getListenerList();
-		for (int i = 0; i < listeners.length; i = i + 2) {
-
-			if (e instanceof StatusChangedEvent) {
-				StatusChangedEvent e1 = (StatusChangedEvent)e;
-				((ClientEventListener) listeners[i+1]).statusChanged(e1);
-			}
-
-//			if(e instanceof TuEvento)
-//				((ClientEventListener) listeners[i+1]).tuMetodo(e);
-
-		}
-	}
-
-	/* Getters & Setters */
-	public String getUser() {
-		return user;
-	}
-	public String getIP() {
-		return IP;
-	}
-=======
-	// Fin: GRUPOS
->>>>>>> branch 'master' of https://github.com/ghiroma/Chat.git
 
 }
