@@ -1,5 +1,7 @@
 package common;
 
+import interfaces.tateti.InterfazTateti;
+
 import java.io.Serializable;
 
 public class MensajePartida implements Serializable {
@@ -8,14 +10,16 @@ public class MensajePartida implements Serializable {
 
 	private String jugador1;
 	private String jugador2;
+	private InterfazTateti partida;
 
 	/* Constructores */
-	public MensajePartida(String j1,String j2) {
+	public MensajePartida(String j1,String j2, InterfazTateti partida) {
 		this.jugador1 = j1;
 		this.jugador2 = j2;
+		this.partida = partida;
 	}
 	public MensajePartida() {
-		this("","");
+		this("","",null);
 	}
 
 
@@ -34,6 +38,12 @@ public class MensajePartida implements Serializable {
 	}
 	public void setJugador2(String jugador2) {
 		this.jugador2 = jugador2;
+	}
+	public InterfazTateti getPartida() {
+		return partida;
+	}
+	public void setPartida(InterfazTateti partida) {
+		this.partida = partida;
 	}
 	
 }

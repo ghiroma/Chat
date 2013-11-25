@@ -1,14 +1,20 @@
 package interfaces.tateti;
 
+import java.io.Serializable;
+
 /* Esta clase es la que posee informacion general de la pizarra, el numero de jugadas, la matriz de la tabla y si finalizo o no la partida */
 
-public class Blackboard {
+public class Blackboard implements Serializable {
 
 	/* Atributos  */
 	public static  int nroJugadas;
 	private static int table[][] = new int[3][3];
 	public static boolean gameOver;
 	private boolean hayGanador = false;
+	private String jugador1;
+	private String jugador2;
+	private int idBlackboard1;
+	private int idBlackboard2;
 	
 	/* Constructores */
 	public Blackboard(){
@@ -22,19 +28,6 @@ public class Blackboard {
 	}
 	
 	/* Metodos */
-	/*
-	public boolean update(int i, int j, int id) {
-		nroJugadas++;
-		table[i][j] = id;						
-		if (hayGanador(id) || nroJugadas == 9) {
-			if(hayGanador(id) == true)
-				hayGanador = true;					
-			gameOver = true;
-		}			
-		return gameOver;
-	}
-	*/
-
 	public int update(int i, int j, int id) {
 		// 1 - Hay Ganador
 		// 0 - Empate 
@@ -130,8 +123,37 @@ public class Blackboard {
 			return false;
 	}	
 	/* Fin Soluciones */
+
+	public String getJugador1() {
+		return jugador1;
+	}
+
+	public void setJugador1(String jugador1) {
+		this.jugador1 = jugador1;
+	}
+
+	public String getJugador2() {
+		return jugador2;
+	}
+
+	public void setJugador2(String jugador2) {
+		this.jugador2 = jugador2;
+	}
+
+	public int getIdBlackboard1() {
+		return idBlackboard1;
+	}
+
+	public void setIdBlackboard1(int idBlackboard1) {
+		this.idBlackboard1 = idBlackboard1;
+	}
+
+	public int getIdBlackboard2() {
+		return idBlackboard2;
+	}
+
+	public void setIdBlackboard2(int idBlackboard2) {
+		this.idBlackboard2 = idBlackboard2;
+	}
 	
 }
-
-
-

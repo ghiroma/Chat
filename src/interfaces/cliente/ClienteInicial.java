@@ -1,6 +1,7 @@
 package interfaces.cliente;
 
 import interfaces.grupos.ClienteModCrearChatBroad;
+import interfaces.tateti.InterfazTateti;
 import interfaces.tateti.InvitacionJuego;
 
 import java.awt.Color;
@@ -22,9 +23,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import client.ChatClient;
-import common.FriendStatus;
-import common.Mensaje;
-import common.MensajeInvitacion;
+import common.*;
 
 public class ClienteInicial extends JFrame {
 
@@ -231,8 +230,6 @@ public class ClienteInicial extends JFrame {
 
 	}
 
-	
-	// TODO Diego
 	public void mostrarPopUpInvitacionJuego(Mensaje msg) {
 		InvitacionJuego inv = new InvitacionJuego();
 		inv.setUsuarioOrigen(((MensajeInvitacion)msg.getCuerpo()).getSolicitante());
@@ -241,7 +238,18 @@ public class ClienteInicial extends JFrame {
 		inv.setVisible(true);
 		inv.toFront();
 	}
-	//
+		
+	public InterfazTateti mostrarTateti(Mensaje msg) {
+		InterfazTateti tateti = new InterfazTateti();
+		//TODO utilizar cuerpo de mensaje para cargar informacion necesaria en la pantalla
+		String jugador1 = ((MensajePartida)msg.getCuerpo()).getJugador1();
+		String jugador2 = ((MensajePartida)msg.getCuerpo()).getJugador2();
+		tateti.setTitle(jugador1 + " vs " + jugador2);
+		tateti.setVisible(true);
+		tateti.toFront();
+		return tateti;		
+	}
+
 	
 	public void friendStatusChanged(String user, int estado){
 		//TODO: agregar/quitar de la lista de conectados en el front-end el user recibido por parametro.
