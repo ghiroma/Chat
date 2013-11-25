@@ -32,6 +32,7 @@ public class ClienteInicial extends JFrame {
 
 	private JPanel contentPane;
 	private JLabel lblNotificacion;
+	private DefaultListModel modelAmigos;
 
 	/**
 	 * Create the frame.
@@ -210,13 +211,22 @@ public class ClienteInicial extends JFrame {
 	}
 
 	private DefaultListModel obtenerListaAmigos() {
-		DefaultListModel modelAmigos = new DefaultListModel();
+		modelAmigos = new DefaultListModel();
 		List<FriendStatus> amigos = ChatClient.getInstance().getAmigos();
 		for (FriendStatus amigo : amigos) {
 			if(amigo.getEstado() == 1)
 				modelAmigos.addElement(amigo.getUsername());
 		}
 		return modelAmigos;
+	}
+
+	public void friendStatusChanged(String user, int estado){
+		if (estado==1) {
+			if(!modelAmigos.contains(user))
+				modelAmigos.addElement(user);
+		} else {
+			modelAmigos.removeElement(user);
+		}
 	}
 
 	public void mostrarAlerta(String txtAlerta) {
@@ -231,7 +241,7 @@ public class ClienteInicial extends JFrame {
 
 	}
 
-	
+
 	// TODO Diego
 	public void mostrarPopUpInvitacionJuego(Mensaje msg) {
 		InvitacionJuego inv = new InvitacionJuego();
@@ -242,10 +252,5 @@ public class ClienteInicial extends JFrame {
 		inv.toFront();
 	}
 	//
-	
-	public void friendStatusChanged(String user, int estado){
-		//TODO: agregar/quitar de la lista de conectados en el front-end el user recibido por parametro.
 
-
-	}
 }

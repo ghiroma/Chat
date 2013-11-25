@@ -240,6 +240,8 @@ public class ChatClient {
 	public void aceptacionInvitacionAmigo(MensajeInvitacion msgInvitacion) {
 		Mensaje msg = new Mensaje(Mensaje.ACEPTACION_INVITACION_AMIGO, msgInvitacion);
 		enviarAlServer(msg);
+
+		frontEnd.friendStatusChanged(msgInvitacion.getSolicitante(), 1);
 	}
 
 	public void close(){
