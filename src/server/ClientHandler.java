@@ -86,10 +86,6 @@ public class ClientHandler extends Thread {
 					enviarMensajeChat((MensajeChat)msg.getCuerpo());
 					ChatServer.getInstance().logearEvento("Server :: " + user + " envio mensaje a " + ((MensajeChat)msg.getCuerpo()).getDestinatario());
 					break;
-				case Mensaje.ENVIAR_MENSAJE_TATETI:
-					enviarMensajeChatTaTeTi((MensajeChat)msg.getCuerpo());
-					ChatServer.getInstance().logearEvento("Server :: "+user + " envio mensaje en el tateti a "+ ((MensajeChat)msg.getCuerpo()).getDestinatario());
-					break;
 				case Mensaje.BUSCAR_USUARIO:
 					buscarUsuarios((String)msg.getCuerpo());
 					ChatServer.getInstance().logearEvento("Server :: " + user + " busco: " + (String)msg.getCuerpo());
@@ -160,6 +156,10 @@ public class ClientHandler extends Thread {
 				case Mensaje.RESPUESTA_ACTUALIZACION_PIZARRA:
 					actualizarMovimiento(msg);
 					break;
+				case Mensaje.ENVIAR_MENSAJE_TATETI:
+					enviarMensajeChatTaTeTi((MensajeChat)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: "+user + " envio mensaje en el tateti a "+ ((MensajeChat)msg.getCuerpo()).getDestinatario());
+					break;
 				case Mensaje.CREAR_GRUPO:
 					//TODO: logear la creacion del grupo
 					crearGrupo((MensajeGrupo)msg.getCuerpo());
@@ -180,11 +180,6 @@ public class ClientHandler extends Thread {
 			DataAccess.getInstance().modifyUser(userMeta);
 			ChatServer.getInstance().actualizarUsuarios();
 		} 
-	}
-
-	private void enviarMensajeChatTaTeTi(MensajeChat msgChat) {
-		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgChat.getDestinatario());
-		client.enviarMensajeChatTaTeTi(user, msgChat.getTexto());
 	}
 
 	/* Metodos privados */
@@ -303,16 +298,6 @@ public class ClientHandler extends Thread {
 		return IP;
 	}
 
-	public void enviarMensajeChatTaTeTi(String emisor, String texto){
-		try{
-			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(emisor,texto)));
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace();
-		}
-	}
-	
 
 	// Inicio: TATETI
 	// TODO Diego
@@ -543,6 +528,21 @@ public class ClientHandler extends Thread {
 			e.printStackTrace();
 		}
 	}
+
+	private void enviarMensajeChatTaTeTi(MensajeChat msgChat) {
+		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgChat.getDestinatario());
+		client.enviarMensajeChatTaTeTi(user, msgChat.getTexto());
+	}
+
+	public void enviarMensajeChatTaTeTi(String emisor, String texto){
+		try{
+			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(emisor,texto)));
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
 	// Fin TODO Diego
 	// Fin: TATETI
 
@@ -551,5 +551,6 @@ public class ClientHandler extends Thread {
 	private void crearGrupo(MensajeGrupo mensajeGrupo) {
 		ChatServer.getInstance().crearGrupo(mensajeGrupo);
 	}
+	// Fin: GRUPOS
 
 }

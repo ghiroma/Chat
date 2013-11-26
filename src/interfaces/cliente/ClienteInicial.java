@@ -73,8 +73,6 @@ public class ClienteInicial extends JFrame {
 				// Instancio un nuevo panel para agregar los Amigos//
 				ClienteAgregarAmigo agregarAmigos = new ClienteAgregarAmigo();
 				agregarAmigos.setVisible(true);
-				// TODO FRONT : ver como vamos a recargar la lista de amigos
-				// conectados luego de haber mandado invitaciones en la pantalla
 			}
 		});
 		btnNewButton.setBounds(1, 0, 145, 46);
@@ -213,19 +211,6 @@ public class ClienteInicial extends JFrame {
 		return nuevaConversacion;
 	}
 
-	public void getNuevaConversacionTateti(String nombreUsuario, String texto){
-		InterfazTateti tateti = ChatClient.getInstance().getMapaTateti().get(nombreUsuario);
-		try{
-			if(tateti == null)
-				throw new Exception("No se encuentra la interfaz tateti buscada.");
-			tateti.mostrarMensajeDeRival(texto);
-		}
-		catch(Exception ex)
-		{
-			ex.printStackTrace();
-		}
-	}
-	
 	private DefaultListModel obtenerListaAmigos() {
 		modelAmigos = new DefaultListModel();
 		List<FriendStatus> amigos = ChatClient.getInstance().getAmigos();
@@ -249,6 +234,7 @@ public class ClienteInicial extends JFrame {
 		lblNotificacion.setText("<html>" + txtAlerta + "</html>");
 		lblNotificacion.setForeground(Color.BLUE);
 	}
+
 	public void mostrarPopUpInvitacion(MensajeInvitacion msgInvitacion) {
 		AlertaSolicitudAmistad popUp = new AlertaSolicitudAmistad(msgInvitacion);
 		popUp.setVisible(true);
@@ -279,6 +265,19 @@ public class ClienteInicial extends JFrame {
 		tateti.setVisible(true);
 		tateti.toFront();
 		return tateti;		
+	}
+
+	public void getNuevaConversacionTateti(String nombreUsuario, String texto) {
+		InterfazTateti tateti = ChatClient.getInstance().getMapaTateti().get(nombreUsuario);
+		try{
+			if(tateti == null)
+				throw new Exception("No se encuentra la interfaz tateti buscada.");
+			tateti.mostrarMensajeDeRival(texto);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
 	// Fin: TATETI
 

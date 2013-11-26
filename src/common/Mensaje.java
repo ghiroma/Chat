@@ -41,10 +41,12 @@ public class Mensaje implements Serializable {
 	public static final int ACTUALIZACION_PIZARRA = 28;
 	public static final int RESPUESTA_ACTUALIZACION_PIZARRA = 29;
 	public static final int ENVIAR_MENSAJE_TATETI = 30;
-	
-	/* Grupos */
-	public static final int CREAR_GRUPO = 100; 
 	// Fin: TATETI
+
+	// Inicio: GRUPOS
+	public static final int CREAR_GRUPO = 100;
+	// Fin: GRUPOS
+
 
 	private int id;
 	private Object cuerpo;

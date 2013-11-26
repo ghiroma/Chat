@@ -24,7 +24,6 @@ public class ChatServer {
 	private HashMap<String, ClientHandler> handlerList;
 	private HashMap<String, Grupo> grupoMap;
 	private int port;
-	private String serverName;
 	private Principal frontEnd;
 
 	/* Constructor */
@@ -65,11 +64,10 @@ public class ChatServer {
 		try {
 			prop.load(new FileInputStream("ServerConfig.properties"));
 			port = Integer.valueOf(prop.getProperty("port"));
-			serverName = prop.getProperty("name");			
 		} catch (FileNotFoundException e1) {
 			//Properties no existe => creo uno
 			prop.setProperty("port", "16016");
-			prop.setProperty("name", "default");
+			prop.setProperty("ip", "localhost");
 			try{
 				prop.store(new FileOutputStream("ServerConfig.properties"),null);
 			}
@@ -77,7 +75,6 @@ public class ChatServer {
 				e2.printStackTrace();
 			}
 			port = 16016;
-			serverName = "default";
 		} catch (IOException e3) {
 			e3.printStackTrace();
 		}
@@ -169,12 +166,9 @@ public class ChatServer {
 		return handlerList;
 	}
 
-	/**
-	 * Grupos
-	 */
-	
+
+	// Inicio: GRUPOS
 	public void crearGrupo(MensajeGrupo mensajeGrupo) {
-		// TODO Auto-generated method stub
 		Grupo grupo = mensajeGrupo.getGrupo();
 		grupoMap.put(grupo.getNombre(), grupo);
 		for (String usuario : grupo.getUsuarios()) {
@@ -182,9 +176,8 @@ public class ChatServer {
 			handler.enviarMensajeChat(grupo.getNombre(), grupo.getModerador()+" ha creado la sala de chat.");
 		}
 	}
-	
+
 	public void enviarMensajeGrupo(MensajeGrupo mensajeGrupo) {
-		// TODO Auto-generated method stub
 		Grupo grupo = mensajeGrupo.getGrupo();
 		grupoMap.put(grupo.getNombre(), grupo);
 		for (String usuario : grupo.getUsuarios()) {
@@ -192,4 +185,6 @@ public class ChatServer {
 			handler.enviarMensajeChat(grupo.getNombre(), mensajeGrupo.getEmisor()+": " + mensajeGrupo.getMensaje());
 		}
 	}
+	// Fin: GRUPOS
+
 }

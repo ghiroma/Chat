@@ -113,6 +113,8 @@ public class ChatClient {
 			} catch (IOException e2) {
 				e2.printStackTrace();
 			}
+			port = 16016;
+			serverIP = "localhost";
 		} catch (Exception e3) {
 			e3.printStackTrace();
 		}
@@ -233,12 +235,6 @@ public class ChatClient {
 		enviarAlServer(msg);
 	}
 
-	public void enviarMensajeChatTaTeTi(String amigo, String texto)
-	{
-		Mensaje msg = new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(amigo,texto));
-		enviarAlServer(msg);
-	}
-	
 	public void aceptacionInvitacionAmigo(MensajeInvitacion msgInvitacion) {
 		Mensaje msg = new Mensaje(Mensaje.ACEPTACION_INVITACION_AMIGO, msgInvitacion);
 		enviarAlServer(msg);
@@ -292,7 +288,7 @@ public class ChatClient {
 						enviarPizarra(msg);
 					} else if(msg.getId() == Mensaje.ACTUALIZACION_PIZARRA) {
 						//TODO Diego.
-					}else if(msg.getId() == Mensaje.ENVIAR_MENSAJE_TATETI){
+					} else if(msg.getId() == Mensaje.ENVIAR_MENSAJE_TATETI) {
 						//TODO Guille.
 						MensajeChat msgChat = (MensajeChat)msg.getCuerpo();
 						frontEnd.getNuevaConversacionTateti(msgChat.getDestinatario(), msgChat.getTexto());
@@ -321,8 +317,7 @@ public class ChatClient {
 	public Map<String, ClienteConversacion> getMapaConversaciones() {
 		return mapaConversaciones;
 	}
-	
-	public Map<String, InterfazTateti> getMapaTateti(){
+	public Map<String, InterfazTateti> getMapaTateti() {
 		return mapaTaTeTi;
 	}
 	public BanInfo getBanInfo() {
@@ -372,6 +367,11 @@ public class ChatClient {
 		//msg.setId(Mensaje.RESPUESTA_CONSULTA_PARTIDAS);
 		//enviarAlServer(new Mensaje(Mensaje.RESPUESTA_CONSULTA_PARTIDAS,msg));
 		enviarAlServer(new Mensaje(Mensaje.RESPUESTA_CONSULTA_PARTIDAS,mc));
+	}
+
+	public void enviarMensajeChatTaTeTi(String amigo, String texto) {
+		Mensaje msg = new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(amigo,texto));
+		enviarAlServer(msg);
 	}
 	// Fin: TATETI
 
