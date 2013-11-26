@@ -74,7 +74,6 @@ public class ConnectionListener extends Thread {
 						out.writeObject(msg);
 					} else {// si no esta penalizado
 						/* Envia lista de amigos */
-						//TODO loguear en el loglogin, el ingreso.
 						mensajeLogIn = new Mensaje(Mensaje.ACCEPTED, dataAccess.getFriends(userMeta));
 						dataAccess.insertLogLogin(userMeta);
 						msg.setCuerpo(mensajeLogIn);
