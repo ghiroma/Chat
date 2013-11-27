@@ -265,9 +265,23 @@ public class ClientHandler extends Thread {
 
 	public void aceptacionInvitacionAmistad(MensajeInvitacion msgInvitacion) {
 		DataAccess.getInstance().insertAmigos(msgInvitacion.getInvitado(), msgInvitacion.getSolicitante());
+		//TODO Guille Actualizar lista de amigos en el invitado y solicitante.
+		ChatServer.getInstance().getHandlerList().get(msgInvitacion.getInvitado()).actualizarFriendList(msgInvitacion.getSolicitante());
+		ChatServer.getInstance().getHandlerList().get(msgInvitacion.getSolicitante()).actualizarFriendList(msgInvitacion.getInvitado());
 		dispatchEvent(new StatusChangedEvent(this, user, 1));
 	}
 
+	public void actualizarFriendList(String amigo)
+	{
+		try{
+		out.writeObject(new Mensaje(Mensaje.AGREGAR_AMIGO_FRIENDLIST,amigo));
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
 	/* Metodos de update (Son llamados desde los ClientEventListener)*/
 	public void friendStatusUpdate(String user, int estado){
 		try {

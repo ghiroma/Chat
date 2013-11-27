@@ -304,6 +304,8 @@ public class ChatClient {
 					} else if (msg.getId() == Mensaje.CERRAR_GRUPO) {
 						MensajeChat msgChat = (MensajeChat) msg.getCuerpo();
 						frontEnd.cerrarGrupo(msgChat.getDestinatario(), msgChat.getTexto());
+					}else if(msg.getId()==Mensaje.AGREGAR_AMIGO_FRIENDLIST) {
+						amigos.add(new FriendStatus((String)msg.getCuerpo(),1));
 					} else {
 						synchronized(mapMensajes){
 							mapMensajes.put(msg.getId(), msg.getCuerpo());

@@ -27,7 +27,9 @@ public class Mensaje implements Serializable {
 	public static final int VERIFICAR_USUARIO = 16;
 	public static final int ACEPTACION_INVITACION_AMIGO = 17;
 	public static final int CERRAR_SESION = 18;
-
+	public static final int ACTUALIZAR_FRIENDLIST = 50;
+	public static final int AGREGAR_AMIGO_FRIENDLIST = 51;
+	
 	// Inicio: TATETI
 	public static final int INVITACION_JUEGO = 19;
 	public static final int RESPUESTA_INVITACION_JUEGO = 20;
