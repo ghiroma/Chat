@@ -61,13 +61,7 @@ public class ClienteConversacion extends JFrame {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyChar() == '\n')
-					if(!txtMensaje.getText().equals("")) {
-						ChatClient.getInstance().enviarMensajeChat(nombreAmigo, txtMensaje.getText());
-						textArea.append("Tu : " + txtMensaje.getText() + "\n");
-						txtMensaje.setText("");
-						DefaultCaret caret = (DefaultCaret)textArea.getCaret();
-						caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-					}
+					enviarMensajeChat();
 			}
 			@Override
 			public void keyReleased(KeyEvent arg0) {
@@ -80,17 +74,7 @@ public class ClienteConversacion extends JFrame {
 		JButton btnNewButton = new JButton("Enviar");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(!txtMensaje.getText().equals("")) {
-					if(tipoConversacion == Mensaje.MENSAJE_INDIVIDUAL) {
-						ChatClient.getInstance().enviarMensajeChat(nombreAmigo, txtMensaje.getText());
-						textArea.append("Tu : " + txtMensaje.getText() + "\n");
-						DefaultCaret caret = (DefaultCaret)textArea.getCaret();
-						caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-					} else {
-						ChatClient.getInstance().enviarMensajeGrupo(nombreAmigo, txtMensaje.getText());
-					}
-					txtMensaje.setText("");
-				}
+				enviarMensajeChat();
 			}
 		});
 		btnNewButton.setFocusPainted(true);
@@ -108,6 +92,20 @@ public class ClienteConversacion extends JFrame {
 		lblNombreDeUsuario.setFont(new Font("Tahoma", Font.PLAIN, 28));
 		lblNombreDeUsuario.setBounds(141, 24, 302, 68);
 		contentPane.add(lblNombreDeUsuario);
+	}
+
+	private void enviarMensajeChat() {
+		if(!txtMensaje.getText().equals("")) {
+			if(tipoConversacion == Mensaje.MENSAJE_INDIVIDUAL) {
+				ChatClient.getInstance().enviarMensajeChat(nombreAmigo, txtMensaje.getText());
+				textArea.append("Tu : " + txtMensaje.getText() + "\n");
+				DefaultCaret caret = (DefaultCaret)textArea.getCaret();
+				caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+			} else {
+				ChatClient.getInstance().enviarMensajeGrupo(nombreAmigo, txtMensaje.getText());
+			}
+			txtMensaje.setText("");
+		}
 	}
 
 	public void mostrarMensajeDeAmigo(String texto) {
