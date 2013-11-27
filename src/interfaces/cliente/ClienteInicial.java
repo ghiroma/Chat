@@ -1,6 +1,7 @@
 package interfaces.cliente;
 
 import interfaces.grupos.ClienteModCrearChatBroad;
+import interfaces.grupos.ClienteModSalaDeChat;
 import interfaces.tateti.InterfazTateti;
 import interfaces.tateti.InvitacionJuego;
 
@@ -138,11 +139,11 @@ public class ClienteInicial extends JFrame {
 		btnIniciarJuego.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String nombreUsuario=(String)((JList)contentPane.getComponent(0)).getSelectedValue();
+				String nombreUsuario = (String)((JList)contentPane.getComponent(0)).getSelectedValue();
 				if(nombreUsuario != null) {
 					ChatClient.getInstance().invitarAmigoAJugar(nombreUsuario);
 				} else {
-					lblNotificacion.setText("<html>"+ "Debe seleccionar un amigo" +"</html>");
+					lblNotificacion.setText("<html>" + "Debe seleccionar un amigo" + "</html>");
 					lblNotificacion.setForeground(Color.RED);
 				}
 			}
@@ -182,7 +183,7 @@ public class ClienteInicial extends JFrame {
 		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
 
 		if (nuevaConversacion == null) {
-			nuevaConversacion = new ClienteConversacion(nombreUsuario);
+			nuevaConversacion = new ClienteConversacion(nombreUsuario, Mensaje.MENSAJE_INDIVIDUAL);
 			nuevaConversacion.setVisible(true);
 			lblNotificacion.setText("");
 			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
@@ -198,7 +199,7 @@ public class ClienteInicial extends JFrame {
 		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
 
 		if (nuevaConversacion == null) {
-			nuevaConversacion = new ClienteConversacion(nombreUsuario);
+			nuevaConversacion = new ClienteConversacion(nombreUsuario, Mensaje.MENSAJE_INDIVIDUAL);
 			nuevaConversacion.setVisible(true);
 
 			lblNotificacion.setText("");
@@ -221,7 +222,7 @@ public class ClienteInicial extends JFrame {
 		return modelAmigos;
 	}
 
-	public void friendStatusChanged(String user, int estado){
+	public void friendStatusChanged(String user, int estado) {
 		if (estado==1) {
 			if(!modelAmigos.contains(user))
 				modelAmigos.addElement(user);
@@ -280,5 +281,50 @@ public class ClienteInicial extends JFrame {
 		}
 	}
 	// Fin: TATETI
+
+
+	// Inicio: GRUPOS
+	public ClienteConversacion getNuevaConversacion(int mensajeGrupo, String nombreUsuario, String texto) {
+
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
+
+		if (nuevaConversacion == null) {
+			nuevaConversacion = new ClienteConversacion(nombreUsuario, Mensaje.MENSAJE_GRUPAL);
+			nuevaConversacion.setVisible(true);
+
+			lblNotificacion.setText("");
+			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
+		} else {
+			nuevaConversacion.setVisible(true);
+			nuevaConversacion.toFront();
+		}
+		nuevaConversacion.mostrarMensajeDeAmigo(texto);
+		return nuevaConversacion;
+	}
+
+	public ClienteConversacion cerrarGrupo(String nombreUsuario, String texto) {
+
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
+
+		if (nuevaConversacion == null) {
+			nuevaConversacion = new ClienteConversacion(nombreUsuario, Mensaje.MENSAJE_GRUPAL);
+			nuevaConversacion.setVisible(true);
+
+			lblNotificacion.setText("");
+			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
+		} else {
+			nuevaConversacion.setVisible(true);
+			nuevaConversacion.toFront();
+		}
+		nuevaConversacion.mostrarMensajeDeAmigo(texto);
+		nuevaConversacion.inhabilitarVentana();
+		return nuevaConversacion;
+	}
+
+	public void setNuevoMensajeGrupo(String grupo, String mensaje) {
+		ClienteModSalaDeChat salaGrupo=ChatClient.getInstance().getMapaGrupos().get(grupo);
+		salaGrupo.mostrarMensajeDeAmigo(mensaje);
+	}
+	// Fin: GRUPOS
 
 }

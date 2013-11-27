@@ -6,13 +6,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+
+import groups.ClienteGrupo;
 import groups.Grupo;
+import common.Mensaje;
 import common.MensajeGrupo;
 import common.UserMetaData;
 
@@ -29,6 +35,7 @@ public class ChatServer {
 	/* Constructor */
 	private ChatServer() {
 		handlerList = new HashMap<String, ClientHandler>();
+		grupoMap = new HashMap<String, Grupo>();
 		/* Cargo properties */
 		loadProperties();
 		chatServerInstance = this;
@@ -39,39 +46,39 @@ public class ChatServer {
 		return chatServerInstance;
 	}
 
-	/* Main*/
-	public static void main(String args[]){
+	/* Main */
+	public static void main(String args[]) {
 		ChatServer.getInstance().go();
 	}
 	private void go() {
-		/*  Lanzamiento de handler de manejo de informacion de GUI */
+		/* Lanzamiento de handler de manejo de informacion de GUI */
 		frontEnd = new Principal();
+		frontEnd.setResizable(false);
 		frontEnd.setVisible(true);
 
 		/* Espera de conexiones */
 		new ConnectionAccepter(port).run();	
 		
-		//Los connection listener son lanzados por el Accepter
-		//new ConnectionListener(port, handlerList).run();
+		// Los connection listener son lanzados por el Accepter
+		// new ConnectionListener(port, handlerList).run();
 	}
 
 
 	//-----------------
 	// Metodos privados
 	//-----------------
-	private void loadProperties(){
+	private void loadProperties() {
 		Properties prop = new Properties();
 		try {
 			prop.load(new FileInputStream("ServerConfig.properties"));
 			port = Integer.valueOf(prop.getProperty("port"));
 		} catch (FileNotFoundException e1) {
-			//Properties no existe => creo uno
+			// Properties no existe => creo uno
 			prop.setProperty("port", "16016");
 			prop.setProperty("ip", "localhost");
-			try{
-				prop.store(new FileOutputStream("ServerConfig.properties"),null);
-			}
-			catch (IOException e2){
+			try {
+				prop.store(new FileOutputStream("ServerConfig.properties"), null);
+			} catch (IOException e2) {
 				e2.printStackTrace();
 			}
 			port = 16016;
@@ -124,11 +131,11 @@ public class ChatServer {
 	}
 
 	public void despenalizar(String nombreUsuario) {
-		if(DataAccess.getInstance().checkBan(nombreUsuario) != null){
+		if(DataAccess.getInstance().checkBan(nombreUsuario) != null) {
 			DataAccess.getInstance().despenalizar(nombreUsuario);
 			this.logearEvento("Server :: Se despenalizo al usuario: " + nombreUsuario);
 		} else {
-			this.logearEvento("Server :: El usuario "+ nombreUsuario +" no se encuentra penalizado");
+			this.logearEvento("Server :: El usuario " + nombreUsuario + " no se encuentra penalizado");
 		}
 	}
 
@@ -145,7 +152,8 @@ public class ChatServer {
 				this.handlerList.get(entry.getKey()).cerrarSesion();
 			}
 			return true;
-		} catch(Exception e) {
+		} catch (Exception e) {
+			System.err.println(e);
 			return false;
 		}
 	}
@@ -154,7 +162,6 @@ public class ChatServer {
 		this.frontEnd.logearEvento(mensaje);
 	}
 
-
 	public void actualizarUsuarios() {
 		this.frontEnd.actualizarListaUsuarios();
 	}
@@ -162,7 +169,7 @@ public class ChatServer {
 	//-----------------
 	// Getters & Setters
 	//-----------------	
-	public HashMap<String, ClientHandler> getHandlerList(){
+	public HashMap<String, ClientHandler> getHandlerList() {
 		return handlerList;
 	}
 
@@ -171,20 +178,81 @@ public class ChatServer {
 	public void crearGrupo(MensajeGrupo mensajeGrupo) {
 		Grupo grupo = mensajeGrupo.getGrupo();
 		grupoMap.put(grupo.getNombre(), grupo);
-		for (String usuario : grupo.getUsuarios()) {
-			ClientHandler handler=handlerList.get(usuario);
-			handler.enviarMensajeChat(grupo.getNombre(), grupo.getModerador()+" ha creado la sala de chat.");
+		for (ClienteGrupo usuario : grupo.getUsuarios()) {
+			ClientHandler handler = handlerList.get(usuario.getNombre());
+			handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL, grupo.getNombre(), grupo.getModerador() + " ha creado la sala de chat.");
 		}
 	}
 
 	public void enviarMensajeGrupo(MensajeGrupo mensajeGrupo) {
-		Grupo grupo = mensajeGrupo.getGrupo();
+		Grupo grupo = grupoMap.get(mensajeGrupo.getNombreGrupo());
 		grupoMap.put(grupo.getNombre(), grupo);
-		for (String usuario : grupo.getUsuarios()) {
-			ClientHandler handler=handlerList.get(usuario);
-			handler.enviarMensajeChat(grupo.getNombre(), mensajeGrupo.getEmisor()+": " + mensajeGrupo.getMensaje());
+		for (ClienteGrupo usuario : grupo.getUsuarios()) {
+			ClientHandler handler = handlerList.get(usuario.getNombre());
+			handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL, grupo.getNombre(), mensajeGrupo.getEmisor() + " dice: " + mensajeGrupo.getMensaje());
+		}
+		if (!mensajeGrupo.getEmisor().equals(grupo.getModerador())) {
+			ClientHandler handler = handlerList.get(grupo.getModerador());
+			handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL_MODERADOR, grupo.getNombre(), mensajeGrupo.getEmisor() + " dice: " + mensajeGrupo.getMensaje());
 		}
 	}
+
+	public void enviarMensajeUsuarioEnGrupo(MensajeGrupo mensaje) {
+		Grupo grupo = grupoMap.get(mensaje.getNombreGrupo());
+
+		if (mensaje.getCodigoMensaje() == Mensaje.DISCONNECT_GRUPO) {
+			for (ClienteGrupo usuario : grupo.getUsuarios()) {
+				// Desconecto//
+				if (usuario.getNombre().equals(mensaje.getDestinatarioIndividual())) {
+					ClientHandler handler = handlerList.get(usuario.getNombre());
+					
+					List<ClienteGrupo> usuariosEnGrupo = grupo.getUsuarios();
+					usuariosEnGrupo.get(usuariosEnGrupo.indexOf(usuario)).setOnline(false);
+					handler.enviarMensajeChat(Mensaje.CERRAR_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha desconectado del Chat.");
+					grupo.getUsuarios().remove(usuario);
+				}
+			}
+		} else if (mensaje.getCodigoMensaje() == Mensaje.BANNED_GRUPO) {
+			for (ClienteGrupo usuario : grupo.getUsuarios()) {
+				
+				if (usuario.getNombre().equals(mensaje.getDestinatarioIndividual())) {
+					ClientHandler handler = handlerList.get(usuario.getNombre());
+					
+					List<ClienteGrupo> usuariosEnGrupo = grupo.getUsuarios();
+					usuariosEnGrupo.get(usuariosEnGrupo.indexOf(usuario)).setOnline(false);
+					usuariosEnGrupo.get(usuariosEnGrupo.indexOf(usuario)).setBaneado(true);
+					
+					handler.enviarMensajeChat(Mensaje.CERRAR_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha banneado y te ha desconectado del Chat.");
+					
+				}
+			}
+		}
+	}
+
+	public void cerrarGrupo(MensajeGrupo mensajeGrupo) {
+		Grupo grupo = grupoMap.get(mensajeGrupo.getNombreGrupo());
+		grupoMap.put(grupo.getNombre(), grupo);
+		for (ClienteGrupo usuario : grupo.getUsuarios()) {
+			ClientHandler handler = handlerList.get(usuario.getNombre());
+			handler.enviarMensajeChat(Mensaje.CERRAR_GRUPO, grupo.getNombre(), mensajeGrupo.getEmisor() + mensajeGrupo.getMensaje());
+		}
+		grupoMap.remove(grupo.getNombre());
+	}
+
+	public void actualizarGrupos(String userName) {
+		List<String> grupo = new ArrayList<String>();
+		Iterator<Entry<String, Grupo>> it = grupoMap.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<String, Grupo> group = (Map.Entry<String, Grupo>) it.next();
+			grupo.add(((Grupo)group.getValue()).getNombre());
+			ClientHandler handler = handlerList.get(userName);
+			//handler.enviarMensajeChat(Mensaje.OBTENER_GRUPOS, emisor, texto)
+			//TODO: Enviar mensaje al cliente de cuales son los grupos online.
+		}
+	}
+
+	//TODO pedir grupos//
+	//TODO controlar ingreso a grupo
 	// Fin: GRUPOS
 
 }

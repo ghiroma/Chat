@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -19,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -54,7 +57,21 @@ public class Principal extends JFrame {
 	 */
 	public Principal() {
 		setTitle("Servidor");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent we) {
+				JFrame frame = (JFrame) we.getSource();
+
+				int result = JOptionPane.showConfirmDialog(frame,
+						"Esta seguro que quiere salir?", "Salir",
+						JOptionPane.YES_NO_OPTION);
+				if (result == JOptionPane.YES_OPTION) {
+					if (ChatServer.getInstance().cerrarServer())
+						System.exit(0);
+				}
+			}
+		});
+
 		setBounds(100, 100, 708, 483);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -245,7 +262,7 @@ public class Principal extends JFrame {
 
 	private JPopupMenu generarPopupMenu(int esConectado) {
 		JPopupMenu popupMenu = new JPopupMenu();
-		if(esConectado > 0){
+		if(esConectado > 0) {
 			popupMenu.setName("conectados");
 			popupMenu.add(mntmEnviarAlerta);
 			popupMenu.add(mntmVisualizarInformacion);
@@ -267,7 +284,7 @@ public class Principal extends JFrame {
 
 	private String obtenerNombreUsuario(ActionEvent e) {
 		String nombreUsuario;
-		if(((JMenuItem)e.getSource()).getParent().getName().equals("conectados")){
+		if(((JMenuItem)e.getSource()).getParent().getName().equals("conectados")) {
 			nombreUsuario = (String)listConectados.getSelectedValue();
 		} else {
 			nombreUsuario = (String)listDesconectados.getSelectedValue();
@@ -305,6 +322,5 @@ public class Principal extends JFrame {
 		logEventos.append(msg + "\n");
 		System.out.println(msg);
 	}
-	
 
 }

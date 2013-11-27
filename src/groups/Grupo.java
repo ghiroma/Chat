@@ -9,15 +9,15 @@ public class Grupo implements Serializable {
 
 	private String nombre;
 	private String moderador;
-	private List<String> usuarios;
+	private List<ClienteGrupo> usuarios;
 
-	public Grupo(String nombre, String moderador, List<String> usuarios) {
+	public Grupo(String nombre, String moderador, List<ClienteGrupo> usuarios) {
 		this.nombre = nombre;
 		this.moderador = moderador;
 		this.usuarios = usuarios;
 	}
 
-	public Grupo(String nombre, List<String> usuarios) {
+	public Grupo(String nombre, List<ClienteGrupo> usuarios) {
 		this.nombre = nombre;
 		this.usuarios = usuarios;
 	}
@@ -36,10 +36,10 @@ public class Grupo implements Serializable {
 		this.moderador = moderador;
 	}
 
-	public List<String> getUsuarios() {
+	public List<ClienteGrupo> getUsuarios() {
 		return usuarios;
 	}
-	public void setUsuarios(List<String> usuarios) {
+	public void setUsuarios(List<ClienteGrupo> usuarios) {
 		this.usuarios = usuarios;
 	}
 

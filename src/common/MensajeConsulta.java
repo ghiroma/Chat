@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class MensajeConsulta implements Serializable{
 
+	private static final long serialVersionUID = 8662775367502947227L;
+
 	/* Atributos */
 	private String solicitante;
 	private String invitado;

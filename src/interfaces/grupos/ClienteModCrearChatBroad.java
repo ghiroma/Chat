@@ -1,5 +1,6 @@
 package interfaces.grupos;
 
+import groups.ClienteGrupo;
 import groups.Grupo;
 
 import java.awt.Font;
@@ -50,17 +51,16 @@ public class ClienteModCrearChatBroad extends JFrame {
 		lblCrearGrupoDe.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCrearGrupoDe.setBounds(10, 11, 461, 47);
 		contentPane.add(lblCrearGrupoDe);
-		
+
 		final JList listAmigos = new JList();
 		listAmigos.setBounds(20, 149, 181, 245);
 		contentPane.add(listAmigos);
 		listAmigos.setModel(this.obtenerListaAmigos());
-		
-		
+
 		final JList listAmigosAgregados = new JList();
 		listAmigosAgregados.setBounds(269, 149, 191, 245);
 		contentPane.add(listAmigosAgregados);
-		
+
 		JButton btnAgregarAmigo = new JButton("->");
 		btnAgregarAmigo.addMouseListener(new MouseAdapter() {
 			@Override
@@ -72,7 +72,8 @@ public class ClienteModCrearChatBroad extends JFrame {
 				listAmigosAgregados.setModel(this.agregarAmigo(nombreUsuario));
 				listAmigos.setModel(this.removerAmigo(nombreUsuario));
 			}
-			private DefaultListModel agregarAmigo(String nombreUsuario){
+
+			private DefaultListModel agregarAmigo(String nombreUsuario) {
 				DefaultListModel modelAmigos = new DefaultListModel();
 				boolean existe = false;
 				// Recorro toda la lista de amigos agregados para que quede cargada con todos los elemtos que tenia
@@ -80,21 +81,22 @@ public class ClienteModCrearChatBroad extends JFrame {
 					Object item = listAmigosAgregados.getModel().getElementAt(i);
 					modelAmigos.addElement(item.toString());
 					// Valido que el usuario no esta ya agregado
-					if(item.toString() == nombreUsuario){
+					if(item.toString() == nombreUsuario) {
 						existe = true;
 					}
 				}
-				if(!existe){
+				if(!existe) {
 					modelAmigos.addElement(nombreUsuario);	
 				}
 				return modelAmigos;
 			}
-			private DefaultListModel removerAmigo(String nombreUsuario){
+
+			private DefaultListModel removerAmigo(String nombreUsuario) {
 				DefaultListModel modelAmigos = new DefaultListModel();
 				// Vuelvo a cargar la lista de amigos con todos los amigos menos el que se agrego
 				for(int i = 0; i < listAmigos.getModel().getSize(); i++) {
 					Object item = listAmigos.getModel().getElementAt(i);
-					if(item.toString() != nombreUsuario){
+					if(item.toString() != nombreUsuario) {
 						modelAmigos.addElement(item.toString());
 					}
 				}
@@ -115,7 +117,8 @@ public class ClienteModCrearChatBroad extends JFrame {
 				listAmigos.setModel(this.agregarAmigo(nombreUsuario));
 				listAmigosAgregados.setModel(this.removerAmigo(nombreUsuario));
 			}
-			private DefaultListModel agregarAmigo(String nombreUsuario){
+
+			private DefaultListModel agregarAmigo(String nombreUsuario) {
 				DefaultListModel modelAmigos = new DefaultListModel();
 				boolean existe = false;
 				// Recorro toda la lista de amigos agregados para que quede cargada con todos los elemtos que tenia
@@ -123,21 +126,22 @@ public class ClienteModCrearChatBroad extends JFrame {
 					Object item = listAmigos.getModel().getElementAt(i);
 					modelAmigos.addElement(item.toString());
 					// Valido que el usuario no este ya agregado
-					if(item.toString() == nombreUsuario){
+					if(item.toString() == nombreUsuario) {
 						existe = true;
 					}
 				}
-				if(!existe){
+				if(!existe) {
 					modelAmigos.addElement(nombreUsuario);	
 				}
 				return modelAmigos;
 			}
-			private DefaultListModel removerAmigo(String nombreUsuario){
+
+			private DefaultListModel removerAmigo(String nombreUsuario) {
 				DefaultListModel modelAmigos = new DefaultListModel();
 				// Vuelvo a cargar la lista de amigos con todos los amigos menos el que se agrego
 				for(int i = 0; i < listAmigosAgregados.getModel().getSize(); i++) {
 					Object item = listAmigosAgregados.getModel().getElementAt(i);
-					if(item.toString() != nombreUsuario){
+					if(item.toString() != nombreUsuario) {
 						modelAmigos.addElement(item.toString());
 					}
 				}
@@ -165,33 +169,40 @@ public class ClienteModCrearChatBroad extends JFrame {
 		JButton btnCrearSala = new JButton("Crear Sala");
 		btnCrearSala.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-			}
-		});
-		
-		btnCrearSala.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
+				// Crea grupo
+				List<ClienteGrupo> amigos = new ArrayList<ClienteGrupo>();
+				for (int i = 0; i < listAmigosAgregados.getModel().getSize(); i++) {
+					Object item = listAmigosAgregados.getModel().getElementAt(i);
+					amigos.add(new ClienteGrupo(item.toString(), false, true));
+					// TODO chequear ClienteAmigos
+				}
+				Grupo grupo = new Grupo(txtNombreGrupo.getText(), amigos);
+				ChatClient.getInstance().crearGrupo(grupo);
 				String nombre = txtNombreGrupo.getText();
 				String emisor = ChatClient.getInstance().getUsuarioLogeado().getUser();
-				List<String> usuarios = new ArrayList<String>();
+				List<ClienteGrupo> usuarios = new ArrayList<ClienteGrupo>();
 				// Recorro toda la lista de los usuarios que se agregaron y los agrego a usuarios
-				for(int i = 0; i < listAmigosAgregados.getModel().getSize(); i++) {
+				for (int i = 0; i < listAmigosAgregados.getModel().getSize(); i++) {
 					Object item = listAmigosAgregados.getModel().getElementAt(i);
-					usuarios.add(item.toString());
+					usuarios.add(new ClienteGrupo(item.toString(), false, true));
 				}
-				// Creo el grupo
-				Grupo grupo = new Grupo(nombre, usuarios);
 				// Creo el mensaje que se envia a todos los usuarios del grupo
 				MensajeGrupo mensaje = new MensajeGrupo(grupo, emisor, "");
 				// Valido que este todo bien antes de mostrar la pantalla
 				// Se valida que haya usuarios agregados y que tenga nombre el grupo
-				if(!usuarios.isEmpty() && !nombre.isEmpty()){
+				if (!usuarios.isEmpty() && !nombre.isEmpty()) {
 					ClienteModSalaDeChat salaDeChat = new ClienteModSalaDeChat();
-					salaDeChat.setVisible(true);	
+					// Me agrego como moderador//
+					salaDeChat.setTitulos(ChatClient.getInstance().getUsuarioLogeado().getUser(), nombre);
+					// Agrego todos mis amigos//
+					salaDeChat.setClientes(usuarios);
+					salaDeChat.setGrupo(nombre);
+					salaDeChat.setVisible(true);
+					ChatClient.getInstance().getMapaGrupos().put(nombre, salaDeChat);
 				}
 			}
 		});
+
 		btnCrearSala.setBounds(251, 419, 107, 23);
 		contentPane.add(btnCrearSala);
 		

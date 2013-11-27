@@ -47,7 +47,6 @@ public class ClientHandler extends Thread {
 	private int cantpartidas;
 
 
-
 	/* Constructores */
 	public ClientHandler(Socket client, String user, ObjectInputStream in, ObjectOutputStream out) {
 		this.listenerList = new EventListenerList();
@@ -164,6 +163,18 @@ public class ClientHandler extends Thread {
 					//TODO: logear la creacion del grupo
 					crearGrupo((MensajeGrupo)msg.getCuerpo());
 					break;
+				case Mensaje.MENSAJE_GRUPAL:
+					enviarMensajeGrupo((MensajeGrupo)msg.getCuerpo());
+					break;
+				case Mensaje.CERRAR_GRUPO:
+					cerrarGrupo((MensajeGrupo)msg.getCuerpo());
+					break;
+				case Mensaje.MENSAJE_USUARIO_GRUPO:
+					//TODO recibo un mensaje que es para un usuario en especifico del chat grupal//
+					enviarMensajeUsuarioEnGrupo((MensajeGrupo) msg.getCuerpo());
+					//get cuerpo tiene todo lo referido al mensaje
+				case Mensaje.OBTENER_GRUPOS:
+					obtenerGrupos((String) msg.getCuerpo());
 				}
 			} 
 		} catch (SocketException se) {
@@ -205,7 +216,7 @@ public class ClientHandler extends Thread {
 
 	private void enviarMensajeChat(MensajeChat msgChat) {
 		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgChat.getDestinatario());
-		client.enviarMensajeChat(user, msgChat.getTexto());
+		client.enviarMensajeChat(Mensaje.MENSAJE_INDIVIDUAL, user, msgChat.getTexto());
 	}
 
 	private void invitarUsuario(MensajeInvitacion msgInvitacion) {
@@ -235,9 +246,10 @@ public class ClientHandler extends Thread {
 		}
 	}
 
-	public void enviarMensajeChat(String emisor, String texto) {
+	public void enviarMensajeChat(int tipoMensaje, String emisor, String texto) {
+		//el tipo de mensaje diferencia el mensaje de un mensaje normal, grupal o enviado al moderador del grupo.
 		try {
-			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE, new MensajeChat(emisor, texto)));
+			out.writeObject(new Mensaje(tipoMensaje, new MensajeChat(emisor, texto)));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -550,6 +562,22 @@ public class ClientHandler extends Thread {
 	// Inicio: GRUPOS
 	private void crearGrupo(MensajeGrupo mensajeGrupo) {
 		ChatServer.getInstance().crearGrupo(mensajeGrupo);
+	}
+
+	private void obtenerGrupos(String userName) {
+		ChatServer.getInstance().actualizarGrupos(userName);
+	}
+
+	private void enviarMensajeGrupo(MensajeGrupo mensajeGrupo) {
+		ChatServer.getInstance().enviarMensajeGrupo(mensajeGrupo);
+	}
+
+	private void enviarMensajeUsuarioEnGrupo(MensajeGrupo mensajeGrupo) {
+		ChatServer.getInstance().enviarMensajeUsuarioEnGrupo(mensajeGrupo);
+	}
+
+	private void cerrarGrupo(MensajeGrupo mensajeGrupo) {
+		ChatServer.getInstance().cerrarGrupo(mensajeGrupo);
 	}
 	// Fin: GRUPOS
 

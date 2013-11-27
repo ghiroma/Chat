@@ -1,7 +1,6 @@
 package common;
 
 import interfaces.tateti.Blackboard;
-import interfaces.tateti.InterfazTateti;
 
 import java.io.Serializable;
 

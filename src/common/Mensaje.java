@@ -45,6 +45,14 @@ public class Mensaje implements Serializable {
 
 	// Inicio: GRUPOS
 	public static final int CREAR_GRUPO = 100;
+	public static final int MENSAJE_INDIVIDUAL = 101;
+	public static final int MENSAJE_GRUPAL = 102;
+	public static final int MENSAJE_GRUPAL_MODERADOR=103;
+	public static final int CERRAR_GRUPO=104;
+	public static final int MENSAJE_USUARIO_GRUPO = 105;
+	public static final int BANNED_GRUPO = 106;
+	public static final int DISCONNECT_GRUPO = 107;
+	public static final int OBTENER_GRUPOS = 108;
 	// Fin: GRUPOS
 
 
@@ -53,7 +61,7 @@ public class Mensaje implements Serializable {
 
 	/* Constructores */
 	public Mensaje() {
-		this(0,null);
+		this(0, null);
 	}
 	public Mensaje(int id, Object cuerpo) {
 		this.id = id;
@@ -67,6 +75,7 @@ public class Mensaje implements Serializable {
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public Object getCuerpo() {
 		return cuerpo;
 	}

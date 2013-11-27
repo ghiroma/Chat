@@ -4,6 +4,7 @@ import groups.Grupo;
 import interfaces.cliente.ClienteConversacion;
 import interfaces.cliente.ClienteInicial;
 import interfaces.cliente.UserLogin;
+import interfaces.grupos.ClienteModSalaDeChat;
 import interfaces.tateti.InterfazTateti;
 
 import java.io.FileInputStream;
@@ -37,7 +38,7 @@ public class ChatClient {
 	private int port;
 	private String serverIP;
 	
-	//Negrada
+	// Negrada
 	private BanInfo banInfo;
 	
 	// Conexion / Auxiliar
@@ -47,7 +48,7 @@ public class ChatClient {
 	private static ChatClient chatClientInstance;
 	private Map<Integer, Object> mapMensajes;
 	// alive
-	//private Alive alive;
+	// private Alive alive;
 
 	// User
 	private UserMetaData usuarioLogeado;
@@ -57,6 +58,8 @@ public class ChatClient {
 	private UserLogin frontEndLogIn;
 	private ClienteInicial frontEnd;
 	private Map<String, ClienteConversacion> mapaConversaciones;
+	private Map<String, ClienteModSalaDeChat> mapaGrupos;
+	private Map<String, ClienteModSalaDeChat> mapaGruposParaLista;
 	private Map<String, InterfazTateti> mapaTaTeTi;
 	
 	/* Constructor */
@@ -69,7 +72,7 @@ public class ChatClient {
 			entrada = new ObjectInputStream(socket.getInputStream());
 			new ListenFromServer().start();
 
-			banInfo = new BanInfo(0,"");
+			banInfo = new BanInfo(0, "");
 			chatClientInstance = this;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -128,7 +131,7 @@ public class ChatClient {
 		}
 	}
 
-	private void mostrarAlerta(String txtAlerta){
+	private void mostrarAlerta(String txtAlerta) {
 		this.frontEnd.mostrarAlerta(txtAlerta);
 	}
 
@@ -136,7 +139,7 @@ public class ChatClient {
 		Mensaje msg = new Mensaje(Mensaje.OBTENER_USUARIO, usuarioVacio.getUser());
 		try {
 			enviarAlServer(msg);
-			synchronized(mapMensajes){
+			synchronized(mapMensajes) {
 				mapMensajes.wait();
 				return (UserMetaData)mapMensajes.remove(Mensaje.OBTENER_USUARIO);
 			}
@@ -152,13 +155,12 @@ public class ChatClient {
 	@SuppressWarnings("unchecked")
 	public ClienteInicial login(UserMetaData userData) {
 		// metodo de verificacion contra la base para realizar el login
-		// si la conexion es buena se inicia el alive;
 		Mensaje msg = new Mensaje(Mensaje.LOG_IN, userData);
 		try {
 			this.enviarAlServer(msg);
 			synchronized(mapMensajes){
 				mapMensajes.wait();
-				msg=(Mensaje)mapMensajes.remove(Mensaje.LOG_IN);
+				msg = (Mensaje)mapMensajes.remove(Mensaje.LOG_IN);
 			}
 			if (msg.getId()==Mensaje.ACCEPTED) {
 				// alive.start??
@@ -166,6 +168,7 @@ public class ChatClient {
 				usuarioLogeado = obtenerUsuario(userData);
 	
 				this.mapaConversaciones = new HashMap<String ,ClienteConversacion>();
+				this.mapaGrupos = new HashMap<String, ClienteModSalaDeChat>();
 				this.mapaTaTeTi = new HashMap<String, InterfazTateti>();
 				this.frontEnd = new ClienteInicial();
 				return frontEnd;
@@ -242,7 +245,7 @@ public class ChatClient {
 		frontEnd.friendStatusChanged(msgInvitacion.getSolicitante(), 1);
 	}
 
-	public void close(){
+	public void close() {
 		enviarAlServer(new Mensaje(Mensaje.CERRAR_SESION, null));
 		try {
 			entrada.close();
@@ -264,14 +267,14 @@ public class ChatClient {
 					Mensaje msg = (Mensaje) entrada.readObject();
 					if (msg.getId() == Mensaje.ALERTA) {
 						mostrarAlerta((String)msg.getCuerpo());
-					} else if(msg.getId() == Mensaje.ENVIAR_MENSAJE) {
-						MensajeChat msgChat=(MensajeChat)msg.getCuerpo();		
-						frontEnd.getNuevaConversacion(msgChat.getDestinatario(),msgChat.getTexto());
+					} else if(msg.getId() == Mensaje.MENSAJE_INDIVIDUAL) {
+						MensajeChat msgChat = (MensajeChat)msg.getCuerpo();		
+						frontEnd.getNuevaConversacion(msgChat.getDestinatario(), msgChat.getTexto());
 					} else if(msg.getId() == Mensaje.INVITAR_USUARIO) {
 						MensajeInvitacion msgInvitacion = (MensajeInvitacion)msg.getCuerpo();		
 						frontEnd.mostrarPopUpInvitacion(msgInvitacion);
 					} else if(msg.getId() == Mensaje.CAMBIO_ESTADO) {
-						frontEnd.friendStatusChanged(((FriendStatus)msg.getCuerpo()).getUsername(),((FriendStatus)msg.getCuerpo()).getEstado());
+						frontEnd.friendStatusChanged(((FriendStatus)msg.getCuerpo()).getUsername(), ((FriendStatus)msg.getCuerpo()).getEstado());
 					} else if(msg.getId() == Mensaje.INVITACION_JUEGO) {
 						frontEnd.mostrarPopUpInvitacionJuego(msg);
 					} else if(msg.getId() == Mensaje.INICIO_PARTIDA) {
@@ -292,6 +295,15 @@ public class ChatClient {
 						//TODO Guille.
 						MensajeChat msgChat = (MensajeChat)msg.getCuerpo();
 						frontEnd.getNuevaConversacionTateti(msgChat.getDestinatario(), msgChat.getTexto());
+					} else if (msg.getId() == Mensaje.MENSAJE_GRUPAL) {
+						MensajeChat msgChat = (MensajeChat) msg.getCuerpo();
+						frontEnd.getNuevaConversacion(Mensaje.MENSAJE_GRUPAL, msgChat.getDestinatario(), msgChat.getTexto());
+					} else if (msg.getId() == Mensaje.MENSAJE_GRUPAL_MODERADOR) {
+						MensajeChat msgChat = (MensajeChat) msg.getCuerpo();
+						frontEnd.setNuevoMensajeGrupo(msgChat.getDestinatario(), msgChat.getTexto());
+					} else if (msg.getId() == Mensaje.CERRAR_GRUPO) {
+						MensajeChat msgChat = (MensajeChat) msg.getCuerpo();
+						frontEnd.cerrarGrupo(msgChat.getDestinatario(), msgChat.getTexto());
 					} else {
 						synchronized(mapMensajes){
 							mapMensajes.put(msg.getId(), msg.getCuerpo());
@@ -320,18 +332,12 @@ public class ChatClient {
 	public Map<String, InterfazTateti> getMapaTateti() {
 		return mapaTaTeTi;
 	}
+	public Map<String, ClienteModSalaDeChat> getMapaGrupos() {
+		return mapaGrupos;
+	}
 	public BanInfo getBanInfo() {
 		return this.banInfo;
 	}
-
-
-	// Inicio: GRUPOS
-	public void crearGrupo(Grupo grupo){
-		grupo.setModerador(usuarioLogeado.getUser());
-		Mensaje msg = new Mensaje(Mensaje.CREAR_GRUPO, new MensajeGrupo(grupo,getUsuarioLogeado().getUser(),""));
-		enviarAlServer(msg);
-	}
-	// Fin: GRUPOS
 
 
 	// Inicio: TATETI
@@ -374,5 +380,54 @@ public class ChatClient {
 		enviarAlServer(msg);
 	}
 	// Fin: TATETI
+
+
+	// Inicio: GRUPOS
+	public void crearGrupo(Grupo grupo) {
+		grupo.setModerador(usuarioLogeado.getUser());
+		Mensaje msg = new Mensaje(Mensaje.CREAR_GRUPO, new MensajeGrupo(grupo, getUsuarioLogeado().getUser(), ""));
+		enviarAlServer(msg);
+	}
+
+	public void cerrarGrupo(String grupo, String mensaje) {
+		Mensaje msg = new Mensaje(Mensaje.CERRAR_GRUPO, new MensajeGrupo(grupo, this.usuarioLogeado.getUser(), mensaje));
+		enviarAlServer(msg);
+	}
+
+	public void enviarMensajeGrupo(String grupo, String mensaje) {
+
+		Mensaje msg = new Mensaje(Mensaje.MENSAJE_GRUPAL, new MensajeGrupo(grupo, this.usuarioLogeado.getUser(), mensaje));
+		enviarAlServer(msg);
+	}
+
+	// Envio mensaje a un usuario para o banearlo o desconectarlo
+	public void enviarMensajeUsuarioDeGrupo(String grupo, String UsuarioDestino, int cod) {
+
+		Mensaje msg = null;
+		if (cod == Mensaje.DISCONNECT_GRUPO) {
+			msg = new Mensaje(Mensaje.MENSAJE_USUARIO_GRUPO, new MensajeGrupo(grupo, this.usuarioLogeado.getUser(), UsuarioDestino, Mensaje.DISCONNECT_GRUPO));
+		} else {
+			// TODO Setear Bann en la lista de clientes//
+			msg = new Mensaje(Mensaje.MENSAJE_USUARIO_GRUPO, new MensajeGrupo(grupo, this.usuarioLogeado.getUser(), UsuarioDestino, Mensaje.BANNED_GRUPO));
+		}
+		enviarAlServer(msg);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<String> actualizarGrupos() {
+		
+		Mensaje msg = new Mensaje(Mensaje.OBTENER_GRUPOS, this.getUsuarioLogeado().getUser());
+		try {
+			enviarAlServer(msg);
+			synchronized (mapMensajes) {
+				mapMensajes.wait();
+				return (List<String>) mapMensajes.remove(Mensaje.OBTENER_GRUPOS);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new ArrayList<String>();
+	}
+	// Fin: GRUPOS
 
 }

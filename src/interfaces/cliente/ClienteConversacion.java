@@ -14,8 +14,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.DefaultCaret;
 
 import client.ChatClient;
+
+import common.Mensaje;
 
 public class ClienteConversacion extends JFrame {
 
@@ -25,13 +28,24 @@ public class ClienteConversacion extends JFrame {
 	private JPanel contentPane;
 	private JTextArea textArea;
 	private JTextField txtMensaje;
+	private int tipoConversacion;
 
 	/**
 	 * Create the frame.
 	 */
-	public ClienteConversacion(String nombreDeAmigo) {
+	public ClienteConversacion(String nombreDeAmigo, final int tipoConversacion) {
 		this.nombreAmigo = nombreDeAmigo;
-		setTitle("Conversaci\u00F3n con: " +nombreDeAmigo);
+		this.tipoConversacion = tipoConversacion;
+
+		setResizable(false);
+		JLabel lblNombreDeUsuario = new JLabel();
+		if(tipoConversacion==Mensaje.MENSAJE_INDIVIDUAL){
+			setTitle("Conversacion con: " + nombreDeAmigo);
+			lblNombreDeUsuario.setText(nombreDeAmigo);
+		} else {
+			setTitle("Conversacion de grupo: " + nombreDeAmigo);
+			lblNombreDeUsuario.setText("Grupo "+ nombreDeAmigo);
+		}
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		setBounds(100, 100, 600, 577);
 		contentPane = new JPanel();
@@ -43,14 +57,16 @@ public class ClienteConversacion extends JFrame {
 		txtMensaje.setBounds(10, 483, 460, 43);
 		contentPane.add(txtMensaje);
 		txtMensaje.setColumns(10);
-		txtMensaje.addKeyListener(new KeyListener(){
+		txtMensaje.addKeyListener(new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(e.getKeyChar()=='\n')
+				if(e.getKeyChar() == '\n')
 					if(!txtMensaje.getText().equals("")) {
 						ChatClient.getInstance().enviarMensajeChat(nombreAmigo, txtMensaje.getText());
 						textArea.append("Tu : " + txtMensaje.getText() + "\n");
 						txtMensaje.setText("");
+						DefaultCaret caret = (DefaultCaret)textArea.getCaret();
+						caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 					}
 			}
 			@Override
@@ -65,10 +81,15 @@ public class ClienteConversacion extends JFrame {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!txtMensaje.getText().equals("")) {
-					ChatClient.getInstance().enviarMensajeChat(nombreAmigo, txtMensaje.getText());
-					textArea.append("Tu : " + txtMensaje.getText() + "\n");
+					if(tipoConversacion == Mensaje.MENSAJE_INDIVIDUAL) {
+						ChatClient.getInstance().enviarMensajeChat(nombreAmigo, txtMensaje.getText());
+						textArea.append("Tu : " + txtMensaje.getText() + "\n");
+						DefaultCaret caret = (DefaultCaret)textArea.getCaret();
+						caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+					} else {
+						ChatClient.getInstance().enviarMensajeGrupo(nombreAmigo, txtMensaje.getText());
+					}
 					txtMensaje.setText("");
-					
 				}
 			}
 		});
@@ -82,8 +103,7 @@ public class ClienteConversacion extends JFrame {
 		textArea.setColumns(1);
 		textArea.setBounds(10, 113, 460, 359);
 		contentPane.add(textArea);
-				
-		JLabel lblNombreDeUsuario = new JLabel(nombreAmigo);
+
 		lblNombreDeUsuario.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNombreDeUsuario.setFont(new Font("Tahoma", Font.PLAIN, 28));
 		lblNombreDeUsuario.setBounds(141, 24, 302, 68);
@@ -91,8 +111,19 @@ public class ClienteConversacion extends JFrame {
 	}
 
 	public void mostrarMensajeDeAmigo(String texto) {
-		textArea.append(">> "+ nombreAmigo +" : "+ texto + "\n");
-		
+		if (tipoConversacion == Mensaje.MENSAJE_INDIVIDUAL) {
+			textArea.append(">> " + nombreAmigo + " : " + texto + "\n");
+		} else {
+			textArea.append(">> " + texto + "\n");
+		}
+		DefaultCaret caret = (DefaultCaret)textArea.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+	}
+
+	public void inhabilitarVentana() {
+		textArea.setEditable(false);
+		txtMensaje.setEditable(false);
+		txtMensaje.setEnabled(false);	
 	}
 
 }

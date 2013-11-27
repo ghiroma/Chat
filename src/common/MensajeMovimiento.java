@@ -7,6 +7,8 @@ import javax.swing.JLabel;
 
 public class MensajeMovimiento implements Serializable {
 
+	private static final long serialVersionUID = 3996658041889623173L;
+
 	/* Atributos */
 	private String jugador;
 	private String jugador1;				// jugador1 y jugador2 van a ser mis identificadores de interfaz y me ayudaran a vincular con las pizarras
