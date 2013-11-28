@@ -89,6 +89,10 @@ public class PuntuacionTateti extends javax.swing.JFrame{
     		matPuntuacion[0][2] = puntuacion.get("Empatados").toString();
     		matPuntuacion[0][3] = puntuacion.get("Perdidos").toString();
     		}
+    		else
+    		{
+    			
+    		}
     		return matPuntuacion;
     	}
     	catch(Exception ex)

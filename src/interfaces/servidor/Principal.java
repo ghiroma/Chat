@@ -113,6 +113,15 @@ public class Principal extends JFrame {
 					System.exit(0);
 			}
 		});
+		JButton btnVerPuntuacionGeneral = new JButton("Ver Puntuaciones");
+		btnVerPuntuacionGeneral.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e)
+			{
+				PuntuacionTateti puntuacion = new PuntuacionTateti(null);
+				puntuacion.setVisible(true);
+			}
+		});
+		
 		logEventos = new JTextArea();
 		logEventos.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(logEventos);
@@ -129,6 +138,7 @@ public class Principal extends JFrame {
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(btnCerrarServer, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
 								.addGap(49))
+
 							.addGroup(gl_contentPane.createSequentialGroup()
 								.addComponent(lblLogDeEventos)
 								.addPreferredGap(ComponentPlacement.RELATED)))
@@ -227,6 +237,7 @@ public class Principal extends JFrame {
 				puntacionView.setVisible(true);
 			}
 		});
+		
 		contentPane.setLayout(gl_contentPane);
 	}
 

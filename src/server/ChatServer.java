@@ -276,5 +276,28 @@ public class ChatServer {
 		}
 	}
 	
+	public String[][] obtenerPuntuaciones()
+	{
+		String[][] matPuntuaciones = null;
+		try{
+		ResultSet rs = DataAccess.getInstance().getPuntajes();
+		matPuntuaciones = new String[rs.getFetchSize()][4];
+		int cont = 0;
+		while(rs.next())
+		{
+			matPuntuaciones[cont][0] = rs.getString(0);
+			matPuntuaciones[cont][1] = rs.getString(1);
+			matPuntuaciones[cont][2] = rs.getString(2);
+			matPuntuaciones[cont][3] = rs.getString(3);
+			cont++;
+		}
+		return matPuntuaciones;
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			return matPuntuaciones;
+		}
+	}
 	//Fin: TATETI
 }
