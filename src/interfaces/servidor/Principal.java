@@ -50,6 +50,7 @@ public class Principal extends JFrame {
 	private JMenuItem mntmPenalizar;
 	private JMenuItem mntmDespenalizar;
 	private JMenuItem mntmDesconectar;
+	private JMenuItem mntmPuntacion;
 	private JTextArea logEventos;
 	
 	/**
@@ -86,15 +87,15 @@ public class Principal extends JFrame {
 		listConectados.setName("conectados");
 		listConectados.setModel(modelUsuariosConectados);
 		listConectados.addMouseListener(rightClick);
-
+		
 		JLabel lblDesconectados = new JLabel("Desconectados");
 		lblDesconectados.setFont(new Font("Tahoma", Font.PLAIN, 16));
-
+		
 		listDesconectados = new JList();
 		listDesconectados.setName("desconectados");
 		listDesconectados.setModel(modelUsuariosDesconectados);
 		listDesconectados.addMouseListener(rightClick);
-
+		
 		JLabel lblLogDeEventos = new JLabel("Eventos");
 		lblLogDeEventos.setFont(new Font("Tahoma", Font.PLAIN, 16));
 
@@ -219,6 +220,13 @@ public class Principal extends JFrame {
 			}
 		});
 
+		mntmPuntacion = new JMenuItem("Ver Puntuacion");
+		mntmPuntacion.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				PuntuacionTateti puntacionView = new PuntuacionTateti(obtenerNombreUsuario(e));
+				puntacionView.setVisible(true);
+			}
+		});
 		contentPane.setLayout(gl_contentPane);
 	}
 
@@ -266,6 +274,7 @@ public class Principal extends JFrame {
 			popupMenu.setName("conectados");
 			popupMenu.add(mntmEnviarAlerta);
 			popupMenu.add(mntmVisualizarInformacion);
+			popupMenu.add(mntmPuntacion);
 			popupMenu.add(mntmVerHistorialLogin);
 			popupMenu.add(mntmBlanquearClave);
 			popupMenu.add(mntmPenalizar);
@@ -274,6 +283,7 @@ public class Principal extends JFrame {
 		} else {
 			popupMenu.setName("desconectados");
 			popupMenu.add(mntmVisualizarInformacion);
+			popupMenu.add(mntmPuntacion);
 			popupMenu.add(mntmVerHistorialLogin);
 			popupMenu.add(mntmBlanquearClave);
 			popupMenu.add(mntmPenalizar);

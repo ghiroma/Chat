@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -21,7 +22,6 @@ import groups.Grupo;
 import common.Mensaje;
 import common.MensajeGrupo;
 import common.UserMetaData;
-
 import dataTier.DataAccess;
 
 public class ChatServer {
@@ -255,4 +255,26 @@ public class ChatServer {
 	//TODO controlar ingreso a grupo
 	// Fin: GRUPOS
 
+	//Inicio: TATETI
+	
+	public HashMap<String,Integer> obtenerPuntacionPorUsuario(String nombreUsuario)
+	{
+		try
+		{
+		ResultSet rs = DataAccess.getInstance().getPuntajeByUser(obtenerInfoUsuario(nombreUsuario));
+		HashMap<String,Integer> map = new HashMap();
+		rs.next();
+		map.put("Ganados", rs.getInt("GANADOS"));
+		map.put("Empatados", rs.getInt("EMPATADOS"));
+		map.put("Perdidos", rs.getInt("PERDIDOS"));
+		return map;
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			return null;
+		}
+	}
+	
+	//Fin: TATETI
 }
