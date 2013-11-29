@@ -113,8 +113,13 @@ public class Principal extends JFrame {
 					System.exit(0);
 			}
 		});
-		JButton btnVerPuntuacionGeneral = new JButton("Ver Puntuaciones");
-		btnVerPuntuacionGeneral.addActionListener(new ActionListener(){
+		
+		logEventos = new JTextArea();
+		logEventos.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(logEventos);
+		
+		JButton btnPuntuaciones = new JButton("Ver Puntuaciones");
+		btnPuntuaciones.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e)
 			{
 				PuntuacionTateti puntuacion = new PuntuacionTateti(null);
@@ -122,29 +127,23 @@ public class Principal extends JFrame {
 			}
 		});
 		
-		logEventos = new JTextArea();
-		logEventos.setEditable(false);
-		JScrollPane scrollPane = new JScrollPane(logEventos);
-
+		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-							.addGroup(gl_contentPane.createSequentialGroup()
-								.addComponent(btnAlerta, GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(btnCerrarServer, GroupLayout.PREFERRED_SIZE, 171, GroupLayout.PREFERRED_SIZE)
-								.addGap(49))
-
-							.addGroup(gl_contentPane.createSequentialGroup()
-								.addComponent(lblLogDeEventos)
-								.addPreferredGap(ComponentPlacement.RELATED)))
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 371, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)))
+							.addComponent(btnAlerta, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnPuntuaciones, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnCerrarServer, GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
+							.addGap(18))
+						.addComponent(lblLogDeEventos)
+						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 371, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
 							.addComponent(listConectados, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
@@ -162,12 +161,12 @@ public class Principal extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGap(1)
 							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addGroup(gl_contentPane.createSequentialGroup()
-									.addGap(1)
-									.addComponent(btnAlerta, GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
-								.addComponent(btnCerrarServer, GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
+								.addComponent(btnAlerta, GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
+								.addComponent(btnCerrarServer, GroupLayout.DEFAULT_SIZE, 54, Short.MAX_VALUE)
+								.addComponent(btnPuntuaciones, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE))
+							.addGap(18)
 							.addComponent(lblLogDeEventos)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 324, GroupLayout.PREFERRED_SIZE)
@@ -343,5 +342,4 @@ public class Principal extends JFrame {
 		logEventos.append(msg + "\n");
 		System.out.println(msg);
 	}
-
 }

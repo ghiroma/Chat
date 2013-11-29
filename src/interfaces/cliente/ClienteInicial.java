@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -24,7 +25,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import client.ChatClient;
-
 import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeInvitacion;
@@ -148,7 +148,7 @@ public class ClienteInicial extends JFrame {
 				}
 			}
 		});
-		btnIniciarJuego.setBounds(221, 125, 95, 42);
+		btnIniciarJuego.setBounds(221, 110, 95, 42);
 		contentPane.add(btnIniciarJuego);
 		
 		lblNotificacion = new JLabel("");
@@ -175,8 +175,17 @@ public class ClienteInicial extends JFrame {
 				clienteModCrearChatBroad.setVisible(true);
 			}
 		});
-		btnCrearGrupo.setBounds(326, 125, 95, 42);
+		btnCrearGrupo.setBounds(326, 110, 95, 42);
 		contentPane.add(btnCrearGrupo);
+		
+		JButton btnPuntuacion = new JButton("Ver Puntuaje");
+		btnPuntuacion.setBounds(221, 164, 95, 42);
+		btnPuntuacion.addMouseListener(new MouseAdapter(){
+			public void mouseClicked(MouseEvent arg0){
+				ChatClient.getInstance().obtenerPuntuacion();
+			}
+		});
+		contentPane.add(btnPuntuacion);
 	}
 
 	public ClienteConversacion getNuevaConversacion(String nombreUsuario) {
@@ -279,6 +288,17 @@ public class ClienteInicial extends JFrame {
 		{
 			ex.printStackTrace();
 		}
+	}
+	
+	public void mostrarPuntuacion(HashMap<String,Integer>puntuacion)
+	{
+		//TODO convertir hashmap a matriz mejor.
+		String[][] punt = new String[1][3];
+		punt[0][0] = puntuacion.get("Ganados").toString();
+		punt[0][1] = puntuacion.get("Empatados").toString();
+		punt[0][2] = puntuacion.get("Perdidos").toString();
+		PuntuacionTateti tateti = new PuntuacionTateti(punt);
+		tateti.setVisible(true);
 	}
 	// Fin: TATETI
 

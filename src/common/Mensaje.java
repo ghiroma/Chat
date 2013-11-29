@@ -43,6 +43,8 @@ public class Mensaje implements Serializable {
 	public static final int ACTUALIZACION_PIZARRA = 28;
 	public static final int RESPUESTA_ACTUALIZACION_PIZARRA = 29;
 	public static final int ENVIAR_MENSAJE_TATETI = 30;
+	public static final int PEDIR_PUNTUACION = 52;
+	public static final int PUNTUACION = 53;
 	// Fin: TATETI
 
 	// Inicio: GRUPOS

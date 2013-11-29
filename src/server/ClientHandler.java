@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.ImageIcon;
@@ -28,7 +29,6 @@ import common.MensajePartida;
 import common.MensajePizarra;
 import common.MensajeRespuestaInvitacion;
 import common.UserMetaData;
-
 import dataTier.DataAccess;
 import events.StatusChangedEvent;
 
@@ -103,6 +103,10 @@ public class ClientHandler extends Thread {
 				case Mensaje.CERRAR_SESION:
 					ChatServer.getInstance().logearEvento("Server :: " + user + " cerro sesion.");
 					cerrarSesion();
+					break;
+				case Mensaje.PEDIR_PUNTUACION:
+					ChatServer.getInstance().obtenerPuntuacionPorUsuarioCliente((String)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: "+user +" pidió su puntuación de tateti");
 					break;
 				case Mensaje.INVITACION_JUEGO:
 					enviarInvitacionJuego((MensajeInvitacion)msg.getCuerpo());
@@ -563,6 +567,17 @@ public class ClientHandler extends Thread {
 	public void enviarMensajeChatTaTeTi(String emisor, String texto){
 		try{
 			out.writeObject(new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(emisor,texto)));
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public void enviarPuntuacion(HashMap<String,Integer> puntuacion)
+	{
+		try{
+			out.writeObject(new Mensaje(Mensaje.PUNTUACION,puntuacion));
 		}
 		catch(Exception ex)
 		{

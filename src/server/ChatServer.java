@@ -257,6 +257,24 @@ public class ChatServer {
 
 	//Inicio: TATETI
 	
+	public void obtenerPuntuacionPorUsuarioCliente(String nombreUsuario)
+	{
+		try
+		{
+		ResultSet rs = DataAccess.getInstance().getPuntajeByUser(obtenerInfoUsuario(nombreUsuario));
+		HashMap<String,Integer> map = new HashMap();
+		rs.next();
+		map.put("Ganados", rs.getInt("GANADOS"));
+		map.put("Empatados", rs.getInt("EMPATADOS"));
+		map.put("Perdidos", rs.getInt("PERDIDOS"));
+		handlerList.get(nombreUsuario).enviarPuntuacion(map);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
+	
 	public HashMap<String,Integer> obtenerPuntacionPorUsuario(String nombreUsuario)
 	{
 		try
@@ -276,19 +294,20 @@ public class ChatServer {
 		}
 	}
 	
-	public String[][] obtenerPuntuaciones()
+	public ArrayList<ArrayList<String>> obtenerPuntuaciones()
 	{
-		String[][] matPuntuaciones = null;
+		ArrayList<ArrayList<String>> matPuntuaciones = new ArrayList<ArrayList<String>>();
 		try{
 		ResultSet rs = DataAccess.getInstance().getPuntajes();
-		matPuntuaciones = new String[rs.getFetchSize()][4];
 		int cont = 0;
 		while(rs.next())
 		{
-			matPuntuaciones[cont][0] = rs.getString(0);
-			matPuntuaciones[cont][1] = rs.getString(1);
-			matPuntuaciones[cont][2] = rs.getString(2);
-			matPuntuaciones[cont][3] = rs.getString(3);
+			ArrayList<String> tmp = new ArrayList<String>();
+			tmp.add(rs.getString(1));
+			tmp.add(rs.getString(2));
+			tmp.add(rs.getString(3));
+			tmp.add(rs.getString(4));
+			matPuntuaciones.add(cont,tmp);
 			cont++;
 		}
 		return matPuntuaciones;

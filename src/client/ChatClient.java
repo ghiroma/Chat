@@ -3,6 +3,7 @@ package client;
 import groups.Grupo;
 import interfaces.cliente.ClienteConversacion;
 import interfaces.cliente.ClienteInicial;
+import interfaces.cliente.PuntuacionTateti;
 import interfaces.cliente.UserLogin;
 import interfaces.grupos.ClienteModSalaDeChat;
 import interfaces.tateti.InterfazTateti;
@@ -30,7 +31,6 @@ import common.MensajeMovimiento;
 import common.MensajePartida;
 import common.MensajePizarra;
 import common.UserMetaData;
-
 import dataTier.BanInfo;
 
 public class ChatClient {
@@ -292,7 +292,6 @@ public class ChatClient {
 					} else if(msg.getId() == Mensaje.ACTUALIZACION_PIZARRA) {
 						//TODO Diego.
 					} else if(msg.getId() == Mensaje.ENVIAR_MENSAJE_TATETI) {
-						//TODO Guille.
 						MensajeChat msgChat = (MensajeChat)msg.getCuerpo();
 						frontEnd.getNuevaConversacionTateti(msgChat.getDestinatario(), msgChat.getTexto());
 					} else if (msg.getId() == Mensaje.MENSAJE_GRUPAL) {
@@ -306,6 +305,9 @@ public class ChatClient {
 						frontEnd.cerrarGrupo(msgChat.getDestinatario(), msgChat.getTexto());
 					}else if(msg.getId()==Mensaje.AGREGAR_AMIGO_FRIENDLIST) {
 						amigos.add(new FriendStatus((String)msg.getCuerpo(),1));
+					}else if(msg.getId()==Mensaje.PUNTUACION)
+					{
+						frontEnd.mostrarPuntuacion((HashMap<String,Integer>)msg.getCuerpo());
 					} else {
 						synchronized(mapMensajes){
 							mapMensajes.put(msg.getId(), msg.getCuerpo());
@@ -379,6 +381,12 @@ public class ChatClient {
 
 	public void enviarMensajeChatTaTeTi(String amigo, String texto) {
 		Mensaje msg = new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(amigo,texto));
+		enviarAlServer(msg);
+	}
+	
+	public void obtenerPuntuacion()
+	{
+		Mensaje msg = new Mensaje(Mensaje.PEDIR_PUNTUACION,this.usuarioLogeado.getUser());
 		enviarAlServer(msg);
 	}
 	// Fin: TATETI

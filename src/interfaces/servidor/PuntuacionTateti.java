@@ -1,5 +1,6 @@
 package interfaces.servidor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JFrame;
@@ -31,17 +32,6 @@ public class PuntuacionTateti extends javax.swing.JFrame{
             }
         });
         
-//        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-//            new Object [][] {
-//                {null, null, null, null},
-//                {null, null, null, null},
-//                {null, null, null, null},
-//                {null, null, null, null}
-//            },
-//            new String [] {
-//                "Title 1", "Title 2", "Title 3", "Title 4"
-//            }
-//        ));
         String[] columnNames = {"Nombres","Ganados","Empatados","Perdidos"};
         	jTable1 = new JTable(ObtenerPuntuacionPorNombre(user),columnNames);
         jScrollPane1.setViewportView(jTable1);
@@ -79,26 +69,36 @@ public class PuntuacionTateti extends javax.swing.JFrame{
     
     private String[][] ObtenerPuntuacionPorNombre(String nombre)
     {
-    	String[][] matPuntuacion = matPuntuacion = new String[1][4];
+    	String[][] matPuntuacion;
     	try{
     		if(nombre!=null && nombre!="")
     		{
+    			matPuntuacion = new String[1][4];
     		HashMap<String,Integer> puntuacion = ChatServer.getInstance().obtenerPuntacionPorUsuario(nombre);
     		matPuntuacion[0][0] = nombre;
     		matPuntuacion[0][1] = puntuacion.get("Ganados").toString();
     		matPuntuacion[0][2] = puntuacion.get("Empatados").toString();
     		matPuntuacion[0][3] = puntuacion.get("Perdidos").toString();
+    		return matPuntuacion;
     		}
     		else
     		{
-    			
+    			ArrayList<ArrayList<String>> tmp = ChatServer.getInstance().obtenerPuntuaciones();
+    			matPuntuacion = new String[tmp.size()][4];
+    			for(int i=0;i<tmp.size();i++)
+    			{
+    				matPuntuacion[i][0] = tmp.get(i).get(0);
+    				matPuntuacion[i][1] = tmp.get(i).get(1);
+    				matPuntuacion[i][2] = tmp.get(i).get(2);
+    				matPuntuacion[i][3] = tmp.get(i).get(3);
+    			}
+    			return matPuntuacion;
     		}
-    		return matPuntuacion;
     	}
     	catch(Exception ex)
     	{
     		ex.printStackTrace();
-    		return matPuntuacion;
+    		return new String[0][0];
     	}
     }
 }
