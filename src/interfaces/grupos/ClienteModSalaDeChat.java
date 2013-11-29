@@ -46,6 +46,7 @@ public class ClienteModSalaDeChat extends JFrame {
 	private String grupo;
 	private JTextArea textArea;
 	private JMenuItem mntmBanear;
+	private JMenuItem mntmDesBannear;
 	private JMenuItem mntmDesconectar;
 	DefaultListModel modelo;
 
@@ -92,7 +93,6 @@ public class ClienteModSalaDeChat extends JFrame {
 		mntmBanear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ChatClient.getInstance().enviarMensajeUsuarioDeGrupo(grupo, obtenerNombreUsuario(e), Mensaje.BANNED_GRUPO);
-				removerDeLista(e);
 			}
 		});
 		mntmDesconectar = new JMenuItem("Desconectar");
@@ -102,7 +102,12 @@ public class ClienteModSalaDeChat extends JFrame {
 				removerDeLista(e);
 			}
 		});
-
+		mntmDesBannear = new JMenuItem("Desbannear");
+		mntmDesBannear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ChatClient.getInstance().enviarMensajeUsuarioDeGrupo(grupo, obtenerNombreUsuario(e), Mensaje.DESBANEAR_GRUPO);
+			}
+		});
 		/* Fin metodos PopUp */
 
 		btnNewButton.setBounds(509, 430, 113, 23);
@@ -199,6 +204,7 @@ public class ClienteModSalaDeChat extends JFrame {
 		popupMenu.setName("online");
 		popupMenu.add(mntmBanear);
 		popupMenu.add(mntmDesconectar);
+		popupMenu.add(mntmDesBannear);
 		return popupMenu;
 	}
 

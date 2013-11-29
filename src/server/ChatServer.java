@@ -1,5 +1,7 @@
 package server;
 
+import groups.ClienteGrupo;
+import groups.Grupo;
 import interfaces.servidor.Principal;
 
 import java.io.FileInputStream;
@@ -17,11 +19,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import groups.ClienteGrupo;
-import groups.Grupo;
 import common.Mensaje;
 import common.MensajeGrupo;
+import common.MensajeSolicitudGrupo;
 import common.UserMetaData;
+
 import dataTier.DataAccess;
 
 public class ChatServer {
@@ -198,35 +200,51 @@ public class ChatServer {
 	}
 
 	public void enviarMensajeUsuarioEnGrupo(MensajeGrupo mensaje) {
+		int i=0;
 		Grupo grupo = grupoMap.get(mensaje.getNombreGrupo());
-
+		ClienteGrupo usuario;
 		if (mensaje.getCodigoMensaje() == Mensaje.DISCONNECT_GRUPO) {
-			for (ClienteGrupo usuario : grupo.getUsuarios()) {
+			//TODO meter este while en un metodo esta haciendo lo mismo en varios lugares
+			while(i<grupo.getUsuarios().size()){
 				// Desconecto//
+				usuario=grupo.getUsuarios().get(i);
 				if (usuario.getNombre().equals(mensaje.getDestinatarioIndividual())) {
 					ClientHandler handler = handlerList.get(usuario.getNombre());
-					
 					List<ClienteGrupo> usuariosEnGrupo = grupo.getUsuarios();
-					usuariosEnGrupo.get(usuariosEnGrupo.indexOf(usuario)).setOnline(false);
-					handler.enviarMensajeChat(Mensaje.CERRAR_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha desconectado del Chat.");
-					grupo.getUsuarios().remove(usuario);
+					usuariosEnGrupo.remove(usuario.getNombre());
+					handler.enviarMensajeChat(Mensaje.CERRAR_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha desconectado del grupo.");
 				}
+				i++;
 			}
+			
 		} else if (mensaje.getCodigoMensaje() == Mensaje.BANNED_GRUPO) {
-			for (ClienteGrupo usuario : grupo.getUsuarios()) {
-				
+			while(i<grupo.getUsuarios().size()){
+				usuario=grupo.getUsuarios().get(i);
 				if (usuario.getNombre().equals(mensaje.getDestinatarioIndividual())) {
 					ClientHandler handler = handlerList.get(usuario.getNombre());
-					
 					List<ClienteGrupo> usuariosEnGrupo = grupo.getUsuarios();
-					usuariosEnGrupo.get(usuariosEnGrupo.indexOf(usuario)).setOnline(false);
-					usuariosEnGrupo.get(usuariosEnGrupo.indexOf(usuario)).setBaneado(true);
-					
-					handler.enviarMensajeChat(Mensaje.CERRAR_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha banneado y te ha desconectado del Chat.");
-					
+					handler.enviarMensajeChat(Mensaje.BANNED_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha banneado del Grupo.");
 				}
+				i++;
+			}
+			}
+			else{
+				while(i<grupo.getUsuarios().size()){
+					usuario=grupo.getUsuarios().get(i);
+					if (usuario.getNombre().equals(mensaje.getDestinatarioIndividual())) {
+						ClientHandler handler = handlerList.get(usuario.getNombre());
+						handler.enviarMensajeChat(Mensaje.DESBANEAR_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha debanneado del grupo.");
+					}
+					i++;	
 			}
 		}
+	}
+
+	public void solicitarUnionGrupo(MensajeSolicitudGrupo mensaje) {
+		// TODO Verificar que no sea moderador o ya este en el grupo
+		Grupo grupo=grupoMap.get(mensaje.getGrupo());
+		ClientHandler handler = handlerList.get(grupo.getModerador());
+		handler.enviarSolicitudUnionGrupo(Mensaje.SOLICITAR_UNION_GRUPO, mensaje);
 	}
 
 	public void cerrarGrupo(MensajeGrupo mensajeGrupo) {
@@ -251,7 +269,13 @@ public class ChatServer {
 		}
 	}
 
-	//TODO pedir grupos//
+	public List<String> getGrupos() {
+		List<String> grupos=new ArrayList<String>();
+		for(Grupo grupo : grupoMap.values()) {
+			grupos.add(grupo.getNombre());
+		} 
+		return grupos;
+	}
 	//TODO controlar ingreso a grupo
 	// Fin: GRUPOS
 

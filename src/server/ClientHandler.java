@@ -28,7 +28,9 @@ import common.MensajeMovimiento;
 import common.MensajePartida;
 import common.MensajePizarra;
 import common.MensajeRespuestaInvitacion;
+import common.MensajeSolicitudGrupo;
 import common.UserMetaData;
+
 import dataTier.DataAccess;
 import events.StatusChangedEvent;
 
@@ -106,7 +108,7 @@ public class ClientHandler extends Thread {
 					break;
 				case Mensaje.PEDIR_PUNTUACION:
 					ChatServer.getInstance().obtenerPuntuacionPorUsuarioCliente((String)msg.getCuerpo());
-					ChatServer.getInstance().logearEvento("Server :: "+user +" pidió su puntuación de tateti");
+					ChatServer.getInstance().logearEvento("Server :: "+user +" pidio su puntuacion de tateti");
 					break;
 				case Mensaje.INVITACION_JUEGO:
 					enviarInvitacionJuego((MensajeInvitacion)msg.getCuerpo());
@@ -177,8 +179,13 @@ public class ClientHandler extends Thread {
 					//TODO recibo un mensaje que es para un usuario en especifico del chat grupal//
 					enviarMensajeUsuarioEnGrupo((MensajeGrupo) msg.getCuerpo());
 					//get cuerpo tiene todo lo referido al mensaje
+					break;
 				case Mensaje.OBTENER_GRUPOS:
-					obtenerGrupos((String) msg.getCuerpo());
+					buscarGrupos();
+					break;
+				case Mensaje.SOLICITAR_UNION_GRUPO:
+					solicitarUnionGrupo((MensajeSolicitudGrupo)msg.getCuerpo());
+					break;
 				}
 			} 
 		} catch (SocketException se) {
@@ -607,6 +614,26 @@ public class ClientHandler extends Thread {
 
 	private void cerrarGrupo(MensajeGrupo mensajeGrupo) {
 		ChatServer.getInstance().cerrarGrupo(mensajeGrupo);
+	}
+
+	private void buscarGrupos() {
+		try {
+			out.writeObject(new Mensaje(Mensaje.OBTENER_GRUPOS, ChatServer.getInstance().getGrupos()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void solicitarUnionGrupo(MensajeSolicitudGrupo mensaje) {
+		ChatServer.getInstance().solicitarUnionGrupo(mensaje);
+	}
+
+	public void enviarSolicitudUnionGrupo(int tipoMensaje, MensajeSolicitudGrupo mensaje) {
+		try {
+			out.writeObject(new Mensaje(tipoMensaje, mensaje));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	// Fin: GRUPOS
 

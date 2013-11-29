@@ -57,6 +57,8 @@ public class Mensaje implements Serializable {
 	public static final int BANNED_GRUPO = 106;
 	public static final int DISCONNECT_GRUPO = 107;
 	public static final int OBTENER_GRUPOS = 108;
+	public static final int DESBANEAR_GRUPO = 109;
+	public static final int SOLICITAR_UNION_GRUPO = 110;
 	// Fin: GRUPOS
 
 

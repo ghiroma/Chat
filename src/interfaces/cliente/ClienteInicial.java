@@ -25,10 +25,12 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import client.ChatClient;
+
 import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeInvitacion;
 import common.MensajePartida;
+import common.MensajeSolicitudGrupo;
 
 public class ClienteInicial extends JFrame {
 
@@ -341,9 +343,53 @@ public class ClienteInicial extends JFrame {
 		return nuevaConversacion;
 	}
 
+	public ClienteConversacion bannearGrupo(String nombreUsuario, String texto) {
+
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
+
+		if (nuevaConversacion == null) {
+			nuevaConversacion = new ClienteConversacion(nombreUsuario, Mensaje.MENSAJE_GRUPAL);
+			nuevaConversacion.setVisible(true);
+
+			lblNotificacion.setText("");
+			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
+		} else {
+			nuevaConversacion.setVisible(true);
+			nuevaConversacion.toFront();
+		}
+		nuevaConversacion.mostrarMensajeDeAmigo(texto);
+		nuevaConversacion.inhabilitarVentana();
+		return nuevaConversacion;
+	}
+
+	public ClienteConversacion desbannearUsuarioGrupo(String nombreUsuario, String texto) {
+
+		ClienteConversacion nuevaConversacion = ChatClient.getInstance().getMapaConversaciones().get(nombreUsuario);
+
+		if (nuevaConversacion == null) {
+			nuevaConversacion = new ClienteConversacion(nombreUsuario, Mensaje.MENSAJE_GRUPAL);
+			nuevaConversacion.setVisible(true);
+
+			lblNotificacion.setText("");
+			ChatClient.getInstance().getMapaConversaciones().put(nombreUsuario, nuevaConversacion);
+		} else {
+			nuevaConversacion.setVisible(true);
+			nuevaConversacion.toFront();
+		}
+		nuevaConversacion.mostrarMensajeDeAmigo(texto);
+		nuevaConversacion.habilitarVentana();
+		return nuevaConversacion;
+	}
+
 	public void setNuevoMensajeGrupo(String grupo, String mensaje) {
 		ClienteModSalaDeChat salaGrupo=ChatClient.getInstance().getMapaGrupos().get(grupo);
 		salaGrupo.mostrarMensajeDeAmigo(mensaje);
+	}
+
+	public void mostrarPopUpSolicitudGrupo(MensajeSolicitudGrupo msgSolicitud) {
+		AlertaSolicitudUnion popUp = new AlertaSolicitudUnion(msgSolicitud);
+		popUp.setVisible(true);
+		popUp.toFront();
 	}
 	// Fin: GRUPOS
 

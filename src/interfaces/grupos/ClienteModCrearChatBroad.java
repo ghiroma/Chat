@@ -176,8 +176,6 @@ public class ClienteModCrearChatBroad extends JFrame {
 					amigos.add(new ClienteGrupo(item.toString(), false, true));
 					// TODO chequear ClienteAmigos
 				}
-				Grupo grupo = new Grupo(txtNombreGrupo.getText(), amigos);
-				ChatClient.getInstance().crearGrupo(grupo);
 				String nombre = txtNombreGrupo.getText();
 				String emisor = ChatClient.getInstance().getUsuarioLogeado().getUser();
 				List<ClienteGrupo> usuarios = new ArrayList<ClienteGrupo>();
@@ -186,11 +184,13 @@ public class ClienteModCrearChatBroad extends JFrame {
 					Object item = listAmigosAgregados.getModel().getElementAt(i);
 					usuarios.add(new ClienteGrupo(item.toString(), false, true));
 				}
-				// Creo el mensaje que se envia a todos los usuarios del grupo
-				MensajeGrupo mensaje = new MensajeGrupo(grupo, emisor, "");
 				// Valido que este todo bien antes de mostrar la pantalla
 				// Se valida que haya usuarios agregados y que tenga nombre el grupo
 				if (!usuarios.isEmpty() && !nombre.isEmpty()) {
+					Grupo grupo = new Grupo(nombre, amigos);
+					ChatClient.getInstance().crearGrupo(grupo);
+					// Creo el mensaje que se envia a todos los usuarios del grupo
+					MensajeGrupo mensaje = new MensajeGrupo(grupo, emisor, "");
 					ClienteModSalaDeChat salaDeChat = new ClienteModSalaDeChat();
 					// Me agrego como moderador//
 					salaDeChat.setTitulos(ChatClient.getInstance().getUsuarioLogeado().getUser(), nombre);
@@ -199,6 +199,7 @@ public class ClienteModCrearChatBroad extends JFrame {
 					salaDeChat.setGrupo(nombre);
 					salaDeChat.setVisible(true);
 					ChatClient.getInstance().getMapaGrupos().put(nombre, salaDeChat);
+					dispose();
 				}
 			}
 		});

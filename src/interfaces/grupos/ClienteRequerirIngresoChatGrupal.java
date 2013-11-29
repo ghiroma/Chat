@@ -1,4 +1,4 @@
-package interfaces.cliente;
+package interfaces.grupos;
 
 import java.util.List;
 
@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import common.FriendStatus;
+
 import client.ChatClient;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -19,7 +21,6 @@ public class ClienteRequerirIngresoChatGrupal extends JFrame {
 	private static final long serialVersionUID = -7365500936671806946L;
 
 	private JPanel contentPane;
-	private JComboBox cbxGrupos;
 
 	/**
 	 * Create the frame.
@@ -34,9 +35,9 @@ public class ClienteRequerirIngresoChatGrupal extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		cbxGrupos = new JComboBox();
-		cbxGrupos.setBounds(40, 36, 128, 20);
-		contentPane.add(cbxGrupos);
+		final JComboBox comboBox = new JComboBox();
+		comboBox.setBounds(40, 36, 128, 20);
+		contentPane.add(comboBox);
 
 		JLabel lblUnirseAlGrupo = new JLabel("ELEGIR UN GRUPO AL QUE UNIRSE");
 		lblUnirseAlGrupo.setHorizontalAlignment(SwingConstants.CENTER);
@@ -44,12 +45,17 @@ public class ClienteRequerirIngresoChatGrupal extends JFrame {
 		contentPane.add(lblUnirseAlGrupo);
 
 		JButton btnNewButton = new JButton("Unirme");
+		List<String> grupos = ChatClient.getInstance().actualizarGrupos();
+
+		for (String grupo : grupos) {
+			comboBox.addItem(grupo);
+		}
+
 		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String grupoSeleccionado = (String)cbxGrupos.getSelectedItem();
-				if(grupoSeleccionado != null) {
-					ChatClient.getInstance().solicitarUnionGrupo(grupoSeleccionado);
-					dispose();
+			public void actionPerformed(ActionEvent arg0) {
+				if ((String) comboBox.getSelectedItem() != "") {
+					ChatClient.getInstance().solicitarUnionGrupo(
+							(String) comboBox.getSelectedItem());
 				}
 			}
 		});
@@ -58,10 +64,6 @@ public class ClienteRequerirIngresoChatGrupal extends JFrame {
 
 		// Cargar los grupos que estan en el Server//
 		// Pido al client Handler que lo haga //
-		List<String> grupos = ChatClient.getInstance().actualizarGrupos();
 
-		for (String s : grupos) {
-			cbxGrupos.addItem(s);
-		}
 	}
 }

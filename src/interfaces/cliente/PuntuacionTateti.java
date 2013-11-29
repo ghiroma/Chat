@@ -1,15 +1,16 @@
 package interfaces.cliente;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
 
 public class PuntuacionTateti extends JFrame {
+
+	private static final long serialVersionUID = 8745106858270509030L;
 
 	private JPanel contentPane;
 	private JTable table;
@@ -18,7 +19,7 @@ public class PuntuacionTateti extends JFrame {
 	 * Create the frame.
 	 */
 	public PuntuacionTateti(String[][] puntuacion) {
-		setTitle("Mi Puntuación");
+		setTitle("Mi Puntuacion");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();

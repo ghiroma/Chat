@@ -124,4 +124,10 @@ public class ClienteConversacion extends JFrame {
 		txtMensaje.setEnabled(false);	
 	}
 
+	public void habilitarVentana() {
+		textArea.setEditable(true);
+		txtMensaje.setEditable(true);
+		txtMensaje.setEnabled(true);	
+	}
+
 }
