@@ -186,6 +186,9 @@ public class ClientHandler extends Thread {
 				case Mensaje.SOLICITAR_UNION_GRUPO:
 					solicitarUnionGrupo((MensajeSolicitudGrupo)msg.getCuerpo());
 					break;
+				case Mensaje.ACEPTACION_SOLICITUD_UNION_GRUPO:
+					aceptarSolicitudUnionGrupo((MensajeSolicitudGrupo)msg.getCuerpo());
+					break;
 				}
 			} 
 		} catch (SocketException se) {
@@ -626,6 +629,10 @@ public class ClientHandler extends Thread {
 
 	private void solicitarUnionGrupo(MensajeSolicitudGrupo mensaje) {
 		ChatServer.getInstance().solicitarUnionGrupo(mensaje);
+	}
+
+	private void aceptarSolicitudUnionGrupo(MensajeSolicitudGrupo mensaje) {
+		ChatServer.getInstance().aceptarSolicitudUnionGrupo(mensaje);
 	}
 
 	public void enviarSolicitudUnionGrupo(int tipoMensaje, MensajeSolicitudGrupo mensaje) {

@@ -463,7 +463,12 @@ public class ChatClient {
 
 	public void aceptacionSolicitudUnionGrupo(MensajeSolicitudGrupo mensajeSolicitud) {
 		//entra aca una vez q el moderador acepto la solicitud de adhesion
-		//TODO continuar con la aceptacion de adhesion...
+		Mensaje msg = new Mensaje(Mensaje.ACEPTACION_SOLICITUD_UNION_GRUPO, mensajeSolicitud);
+		try {
+			enviarAlServer(msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	// Fin: GRUPOS
 

@@ -247,6 +247,19 @@ public class ChatServer {
 		handler.enviarSolicitudUnionGrupo(Mensaje.SOLICITAR_UNION_GRUPO, mensaje);
 	}
 
+	public void aceptarSolicitudUnionGrupo(MensajeSolicitudGrupo mensaje) {
+		Grupo grupo=grupoMap.get(mensaje.getGrupo());
+		grupo.getUsuarios().add(new ClienteGrupo(mensaje.getUser(), false, true));
+		//envio mensaje de que alguien se ha unido a la sala
+		for (ClienteGrupo usuario : grupo.getUsuarios()) {
+			ClientHandler handler = handlerList.get(usuario.getNombre());
+			handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL, grupo.getNombre(), mensaje.getUser() + " se ha unido a la sala de chat.");
+		}
+		ClientHandler handler = handlerList.get(grupo.getModerador());
+		handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL_MODERADOR, grupo.getNombre(), mensaje.getUser() + " se ha unido a la sala de chat.");
+		//TODO actualizar la lista de conectados a la sala de chat
+	}
+
 	public void cerrarGrupo(MensajeGrupo mensajeGrupo) {
 		Grupo grupo = grupoMap.get(mensajeGrupo.getNombreGrupo());
 		grupoMap.put(grupo.getNombre(), grupo);
