@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import javax.swing.DefaultListModel;
+
 import common.FriendStatus;
 
 import javax.swing.text.html.HTMLDocument.Iterator;
@@ -68,7 +70,6 @@ public class ChatClient {
 	private ClienteInicial frontEnd;
 	private Map<String, ClienteConversacion> mapaConversaciones;
 	private Map<String, ClienteModSalaDeChat> mapaGrupos;
-	private Map<String, ClienteModSalaDeChat> mapaGruposParaLista;
 	private Map<String, InterfazTateti> mapaTaTeTi;
 	private Map<String, Blackboard> mapaPizarra;
 	
@@ -538,11 +539,22 @@ public class ChatClient {
 	public void aceptacionSolicitudUnionGrupo(MensajeSolicitudGrupo mensajeSolicitud) {
 		//entra aca una vez q el moderador acepto la solicitud de adhesion
 		Mensaje msg = new Mensaje(Mensaje.ACEPTACION_SOLICITUD_UNION_GRUPO, mensajeSolicitud);
+		actualizarListaUsuariosGrupo(mensajeSolicitud);
 		try {
 			enviarAlServer(msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void actualizarListaUsuariosGrupo(MensajeSolicitudGrupo mensajeSolicitud) {
+		//entra aca una vez q el moderador acepto la solicitud de adhesion
+		ClienteModSalaDeChat front=mapaGrupos.get(mensajeSolicitud.getGrupo());
+		front.insertarLista(mensajeSolicitud.getUser());
+	}
+	
+	public DefaultListModel obtenerListaAmigos(){
+		return frontEnd.getListaAmigos();
 	}
 	// Fin: GRUPOS
 

@@ -437,6 +437,10 @@ public class ClienteInicial extends JFrame {
 		popUp.setVisible(true);
 		popUp.toFront();
 	}
+	
+	public DefaultListModel getListaAmigos(){
+		return modelAmigos;
+	}
 	// Fin: GRUPOS
 
 }

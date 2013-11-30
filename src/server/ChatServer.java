@@ -183,7 +183,11 @@ public class ChatServer {
 		grupoMap.put(grupo.getNombre(), grupo);
 		for (ClienteGrupo usuario : grupo.getUsuarios()) {
 			ClientHandler handler = handlerList.get(usuario.getNombre());
-			handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL, grupo.getNombre(), grupo.getModerador() + " ha creado la sala de chat.");
+			if(handler!=null) {
+				handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL, grupo.getNombre(), grupo.getModerador() + " ha creado la sala de chat.");
+			} else {
+				grupo.getUsuarios().remove(usuario.getNombre());
+			}
 		}
 	}
 
@@ -192,25 +196,33 @@ public class ChatServer {
 		grupoMap.put(grupo.getNombre(), grupo);
 		for (ClienteGrupo usuario : grupo.getUsuarios()) {
 			ClientHandler handler = handlerList.get(usuario.getNombre());
-			handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL, grupo.getNombre(), mensajeGrupo.getEmisor() + " dice: " + mensajeGrupo.getMensaje());
+			if(handler!=null) {
+				handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL, grupo.getNombre(), mensajeGrupo.getEmisor() + " dice: " + mensajeGrupo.getMensaje());
+			} else {
+				grupo.getUsuarios().remove(usuario.getNombre());
+			}
 		}
 		if (!mensajeGrupo.getEmisor().equals(grupo.getModerador())) {
 			ClientHandler handler = handlerList.get(grupo.getModerador());
-			handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL_MODERADOR, grupo.getNombre(), mensajeGrupo.getEmisor() + " dice: " + mensajeGrupo.getMensaje());
+			if(handler!=null) {
+				handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL_MODERADOR, grupo.getNombre(), mensajeGrupo.getEmisor() + " dice: " + mensajeGrupo.getMensaje());
+			}
+			
 		}
 	}
 
 	public void enviarMensajeUsuarioEnGrupo(MensajeGrupo mensaje) {
 		int i=0;
+		ClientHandler handler=null;
 		Grupo grupo = grupoMap.get(mensaje.getNombreGrupo());
 		ClienteGrupo usuario;
 		if (mensaje.getCodigoMensaje() == Mensaje.DISCONNECT_GRUPO) {
 			//TODO meter este while en un metodo esta haciendo lo mismo en varios lugares
-			while(i<grupo.getUsuarios().size()){
+			while(i<grupo.getUsuarios().size() && handler==null){
 				// Desconecto//
 				usuario=grupo.getUsuarios().get(i);
 				if (usuario.getNombre().equals(mensaje.getDestinatarioIndividual())) {
-					ClientHandler handler = handlerList.get(usuario.getNombre());
+					handler = handlerList.get(usuario.getNombre());
 					List<ClienteGrupo> usuariosEnGrupo = grupo.getUsuarios();
 					usuariosEnGrupo.remove(usuario.getNombre());
 					handler.enviarMensajeChat(Mensaje.CERRAR_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha desconectado del grupo.");
@@ -219,10 +231,10 @@ public class ChatServer {
 			}
 			
 		} else if (mensaje.getCodigoMensaje() == Mensaje.BANNED_GRUPO) {
-			while(i<grupo.getUsuarios().size()){
+			while(i<grupo.getUsuarios().size() && handler==null){
 				usuario=grupo.getUsuarios().get(i);
 				if (usuario.getNombre().equals(mensaje.getDestinatarioIndividual())) {
-					ClientHandler handler = handlerList.get(usuario.getNombre());
+					handler = handlerList.get(usuario.getNombre());
 					List<ClienteGrupo> usuariosEnGrupo = grupo.getUsuarios();
 					handler.enviarMensajeChat(Mensaje.BANNED_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha banneado del Grupo.");
 				}
@@ -230,10 +242,10 @@ public class ChatServer {
 			}
 			}
 			else{
-				while(i<grupo.getUsuarios().size()){
+				while(i<grupo.getUsuarios().size() && handler==null){
 					usuario=grupo.getUsuarios().get(i);
 					if (usuario.getNombre().equals(mensaje.getDestinatarioIndividual())) {
-						ClientHandler handler = handlerList.get(usuario.getNombre());
+						handler = handlerList.get(usuario.getNombre());
 						handler.enviarMensajeChat(Mensaje.DESBANEAR_GRUPO, grupo.getNombre(), mensaje.getEmisor() + " te ha debanneado del grupo.");
 					}
 					i++;	
@@ -266,7 +278,9 @@ public class ChatServer {
 		grupoMap.put(grupo.getNombre(), grupo);
 		for (ClienteGrupo usuario : grupo.getUsuarios()) {
 			ClientHandler handler = handlerList.get(usuario.getNombre());
-			handler.enviarMensajeChat(Mensaje.CERRAR_GRUPO, grupo.getNombre(), mensajeGrupo.getEmisor() + mensajeGrupo.getMensaje());
+			if(handler!=null) {
+				handler.enviarMensajeChat(Mensaje.CERRAR_GRUPO, grupo.getNombre(), mensajeGrupo.getEmisor() + mensajeGrupo.getMensaje());
+			}
 		}
 		grupoMap.remove(grupo.getNombre());
 	}
