@@ -465,6 +465,8 @@ public class ClientHandler extends Thread {
 		ClientHandler handlerDestino = ChatServer.getInstance().getHandlerList().get(destino);
 		if(msg.isHayEmpate()){
 			handlerDestino.finalizarPartida(Mensaje.EMPATE,user);
+			DataAccess.getInstance().addDraw(DataAccess.getInstance().getUserByUsername(msg.getGanador()));
+			DataAccess.getInstance().addDraw(DataAccess.getInstance().getUserByUsername(msg.getPerdedor()));
 			//Loggeo en consola
 			ChatServer.getInstance().logearEvento("Server :: Resultado partida " + user + " - " + destino + ": empate");
 		}

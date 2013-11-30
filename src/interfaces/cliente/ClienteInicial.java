@@ -34,6 +34,8 @@ import common.MensajeJuego;
 import common.MensajeMovimiento;
 import common.MensajePartida;
 import common.MensajeSolicitudGrupo;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ClienteInicial extends JFrame {
 
@@ -120,6 +122,10 @@ public class ClienteInicial extends JFrame {
 		contentPane.add(lblAmigosOnline);
 
 		JButton btnIniciarChat = new JButton("Chatear");
+		btnIniciarChat.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
 		btnIniciarChat.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -135,7 +141,7 @@ public class ClienteInicial extends JFrame {
 
 			}
 		});
-		btnIniciarChat.setBounds(221, 57, 95, 42);
+		btnIniciarChat.setBounds(233, 57, 95, 34);
 		contentPane.add(btnIniciarChat);
 
 		
@@ -154,7 +160,7 @@ public class ClienteInicial extends JFrame {
 				}
 			}
 		});
-		btnIniciarJuego.setBounds(221, 125, 95, 42);
+		btnIniciarJuego.setBounds(233, 102, 95, 34);
 		contentPane.add(btnIniciarJuego);
 		
 		lblNotificacion = new JLabel("");
@@ -170,7 +176,7 @@ public class ClienteInicial extends JFrame {
 				clienteReqIngChatGrupal.setVisible(true);
 			}
 		});
-		btnIngresarGrupo.setBounds(326, 57, 95, 42);
+		btnIngresarGrupo.setBounds(338, 57, 88, 34);
 		contentPane.add(btnIngresarGrupo);
 		
 		JButton btnCrearGrupo = new JButton("Crear Grupo");
@@ -181,11 +187,11 @@ public class ClienteInicial extends JFrame {
 				clienteModCrearChatBroad.setVisible(true);
 			}
 		});
-		btnCrearGrupo.setBounds(326, 110, 95, 42);
+		btnCrearGrupo.setBounds(338, 98, 96, 42);
 		contentPane.add(btnCrearGrupo);
 		
 		JButton btnPuntuacion = new JButton("Ver Puntuaje");
-		btnPuntuacion.setBounds(221, 164, 95, 42);
+		btnPuntuacion.setBounds(283, 147, 95, 34);
 		btnPuntuacion.addMouseListener(new MouseAdapter(){
 			public void mouseClicked(MouseEvent arg0){
 				ChatClient.getInstance().obtenerPuntuacion();
