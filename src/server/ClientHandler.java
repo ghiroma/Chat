@@ -5,14 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.HashMap;
-import java.util.Iterator;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.event.EventListenerList;
 
 import common.FriendStatus;
@@ -28,6 +23,7 @@ import common.MensajePartida;
 import common.MensajeRespuestaMovimiento;
 import common.MensajeSolicitudGrupo;
 import common.UserMetaData;
+
 import dataTier.DataAccess;
 import events.StatusChangedEvent;
 
@@ -165,7 +161,6 @@ public class ClientHandler extends Thread {
 					ChatServer.getInstance().getHandlerList().get((String)msg.getCuerpo()).jugadorAbandono(user);						
 					break;
 				case Mensaje.CREAR_GRUPO:
-					//TODO: logear la creacion del grupo
 					crearGrupo((MensajeGrupo)msg.getCuerpo());
 					break;
 				case Mensaje.MENSAJE_GRUPAL:
@@ -513,10 +508,6 @@ public class ClientHandler extends Thread {
 	// Inicio: GRUPOS
 	private void crearGrupo(MensajeGrupo mensajeGrupo) {
 		ChatServer.getInstance().crearGrupo(mensajeGrupo);
-	}
-
-	private void obtenerGrupos(String userName) {
-		ChatServer.getInstance().actualizarGrupos(userName);
 	}
 
 	private void enviarMensajeGrupo(MensajeGrupo mensajeGrupo) {

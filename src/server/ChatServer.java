@@ -180,6 +180,7 @@ public class ChatServer {
 	// Inicio: GRUPOS
 	public void crearGrupo(MensajeGrupo mensajeGrupo) {
 		Grupo grupo = mensajeGrupo.getGrupo();
+		this.logearEvento("Server :: " + grupo.getModerador() + " ha creado la sala de chat: " + grupo.getNombre());
 		grupoMap.put(grupo.getNombre(), grupo);
 		for (ClienteGrupo usuario : grupo.getUsuarios()) {
 			ClientHandler handler = handlerList.get(usuario.getNombre());
@@ -270,11 +271,11 @@ public class ChatServer {
 		}
 		ClientHandler handler = handlerList.get(grupo.getModerador());
 		handler.enviarMensajeChat(Mensaje.MENSAJE_GRUPAL_MODERADOR, grupo.getNombre(), mensaje.getUser() + " se ha unido a la sala de chat.");
-		//TODO actualizar la lista de conectados a la sala de chat
 	}
 
 	public void cerrarGrupo(MensajeGrupo mensajeGrupo) {
 		Grupo grupo = grupoMap.get(mensajeGrupo.getNombreGrupo());
+		this.logearEvento("Server :: " + grupo.getModerador() + " ha cerrado la sala de chat: " + grupo.getNombre());
 		grupoMap.put(grupo.getNombre(), grupo);
 		for (ClienteGrupo usuario : grupo.getUsuarios()) {
 			ClientHandler handler = handlerList.get(usuario.getNombre());
@@ -285,18 +286,6 @@ public class ChatServer {
 		grupoMap.remove(grupo.getNombre());
 	}
 
-	public void actualizarGrupos(String userName) {
-		List<String> grupo = new ArrayList<String>();
-		Iterator<Entry<String, Grupo>> it = grupoMap.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<String, Grupo> group = (Map.Entry<String, Grupo>) it.next();
-			grupo.add(((Grupo)group.getValue()).getNombre());
-			ClientHandler handler = handlerList.get(userName);
-			//handler.enviarMensajeChat(Mensaje.OBTENER_GRUPOS, emisor, texto)
-			//TODO: Enviar mensaje al cliente de cuales son los grupos online.
-		}
-	}
-
 	public List<String> getGrupos() {
 		List<String> grupos=new ArrayList<String>();
 		for(Grupo grupo : grupoMap.values()) {
@@ -304,7 +293,6 @@ public class ChatServer {
 		} 
 		return grupos;
 	}
-	//TODO controlar ingreso a grupo
 	// Fin: GRUPOS
 
 	//Inicio: TATETI
