@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.Date;
 
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,7 +19,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import common.UserMetaData;
-
 import client.ChatClient;
 
 public class ClienteNuevoUsuario extends JFrame {
@@ -40,6 +40,10 @@ public class ClienteNuevoUsuario extends JFrame {
 	public ClienteNuevoUsuario() {
 		setResizable(false);
 		setTitle("Chat - Nuevo Usuario");
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 596, 376);

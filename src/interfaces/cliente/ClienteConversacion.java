@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -17,7 +18,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.DefaultCaret;
 
 import client.ChatClient;
-
 import common.Mensaje;
 
 public class ClienteConversacion extends JFrame {
@@ -36,7 +36,10 @@ public class ClienteConversacion extends JFrame {
 	public ClienteConversacion(String nombreDeAmigo, final int tipoConversacion) {
 		this.nombreAmigo = nombreDeAmigo;
 		this.tipoConversacion = tipoConversacion;
-
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		setResizable(false);
 		JLabel lblNombreDeUsuario = new JLabel();
 		if(tipoConversacion==Mensaje.MENSAJE_INDIVIDUAL){

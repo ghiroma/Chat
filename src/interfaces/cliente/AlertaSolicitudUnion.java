@@ -6,13 +6,13 @@ import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import client.ChatClient;
-
 import common.MensajeSolicitudGrupo;
 
 public class AlertaSolicitudUnion extends JDialog {
@@ -29,6 +29,10 @@ public class AlertaSolicitudUnion extends JDialog {
 	 * Create the dialog.
 	 */
 	public AlertaSolicitudUnion(MensajeSolicitudGrupo msgInv) {
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		this.msgInvitacion = msgInv;
 		setBounds(100, 100, 454, 218);
 		{
@@ -90,5 +94,6 @@ public class AlertaSolicitudUnion extends JDialog {
 					.addGap(14))
 		);
 		getContentPane().setLayout(groupLayout);
+		new SoundClient("invitacion.wav").play();
 	}
 }

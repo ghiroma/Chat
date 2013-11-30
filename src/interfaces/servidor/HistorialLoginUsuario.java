@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -30,6 +31,10 @@ public class HistorialLoginUsuario extends JFrame {
 	 */
 	public HistorialLoginUsuario(String nombreUsuario) {
 		setTitle("Historial de Login");
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();

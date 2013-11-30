@@ -1,5 +1,7 @@
 package interfaces.tateti;
 
+import interfaces.cliente.SoundClient;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
@@ -41,7 +43,6 @@ public class InvitacionJuego extends JFrame{
 			public void windowClosed(WindowEvent arg0) {}
 			public void windowActivated(WindowEvent arg0) {}
 		});		
-		
 		this.setTitle("Invitacion de juego");
 		this.setSize(300, 110);
 		this.setLocation(new java.awt.Point(500, 300));
@@ -72,6 +73,7 @@ public class InvitacionJuego extends JFrame{
 		
 		//this.pack();	 // Compacta el frame hasta el minimo tamaño para poder seguir visualizando componentes
 		this.setVisible(true);
+		new SoundClient("invitacion.wav").play();
 	}
 	
 	/* Metodos */

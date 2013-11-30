@@ -2,6 +2,7 @@ package interfaces.cliente;
 
 import java.awt.BorderLayout;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -20,6 +21,10 @@ public class PuntuacionTateti extends JFrame {
 	 */
 	public PuntuacionTateti(String[][] puntuacion) {
 		setTitle("Mi Puntuacion");
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();

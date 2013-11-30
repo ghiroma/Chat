@@ -3,6 +3,7 @@ package interfaces.servidor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JTable;
 
@@ -17,6 +18,10 @@ public class PuntuacionTateti extends javax.swing.JFrame{
     public PuntuacionTateti(String user)
     {
         setTitle("Puntacion");
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
         setResizable(false);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         jButton1 = new javax.swing.JButton();

@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,7 +32,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import server.ChatServer;
-
 import common.UserMetaData;
 
 public class Principal extends JFrame {
@@ -57,7 +57,11 @@ public class Principal extends JFrame {
 	 * Create the frame.
 	 */
 	public Principal() {
-		setTitle("Servidor");
+		setTitle("Servidor");		
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent we) {
@@ -238,6 +242,7 @@ public class Principal extends JFrame {
 		});
 		
 		contentPane.setLayout(gl_contentPane);
+		new SoundServer("startup.wav").play();
 	}
 
 	private MouseAdapter rightClick = new MouseAdapter() {

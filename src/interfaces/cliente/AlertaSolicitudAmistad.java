@@ -4,13 +4,16 @@ import java.awt.Font;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
 import client.ChatClient;
 import common.MensajeInvitacion;
+
 import javax.swing.LayoutStyle.ComponentPlacement;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -28,6 +31,10 @@ public class AlertaSolicitudAmistad extends JDialog {
 	 */
 	public AlertaSolicitudAmistad(MensajeInvitacion msgInv) {
 		this.msgInvitacion = msgInv;
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		setBounds(100, 100, 454, 218);
 		{
 			lblNewLabel = new JLabel("quiere ser tu amigo..");
@@ -88,5 +95,6 @@ public class AlertaSolicitudAmistad extends JDialog {
 					.addGap(14))
 		);
 		getContentPane().setLayout(groupLayout);
+		new SoundClient("invitacion.wav").play();
 	}
 }

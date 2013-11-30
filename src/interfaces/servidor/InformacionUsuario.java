@@ -6,6 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.Box;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -15,7 +16,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import server.ChatServer;
-
 import common.UserMetaData;
 
 public class InformacionUsuario extends JFrame {
@@ -33,6 +33,10 @@ public class InformacionUsuario extends JFrame {
 	 */
 	public InformacionUsuario(String nombreUsuario) {
 		setTitle("Informaci\u00F3n de Usuario");
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 618, 312);

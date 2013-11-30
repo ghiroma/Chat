@@ -1,5 +1,7 @@
 package interfaces.tateti;
 
+import interfaces.cliente.SoundClient;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.Serializable;
@@ -151,15 +153,15 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 				}
 			}});
 		
-		//TODO CONTROLADOR this.controlador = new Controller();
 		this.setTitle("Ta Te Ti ");
 		this.setSize(750, 550);												
 		this.setLocation(new java.awt.Point(200, 100));
 		this.setResizable(false);
 		this.setContentPane(getJPanelPrincipal());							// Panel principal tiene el panel de juego y el panel de chat
-		this.setJMenuBar(getJJMenuBar());
+		//this.setJMenuBar(getJJMenuBar());
 		this.paintComponents(getGraphics());								// Pinta los componentes
 		this.pack();
+		new SoundClient("inicio-partida.wav").play();
 	}
 	
 	/* Metodos */
@@ -991,6 +993,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 			//popup "Usuario ganador ha ganado la partida"
 			//sonido
 		}
+		new SoundClient("endgame.wav").play();
 	}
 
 	private void deshabilitarBotones(){

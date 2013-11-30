@@ -7,6 +7,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -34,6 +35,9 @@ public class UserLogin {
 	public UserLogin() {
 		frmIngreso = new JFrame();
 		frmIngreso.setTitle("Ingreso");
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		frmIngreso.setIconImage(img.getImage());
 		frmIngreso.setBounds(100, 100, 450, 157);
 		frmIngreso.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmIngreso.getContentPane().setLayout(null);

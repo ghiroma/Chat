@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,7 +17,9 @@ import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import server.ChatServer;
+
 import javax.swing.SwingConstants;
+
 import java.awt.Color;
 
 public class Alerta extends JFrame {
@@ -32,6 +35,10 @@ public class Alerta extends JFrame {
 	 */
 	public Alerta(final String nombreUsuario) {
 		setTitle("Alerta");
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 235);
 		contentPane = new JPanel();

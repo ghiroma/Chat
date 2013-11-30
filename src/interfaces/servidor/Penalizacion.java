@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,7 +32,11 @@ public class Penalizacion extends JFrame {
 	 * Create the frame.
 	 */
 	public Penalizacion(final String nombreUsuario) {
-		setTitle("Penalizaci\u00F3n");
+		setTitle("Penalizaci\u00F3n");	//te amo unicode
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
+		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 423, 250);
 		contentPane = new JPanel();

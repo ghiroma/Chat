@@ -24,18 +24,15 @@ import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.ImageIcon;
 
 import client.ChatClient;
-
 import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeInvitacion;
 import common.MensajeJuego;
-import common.MensajeMovimiento;
-import common.MensajePartida;
 import common.MensajeSolicitudGrupo;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+
 
 public class ClienteInicial extends JFrame {
 
@@ -53,6 +50,9 @@ public class ClienteInicial extends JFrame {
 		user = ChatClient.getInstance().getUsuarioLogeado().getUser();
 		setTitle("Menu principal - " + ChatClient.getInstance().getUsuarioLogeado().getUser().toUpperCase());
 		setResizable(false);
+		/* Icono del frame */
+		ImageIcon img = new ImageIcon(getClass().getResource("icon.png"));
+		setIconImage(img.getImage());
 
 		/* Seteo del cierre del Frame */
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -122,10 +122,6 @@ public class ClienteInicial extends JFrame {
 		contentPane.add(lblAmigosOnline);
 
 		JButton btnIniciarChat = new JButton("Chatear");
-		btnIniciarChat.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
 		btnIniciarChat.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -230,6 +226,7 @@ public class ClienteInicial extends JFrame {
 			nuevaConversacion.toFront();
 		}
 		nuevaConversacion.mostrarMensajeDeAmigo(texto);
+		new SoundClient("message.wav").play();
 		return nuevaConversacion;
 	}
 
@@ -239,6 +236,7 @@ public class ClienteInicial extends JFrame {
 		for (FriendStatus amigo : amigos) {
 			if(amigo.getEstado() == 1)
 				modelAmigos.addElement(amigo.getUsername());
+				new SoundClient("login.wav").play();
 		}
 		return modelAmigos;
 	}
