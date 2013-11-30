@@ -1,8 +1,5 @@
 package server;
 
-import interfaces.tateti.Blackboard;
-import interfaces.tateti.InterfazTateti;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -22,15 +19,15 @@ import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeChat;
 import common.MensajeConsulta;
+import common.MensajeEstadoJuego;
 import common.MensajeGrupo;
 import common.MensajeInvitacion;
+import common.MensajeJuego;
 import common.MensajeMovimiento;
 import common.MensajePartida;
-import common.MensajePizarra;
-import common.MensajeRespuestaInvitacion;
+import common.MensajeRespuestaMovimiento;
 import common.MensajeSolicitudGrupo;
 import common.UserMetaData;
-
 import dataTier.DataAccess;
 import events.StatusChangedEvent;
 
@@ -44,10 +41,7 @@ public class ClientHandler extends Thread {
 	private String user;
 	private EventListenerList listenerList;
 	private int estado;
-	private ArrayList<Blackboard> partidas= new ArrayList<Blackboard>();
-	private ArrayList<InterfazTateti> interfaces = new ArrayList<InterfazTateti>();
-	private int cantpartidas;
-
+	private DataAccess dataAccess;
 
 	/* Constructores */
 	public ClientHandler(Socket client, String user, ObjectInputStream in, ObjectOutputStream out) {
@@ -57,7 +51,7 @@ public class ClientHandler extends Thread {
 		this.out = out;
 		this.user = user;
 		estado = 1;
-
+		dataAccess = DataAccess.getInstance();
 		IP = client.getInetAddress().toString();
 		IP = IP.replace("/", " ");
 		IP = IP.trim();
@@ -111,59 +105,64 @@ public class ClientHandler extends Thread {
 					ChatServer.getInstance().logearEvento("Server :: "+user +" pidio su puntuacion de tateti");
 					break;
 				case Mensaje.INVITACION_JUEGO:
-					enviarInvitacionJuego((MensajeInvitacion)msg.getCuerpo());
-					ChatServer.getInstance().logearEvento("Server :: " + user + " invito a jugar a " + ((MensajeInvitacion)msg.getCuerpo()).getInvitado() + ".");
+					enviarInvitacionJuego((String)msg.getCuerpo());
+					ChatServer.getInstance().logearEvento("Server :: " + user + " invito a jugar a " + ((String)msg.getCuerpo()) + ".");
 					break;
-				case Mensaje.RESPUESTA_INVITACION_JUEGO:
-					String invitado = ((MensajeRespuestaInvitacion)msg.getCuerpo()).getInvitado();
-					String solicitante = ((MensajeRespuestaInvitacion)msg.getCuerpo()).getSolicitante();
-					ChatServer.getInstance().logearEvento("Server :: " + invitado + (((MensajeRespuestaInvitacion)msg.getCuerpo()).isAcepto()?" acepto ":" no acepto ") + " jugar con " + solicitante);
-					if(((MensajeRespuestaInvitacion)msg.getCuerpo()).isAcepto()) {
-						// Verifico que no este jugando mas de 3 partidas
-						if(partidas.size() < 3) {
-							MensajeConsulta mc = new MensajeConsulta(solicitante,invitado,false,this.cantpartidas);
-							consultarCantidadPartidasRival(new Mensaje(Mensaje.CANTIDAD_PARTIDAS_VALIDA,mc));							
-						} else {
-							// TODO enviar mensaje a usuario de que no puede jugar ya que llego al limite de partidas
-						}
-					}					
+				case Mensaje.ACEPTO_TATETI:	//Version Nico; Si estas aca, esto es un handler del invitado
+					String invitado = user;
+					String solicitante = (String) msg.getCuerpo();
+					//inicio partida en solicitante
+					ChatServer.getInstance().logearEvento("Server :: " + invitado + " acepto jugar con " + solicitante);
+					//inicio partida en invitado (local)
+					iniciarPartida(solicitante,invitado);
 					break;
-				case Mensaje.INICIO_PARTIDA:
-					// Debo enviar la partida creada a mi rival
-					agregarInterfaz(msg);
-					break;			
-				case Mensaje.ENVIO_PARTIDA:
-					agregarInterfaz(msg);
-					break;
+				/*case Mensaje.INICIO_PARTIDA:
+					agregarPartida(msg);
+					break;*/			
 				case Mensaje.RESPUESTA_CONSULTA_PARTIDAS:
-					if(partidas.size() < 3) {
-						// Cuando respondo con mi cantidad de partidas para crear la pizzara yo soy el invitado
-						String inv = ((MensajeConsulta)msg.getCuerpo()).getSolicitante();
-						String sol = ((MensajeConsulta)msg.getCuerpo()).getInvitado();
-						int id = ((MensajeConsulta)msg.getCuerpo()).getIdPizzaraSolicitante();
-						MensajePartida mp = new MensajePartida(sol,inv,null);
+					if(((MensajeConsulta)msg.getCuerpo()).isCantValida()) {
+						String sol = ((MensajeConsulta)msg.getCuerpo()).getSolicitante();
+						String inv = ((MensajeConsulta)msg.getCuerpo()).getInvitado();
+						MensajePartida mp = new MensajePartida(sol,inv,inv);
 						iniciarPartida(new Mensaje(Mensaje.INICIO_PARTIDA,mp));
-						MensajePizarra mpi = new MensajePizarra(sol,inv,crearPizarraDePartida(sol, inv, this.cantpartidas,id));
-						// Le paso la id de la partida a crear
-						enviarPizarraARival(mpi);
-					} else {
-						// TODO rival no puede jugar ya que se encuentra al limite de partidas permitidas
 					}
 					break;
-				case Mensaje.RESPUESTA_PIZARRA:
-					vincularPizarra(msg);
-					break;
 				case Mensaje.MOVIMIENTO:
-					// Debo actualizarlo en ambas interfaces
-					if(verificarMovimiento(msg))
-						actualizarMovimiento(msg);
+					//obtengo handler del destinatario
+					MensajeMovimiento msgMov = (MensajeMovimiento) msg.getCuerpo();
+					ClientHandler handlerDestino = ChatServer.getInstance().getHandlerList().get(msgMov.getDestinatario());
+					//le envio el movimiento
+					handlerDestino.enviarMovimiento(msgMov);				
+					break;
+				case Mensaje.RESPUESTA_VERIFICACION_MOVIMIENTO:
+					if(((MensajeRespuestaMovimiento)msg.getCuerpo()).isValido())
+						actualizarMovimiento((MensajeRespuestaMovimiento)msg.getCuerpo());
 					break;
 				case Mensaje.RESPUESTA_ACTUALIZACION_PIZARRA:
 					actualizarMovimiento(msg);
 					break;
+				case Mensaje.ACTUALIZAR_TATETI:
+					actualizarTateti(msg);
+					break;
+				case Mensaje.EMPATE:
+					finPartida((MensajeEstadoJuego)msg.getCuerpo());
+					break;
+				case Mensaje.GANADOR:
+					finPartida((MensajeEstadoJuego)msg.getCuerpo());
+					break;
 				case Mensaje.ENVIAR_MENSAJE_TATETI:
 					enviarMensajeChatTaTeTi((MensajeChat)msg.getCuerpo());
 					ChatServer.getInstance().logearEvento("Server :: "+user + " envio mensaje en el tateti a "+ ((MensajeChat)msg.getCuerpo()).getDestinatario());
+					break;
+				case Mensaje.ABANDONO:
+					UserMetaData userMeta = dataAccess.getUserByUsername(user);
+					dataAccess.addDefeat(userMeta);	//el que abandona es el que envia el mensaje "abandono"
+					
+					userMeta = dataAccess.getUserByUsername((String)msg.getCuerpo());
+					dataAccess.addVictory(userMeta);
+					
+					ChatServer.getInstance().logearEvento("Server :: "+user + " abandono la partida con "+ (String) msg.getCuerpo());
+					ChatServer.getInstance().getHandlerList().get((String)msg.getCuerpo()).jugadorAbandono(user);						
 					break;
 				case Mensaje.CREAR_GRUPO:
 					//TODO: logear la creacion del grupo
@@ -238,9 +237,22 @@ public class ClientHandler extends Thread {
 		client.recibirInvitacion(msgInvitacion);
 	}
 
+	private void jugadorAbandono(String player){
+		try {
+			out.writeObject(new Mensaje(Mensaje.ABANDONO,player));
+		} catch (IOException e) {
+			System.err.println("Error al enviar mensaje de abandono al usuario " + user);
+		}
+	}
 	/* Metodos publicos */
 	public void cerrarSesion() {
 		try {
+			/* Almaceno estado en la DB */
+			UserMetaData userMeta = DataAccess.getInstance().getUserByUsername(user);
+			userMeta.setConectado(0);
+			DataAccess.getInstance().modifyUser(userMeta);
+			
+			/* Cierro conexion y streams */
 			in.close();
 			out.close();
 			client.close();
@@ -338,237 +350,101 @@ public class ClientHandler extends Thread {
 		return IP;
 	}
 
-
-	// Inicio: TATETI
-	// TODO Diego
-	private void enviarInvitacionJuego(MensajeInvitacion inv) {
-		ClientHandler client = ChatServer.getInstance().getHandlerList().get(inv.getInvitado());
-		client.recibirInvitacionJuego(new Mensaje(Mensaje.INVITACION_JUEGO,inv));
+	
+	
+	
+	
+	
+	/* Inicio: TATETI */
+	private void enviarInvitacionJuego(String invitado) { //Version Nico
+		ClientHandler client = ChatServer.getInstance().getHandlerList().get(invitado);	// Obtengo thread del invitado
+		client.enviarInvitacionJuego(new Mensaje(Mensaje.INVITACION_JUEGO,user));		// Envio invitacion de juego a mi amigo. "INVITACION_JUEGO, solicitante"
 	}
 		
-	private void recibirInvitacionJuego(Mensaje inv) {
+	private void enviarInvitacionJuego(Mensaje msg) {
 		try {
-			out.writeObject(inv);
+			out.writeObject(msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-		
-	private void consultarCantidadPartidasRival(Mensaje msg) {
-		ClientHandler client = ChatServer.getInstance().getHandlerList().get(((MensajeConsulta)msg.getCuerpo()).getInvitado());
-		client.enviarConsultaPartidas(msg);
-	}
-		
-	private void enviarConsultaPartidas(Mensaje msg) {
+	
+	private void iniciarPartida(String solicitante, String invitado){	//Version Nico; Este metodo lo ejecutan tanto el solicitante como el invitado
+		//Siempre comienza el solicitante
 		try {
-			out.writeObject(msg);
-		} catch (Exception e) {
+			System.out.println("User: " + user + " Solicitante: " + solicitante + " Invitado: " + invitado);
+			//inicio local
+			out.writeObject(new Mensaje(Mensaje.INICIO_PARTIDA,new MensajeJuego(solicitante,solicitante)));
+			//inicia el rival
+			ClientHandler client = ChatServer.getInstance().getHandlerList().get(solicitante);
+			client.iniciarPartida(new Mensaje(Mensaje.INICIO_PARTIDA,new MensajeJuego(invitado,solicitante)));
+			
+		} catch (IOException e) {
+			System.err.println("Error al enviar mensaje de inicio de partida.");
+		}
+	}
+	
+	private void enviarMovimiento(MensajeMovimiento msgMov){
+		try{
+			out.writeObject(new Mensaje(Mensaje.MOVIMIENTO,msgMov));
+		} catch(IOException e){
 			e.printStackTrace();
 		}
 	}
 		
 	private void iniciarPartida(Mensaje msg) {
 		try {
-			ClientHandler client = ChatServer.getInstance().getHandlerList().get(((MensajePartida)msg.getCuerpo()).getJugador2());
-			client.enviarPartida(new Mensaje(
-					Mensaje.ENVIO_PARTIDA,new MensajePartida(
-							((MensajePartida)msg.getCuerpo()).getJugador2(),(
-									(MensajePartida)msg.getCuerpo()).getJugador1(),null)));
 			out.writeObject(msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	
 	}
-		
-	private void enviarPartida(Mensaje msg) {
+	
+	private void actualizarMovimiento(MensajeRespuestaMovimiento msg) {
 		try {
-			out.writeObject(msg);
+			ClientHandler client = ChatServer.getInstance().getHandlerList().get(msg.getJugador2());
+			client.actualizarMovimiento(new Mensaje(Mensaje.ACTUALIZAR_MOVIMIENTO,msg));					// Actualizo movimiento en rival
+			out.writeObject(new Mensaje(Mensaje.ACTUALIZAR_MOVIMIENTO,msg));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-		
-	private void agregarInterfaz(Mensaje msg) {
-		MensajePartida mp = (MensajePartida)msg.getCuerpo();
-		interfaces.add(mp.getPartida());
-	}
-
-	// Creo pizarra
-	private Blackboard crearPizarraDePartida(String s, String i, int idPartidas, int idPartidai) {
-		Blackboard pizarra = new Blackboard();
-		pizarra.setJugador1(s);
-		pizarra.setJugador2(i);
-		pizarra.setIdBlackboard1(idPartidas);
-		pizarra.setIdBlackboard2(idPartidai);
-		this.cantpartidas++;
-		partidas.add(pizarra);
-		return pizarra;
-	}
-
-	// Vinculo pizarra del solicitante con la enviada por el invitado
-	private void vincularPizarra(Mensaje msg) {
-		Blackboard pizarra = ((MensajePizarra)msg.getCuerpo()).getPizarra();
-		this.cantpartidas++;
-		partidas.add(pizarra);	
-	}
-
-	private void enviarPizarraARival(MensajePizarra mp) {
-		ClientHandler client = ChatServer.getInstance().getHandlerList().get(mp.getJugador2());
-		client.recibirPizarra(new Mensaje(Mensaje.ENVIO_PIZARRA,mp));
-	}
-
-	private void recibirPizarra(Mensaje msg) {
-		try {
-			out.writeObject(msg);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private boolean verificarMovimiento(Mensaje msg) {
-		Iterator<Blackboard> i = partidas.iterator();
-		Blackboard pizarra = new Blackboard();
-		MensajeMovimiento mm = (MensajeMovimiento) msg.getCuerpo();
-		String jugador1 = mm.getJugador1();
-		String jugador2 = mm.getJugador2();
-		while(i.hasNext()) {
-			Blackboard bb = (Blackboard) i.next();
-			if((bb.getJugador1() == jugador1 && bb.getJugador2() == jugador2) || (bb.getJugador1() == jugador2 && bb.getJugador2() == jugador1)) {
-				pizarra = bb;
-			}
-		}
-		if(pizarra != null) {
-			if(pizarra.inspect(mm.getX(), mm.getY(), pizarra.nroJugadas)) {
-				return true;
-			} 
-		}
-		return false;
 	}
 
 	private void actualizarMovimiento(Mensaje msg) {
-		Iterator<Blackboard> i = partidas.iterator();
-		Blackboard pizarra = new Blackboard();
-		MensajeMovimiento mm = (MensajeMovimiento)msg.getCuerpo();
-		String jugador1 = mm.getJugador1();
-		String jugador2 = mm.getJugador2();
-		JButton boton = mm.getBoton();
-		// Encuentro pizarra 
-		while(i.hasNext()) {
-			Blackboard bb = (Blackboard) i.next();
-			if((bb.getJugador1() == jugador1 && bb.getJugador2() == jugador2) || (bb.getJugador1() == jugador2 && bb.getJugador2() == jugador1)) {
-				pizarra = bb;
-			}
-		}
-		// Encuentro interfaz
-		Iterator<InterfazTateti> j = interfaces.iterator();
-		InterfazTateti tateti = new InterfazTateti();
-		while(j.hasNext()) {
-			InterfazTateti tt = (InterfazTateti) j.next();
-			if((tt.getPlayer1() == jugador1 && tt.getPlayer2() == jugador2) || (tt.getPlayer1() == jugador2 && tt.getPlayer2() == jugador1)) {
-				tateti = tt;
-			}
-		}
-		// Actualizacion pizarra e interfaz de ClientHandler actual
-		JLabel label1 = tateti.getJLabel2();
-		JLabel label2 = tateti.getJLabel3();
-
-		// Actualizo label de proximo turno
-		setearIcono(label1,(pizarra.nroJugadas+1)%2);
-
-		// Debo encontrar boton correspondiente en el tateti, 
-		// comparo por referencia ya que lo me envian por mensaje es una referencia 
-		// del boton que fue presionado de determinada interfaz que obtuve anteriormente
-		if(tateti.getJButton1() == boton) {
-			// Actualizo icono del boton
-			setearIcono(boton,pizarra.nroJugadas);
-		}
-		if(tateti.getJButton2() == boton) {
-			// Actualizo icono del boton
-			setearIcono(boton,pizarra.nroJugadas);
-		}
-		if(tateti.getJButton3() == boton) {
-			// Actualizo icono del boton
-			setearIcono(boton,pizarra.nroJugadas);
-		}
-		if(tateti.getJButton4() == boton) {
-			// Actualizo icono del boton
-			setearIcono(boton,pizarra.nroJugadas);
-		}
-		if(tateti.getJButton5() == boton) {
-			// Actualizo icono del boton
-			setearIcono(boton,pizarra.nroJugadas);
-		}
-		if(tateti.getJButton6() == boton) {
-			// Actualizo icono del boton
-			setearIcono(boton,pizarra.nroJugadas);
-		}
-		if(tateti.getJButton7() == boton) {
-			// Actualizo icono del boton
-			setearIcono(boton,pizarra.nroJugadas);
-		}
-		if(tateti.getJButton8() == boton) {
-			// Actualizo icono del boton
-			setearIcono(boton,pizarra.nroJugadas);
-		}
-		if(tateti.getJButton9() == boton) {
-			// Actualizo icono del boton
-			setearIcono(boton,pizarra.nroJugadas);
-		}
-
-		// Actualizo pizarra
-		int aux = pizarra.update(mm.getX(), mm.getY(), pizarra.nroJugadas);
-		// TODO recordar que el update() de la clase blackboard devuelvo un entero corresponediente al resultado de la partida
-		// 1 - Hay Ganador
-		// 0 - Empate 
-		// -1 - No paso nada
-		if(aux != -1) {
-			if(aux == 1){
-				// 	Hay ganador
-				label2.setText("Ganador: " + (pizarra.nroJugadas%2 == 0?"Player2":"Player1"));
-			} else if(aux == 0) {
-				// 	Hay empate
-				label2.setText("Empate!");
-			}
-			label2.setVisible(true);
-		}
-
-		if(msg.getId() == Mensaje.RESPUESTA_ACTUALIZACION_PIZARRA) {
-			// Debo mandar informacion necesaria al client handler del rival para que actualice su pizarra
-			ClientHandler client = ChatServer.getInstance().getHandlerList().get(mm.getJugador2());
-			client.enviarActualizacion(new Mensaje(Mensaje.ACTUALIZACION_PIZARRA,mm));
-		}
-	}
-
-	private void enviarActualizacion(Mensaje msg) {
 		try {
 			out.writeObject(msg);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}			
-
-	public void setearIcono(Object obj, int id) {
+	}
+	
+	private void actualizarTateti(Mensaje msg) {
 		try {
-			if(obj != null) {
-				if(obj instanceof JLabel) {
-					JLabel l = (JLabel) obj;
-					if (id != 0)
-						l.setIcon(new ImageIcon(getClass().getResource("cruzChica.png")));
-					else
-						l.setIcon(new ImageIcon(getClass().getResource("circuloChico.png")));
-				} else if(obj instanceof JButton) {
-					JButton b = (JButton) obj;
-					if (id != 0)
-						b.setIcon(new ImageIcon(getClass().getResource("cruzGrande.png")));
-					else
-						b.setIcon(new ImageIcon(getClass().getResource("circuloGrande.png")));
-				}
-			}
-		} catch(NullPointerException e) {
+			MensajeRespuestaMovimiento mrm = (MensajeRespuestaMovimiento)msg.getCuerpo();
+			ClientHandler client = ChatServer.getInstance().getHandlerList().get(mrm.getJugador2());
+			client.actualizarTateti(mrm);
+			out.writeObject(new Mensaje(Mensaje.ACTUALIZAR_TATETI,mrm));		// Debo actualizar ambas interfaces
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
+	
+	private void actualizarTateti(MensajeRespuestaMovimiento msg) {
+		try {
+			out.writeObject(new Mensaje(Mensaje.ACTUALIZAR_TATETI,msg));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/*private void enviarActualizacion(Mensaje msg) { EN DESUSO
+		try {
+			out.writeObject(msg);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}	*/		
+	
 	private void enviarMensajeChatTaTeTi(MensajeChat msgChat) {
 		ClientHandler client = ChatServer.getInstance().getHandlerList().get(msgChat.getDestinatario());
 		client.enviarMensajeChatTaTeTi(user, msgChat.getTexto());
@@ -580,6 +456,40 @@ public class ClientHandler extends Thread {
 		}
 		catch(Exception ex)
 		{
+			ex.printStackTrace();
+		}
+	}
+	
+	public void finPartida(MensajeEstadoJuego msg){	//se ejecuta en el handler del origen
+		String destino = msg.getGanador();	//obtengo el destino
+		ClientHandler handlerDestino = ChatServer.getInstance().getHandlerList().get(destino);
+		if(msg.isHayEmpate()){
+			handlerDestino.finalizarPartida(Mensaje.EMPATE,user);
+			//Loggeo en consola
+			ChatServer.getInstance().logearEvento("Server :: Resultado partida " + user + " - " + destino + ": empate");
+		}
+		if(msg.isHayGanador()){
+			handlerDestino.finalizarPartida(Mensaje.GANADOR,user);
+			//actualizo DB
+			dataAccess = DataAccess.getInstance();
+			//origen pierde		(Ante duda, ver diagrama de "secuencia"; si se le puede decir asi)
+			UserMetaData userMeta = dataAccess.getUserByUsername(user);
+			dataAccess.addDefeat(userMeta);
+			System.out.println("Defeat agregado a " + user);
+			//destino gana
+			userMeta = dataAccess.getUserByUsername(msg.getGanador());
+			dataAccess.addVictory(userMeta);
+			System.out.println("Victory agregado a " + msg.getGanador());
+			//Loggeo en consola
+			ChatServer.getInstance().logearEvento("Server :: Resultado partida " + user + " - " + destino + ": gano " + msg.getGanador());
+		}
+			
+	}
+	
+	public void finalizarPartida(int idMensaje, String rival){	//se ejecuta en el handler del destinatario
+		try{
+			out.writeObject(new Mensaje(idMensaje,rival));
+		} catch(Exception ex){
 			ex.printStackTrace();
 		}
 	}

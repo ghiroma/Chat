@@ -7,14 +7,14 @@ import java.io.Serializable;
 public class Blackboard implements Serializable {
 
 	/* Atributos  */
-	public static  int nroJugadas;
-	private static int table[][] = new int[3][3];
-	public static boolean gameOver;
+	private int nroJugadas;
+	private int table[][] = new int[3][3];
+	public boolean gameOver;
 	private boolean hayGanador = false;
-	private String jugador1;
-	private String jugador2;
-	private int idBlackboard1;
-	private int idBlackboard2;
+	private String user;
+	private String rival;
+	private String proxturno;
+	private int id;
 	
 	/* Constructores */
 	public Blackboard(){
@@ -32,7 +32,7 @@ public class Blackboard implements Serializable {
 		// 1 - Hay Ganador
 		// 0 - Empate 
 		// -1 - No paso nada
-		nroJugadas++;
+		nroJugadas++;		
 		table[i][j] = id;						
 		if (hayGanador(id) || nroJugadas == 9) {
 			gameOver = true;
@@ -40,7 +40,7 @@ public class Blackboard implements Serializable {
 				return 1;
 			else
 				return 0;
-		}			
+		}		
 		return -1;
 	}
 	
@@ -124,36 +124,44 @@ public class Blackboard implements Serializable {
 	}	
 	/* Fin Soluciones */
 
-	public String getJugador1() {
-		return jugador1;
+	public String getUser() {
+		return user;
 	}
 
-	public void setJugador1(String jugador1) {
-		this.jugador1 = jugador1;
+	public void setUser(String user) {
+		this.user = user;
 	}
 
-	public String getJugador2() {
-		return jugador2;
+	public String getRival() {
+		return rival;
 	}
 
-	public void setJugador2(String jugador2) {
-		this.jugador2 = jugador2;
+	public void setRival(String rival) {
+		this.rival = rival;
 	}
 
-	public int getIdBlackboard1() {
-		return idBlackboard1;
+	public String getProxturno() {
+		return proxturno;
 	}
 
-	public void setIdBlackboard1(int idBlackboard1) {
-		this.idBlackboard1 = idBlackboard1;
+	public void setProxturno(String proxturno) {
+		this.proxturno = proxturno;
 	}
 
-	public int getIdBlackboard2() {
-		return idBlackboard2;
+	public int getId() {
+		return id;
 	}
 
-	public void setIdBlackboard2(int idBlackboard2) {
-		this.idBlackboard2 = idBlackboard2;
+	public void setId(int id) {
+		this.id = id;
 	}
-	
+
+	public int getNroJugadas() {
+		return nroJugadas;
+	}
+
+	public void setNroJugadas(int nroJugadas) {
+		this.nroJugadas = nroJugadas;
+	}
+
 }

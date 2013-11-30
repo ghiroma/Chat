@@ -2,6 +2,7 @@ package interfaces.cliente;
 
 import interfaces.grupos.ClienteModCrearChatBroad;
 import interfaces.grupos.ClienteModSalaDeChat;
+import interfaces.tateti.Blackboard;
 import interfaces.tateti.InterfazTateti;
 import interfaces.tateti.InvitacionJuego;
 
@@ -29,6 +30,8 @@ import client.ChatClient;
 import common.FriendStatus;
 import common.Mensaje;
 import common.MensajeInvitacion;
+import common.MensajeJuego;
+import common.MensajeMovimiento;
 import common.MensajePartida;
 import common.MensajeSolicitudGrupo;
 
@@ -39,12 +42,13 @@ public class ClienteInicial extends JFrame {
 	private JPanel contentPane;
 	private JLabel lblNotificacion;
 	private DefaultListModel modelAmigos;
+	private String user;
 
 	/**
 	 * Create the frame.
 	 */
 	public ClienteInicial() {
-
+		user = ChatClient.getInstance().getUsuarioLogeado().getUser();
 		setTitle("Menu principal - " + ChatClient.getInstance().getUsuarioLogeado().getUser().toUpperCase());
 		setResizable(false);
 
@@ -140,17 +144,17 @@ public class ClienteInicial extends JFrame {
 		JButton btnIniciarJuego = new JButton("Iniciar Juego");
 		btnIniciarJuego.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
-				String nombreUsuario = (String)((JList)contentPane.getComponent(0)).getSelectedValue();
-				if(nombreUsuario != null) {
+			public void mouseClicked(MouseEvent e) { // Version Nico
+				String nombreUsuario=(String)((JList)contentPane.getComponent(0)).getSelectedValue();
+				if(nombreUsuario != null && ChatClient.getInstance().getMapaTateti().size() < 3) {
 					ChatClient.getInstance().invitarAmigoAJugar(nombreUsuario);
 				} else {
-					lblNotificacion.setText("<html>" + "Debe seleccionar un amigo" + "</html>");
+					lblNotificacion.setText("<html>"+ "Error: seleccione a un amigo. Recuerde que la maxima cantidad de partidas activas es 3." +"</html>");
 					lblNotificacion.setForeground(Color.RED);
 				}
 			}
 		});
-		btnIniciarJuego.setBounds(221, 110, 95, 42);
+		btnIniciarJuego.setBounds(221, 125, 95, 42);
 		contentPane.add(btnIniciarJuego);
 		
 		lblNotificacion = new JLabel("");
@@ -256,34 +260,76 @@ public class ClienteInicial extends JFrame {
 
 
 	// Inicio: TATETI
-	public void mostrarPopUpInvitacionJuego(Mensaje msg) {
+	public void mostrarPopUpInvitacionJuego(Mensaje msg) {//Version Nico origen = solicitante, destino = invitado
 		InvitacionJuego inv = new InvitacionJuego();
-		inv.setUsuarioOrigen(((MensajeInvitacion)msg.getCuerpo()).getSolicitante());
-		inv.setUsuarioDestino(((MensajeInvitacion)msg.getCuerpo()).getInvitado());
+		inv.setUsuarioOrigen((String)msg.getCuerpo());	//msg = "INVITACION_JUEGO, solicitante"
+		inv.setUsuarioDestino(user);
 		inv.setJLblInformacion(inv.getUsuarioOrigen() + " desea jugar con usted " + inv.getUsuarioDestino());
 		inv.setVisible(true);
 		inv.toFront();
 	}
 
-	public InterfazTateti mostrarTateti(Mensaje msg) {
+	public void iniciarTaTeTi(MensajeJuego msg){ //Version Nico; inicializa el TaTeTi de la nueva partida
+		/* Inicializacion del TaTeTi*/
 		InterfazTateti tateti = new InterfazTateti();
-		//TODO utilizar cuerpo de mensaje para cargar informacion necesaria en la pantalla
+		//Seteo rival
+		String rival = msg.getRival();
+		tateti.setRival(rival);
+		tateti.setUser(user);
+		if(msg.getProxTurno().equals(user)){
+			tateti.setId(1);			
+		}
+
+		else{
+			tateti.setId(0);
+		}
+
+		
+		/* Inicializacion del Blackboard */
+		Blackboard pizarra = new Blackboard();
+		//Seteo de pizarra
+		pizarra.setUser(user);
+		pizarra.setRival(rival);
+		pizarra.setProxturno(msg.getProxTurno());
+		tateti.setPizarra(pizarra);
+		pizarra.setId(tateti.getId());
+		tateti.updateTurno();
+		System.out.println("User: " + user+ " Turno: " + pizarra.getProxturno());
+		
+		// Agrego al mapaPartidas la partida recien creada
+		ChatClient.getInstance().getMapaPizarra().put(rival, pizarra);
+		// Agrego al mapaTateti la interfaz recien creada
+		ChatClient.getInstance().getMapaTateti().put(rival, tateti);
+		tateti.setTitle("Usuario: " + user + " Rival: " + rival);
+		tateti.setVisible(true);
+		tateti.toFront();
+	}
+	
+	public void mostrarTateti(Mensaje msg) {	//Version Nico: En desuso.
+		/*InterfazTateti tateti = new InterfazTateti();
 		String jugador1 = ((MensajePartida)msg.getCuerpo()).getJugador1();
 		String jugador2 = ((MensajePartida)msg.getCuerpo()).getJugador2();
-		tateti.setPlayer1(jugador1);
-		tateti.setPlayer2(jugador2);
+		String proxTurno = ((MensajePartida)msg.getCuerpo()).getProxTurno();
+		tateti.setUser(jugador1);
+		tateti.setRival(jugador2);
+		Blackboard pizarra = new Blackboard();
+		pizarra.setJugador1(jugador1);
+		pizarra.setJugador2(jugador2);
+		pizarra.setProxturno(proxTurno);
+		// Agrego al mapaPartidas la partida recien creada
+		ChatClient.getInstance().getMapaPizarra().put(jugador2, pizarra);
+		// Agrego al mapaTateti la interfaz recien creada
 		ChatClient.getInstance().getMapaTateti().put(jugador2, tateti);
 		tateti.setTitle(jugador1 + " vs " + jugador2);
 		tateti.setVisible(true);
-		tateti.toFront();
-		return tateti;		
+		tateti.toFront();*/
 	}
 
 	public void getNuevaConversacionTateti(String nombreUsuario, String texto) {
 		InterfazTateti tateti = ChatClient.getInstance().getMapaTateti().get(nombreUsuario);
 		try{
 			if(tateti == null)
-				throw new Exception("No se encuentra la interfaz tateti buscada.");
+				throw new Exception("No se encuentra la interfaz tateti: " + nombreUsuario);
 			tateti.mostrarMensajeDeRival(texto);
 		}
 		catch(Exception ex)

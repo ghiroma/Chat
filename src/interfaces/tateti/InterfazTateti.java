@@ -16,15 +16,16 @@ import client.ChatClient;
 public class InterfazTateti extends JFrame implements ActionListener, Serializable {
 
 	/* Atributos */
-		
+		public static int EMPATE = 1;
+	    public static int GANADOR = 2;
 		/* Clases y variables utiles */
 		//private Controller controlador = null;
 		//private Blackboard bb = null;
 		private InvitacionJuego invitacion = null;
 		//private NuevaPartida nuevaPartida = null;
 		private static final long serialVersionUID = 1L;
-		private String player1;
-		private String player2;
+		private String user;
+		private String rival;
 		private String ganador;
 		private String perdedor;
 		private boolean empate = false;
@@ -42,7 +43,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		private JPanel jPanelLinea3 = null;
 		private JPanel jPanelInformacionJuego = null;
 		private JPanel jPanelLabels = null;
-		private JPanel jPanelJugadores = null;
+		//private JPanel jPanelJugadores = null;
 		private JPanel jPanelChat = null;
 		private JPanel jPanelConversacion = null;
 		private JPanel jPanelMensajeEmisor = null;
@@ -59,6 +60,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		private JButton jButton8 = null;
 		private JButton jButton9 = null;
 		private JButton jButtonEnviarMensaje = null;	
+		private boolean[] usados;
 		
 		/* Labels */
 		private JLabel jLabel1 = null;									// Texto informativo
@@ -73,15 +75,28 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		private JTextArea textAreaConversacion;
 		private JTextArea textAreaMensajeEmisor;	
 		
+		/* Logica correspondiente a la partida */
+		private Blackboard pizarra;
+		private String proxTurno;
+		private int idLocal;
+		private int idRival;
+		private boolean gameOver;
+		
 	/* Constructores */ 
 
 	public InterfazTateti(){
 		super();
+		gameOver = false;
 		//this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.addWindowListener(new WindowListener() {
 			public void windowClosing(WindowEvent arg0) {
-				InterfazTateti.this.dispose(); 										// Cierro interfaz tateti pero no la aplicacion, el metodo System.exit(0) cierra por completo la aplicacion
+				pizarra = ChatClient.getInstance().getMapaPizarra().get(rival); 
+				//Si la partida esta en curso y se cierra la ventana -> envio al server que "abandone" la partida
+				if(!gameOver){
+					ChatClient.getInstance().enviarAlServer(new Mensaje(Mensaje.ABANDONO,rival));
+				}
+					InterfazTateti.this.dispose(); 										// Cierro interfaz tateti pero no la aplicacion, el metodo System.exit(0) cierra por completo la aplicacion
 				}
 			public void windowOpened(WindowEvent arg0) {}
 			public void windowIconified(WindowEvent arg0) {}
@@ -92,6 +107,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		});		
 		
 		//this.bb = new Blackboard();
+		//Inicializo todo los botones en "nada"
 		this.limpiarTablero();
 
 		/* Agrego actionListeners a los botones */
@@ -104,6 +120,10 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		jButton7.addActionListener(this);
 		jButton8.addActionListener(this);
 		jButton9.addActionListener(this);
+		usados = new boolean[9];
+		for(boolean x: usados){
+			x = false;
+		}
 		
 		/* Agrego eventos a los text areas y al boton del panelChat */
 		getJButtonEnviarMensaje().addActionListener(this);
@@ -114,7 +134,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 					String mensajeEmisor = textAreaMensajeEmisor.getText();								// TODO enviarselo al server para que lo cargue en el textAreaConversacion
 					String mensajeReceptor = textAreaConversacion.getText();
 					String aux = "";
-					ChatClient.getInstance().enviarMensajeChatTaTeTi(player2, mensajeEmisor);
+					ChatClient.getInstance().enviarMensajeChatTaTeTi(rival, mensajeEmisor);
 					textAreaConversacion.append("Tu: "+mensajeEmisor);
 					StringTokenizer palabras= new StringTokenizer(mensajeEmisor," ");					// Copio todo el mensaje y lo cargo en un vector de palabras
 					textAreaMensajeEmisor.setText("");
@@ -129,7 +149,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 							mensajeReceptor = mensajeReceptor + aux;
 					}
 				}
-			}}); 
+			}});
 		
 		//TODO CONTROLADOR this.controlador = new Controller();
 		this.setTitle("Ta Te Ti ");
@@ -164,166 +184,157 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		getJButton9().setIcon(new ImageIcon(getClass().getResource("nada.png")));
 		getJButton9().setBackground(Color.BLACK);
 
-		getJLabel2().setIcon(new ImageIcon(getClass().getResource("circuloChico.png"))); 	
-		getJLabel3().setVisible(false); 																
+		getJLabel2().setIcon(new ImageIcon(getClass().getResource("circuloChico.png")));															
 	}
 
-	// TODO proceso de informacion de ganador y actualizacion del tablero para una nueva partida
-	// 1- Activar Label de Ganador jugador tanto, y mostrar una ventana indicando jugador ganador o hubo empate que solo tenga un boton aceptar
-	// 2- Luego de aceptar esa ventana emergente debe aparecer ventana si se desea iniciar nueva partida
-	// 		Si->I- Envio solicitud de juego a mi rival
-	//					Si-> Creo nuevo blackboard y limpio tablero
-	//					No-> Cierro todo y vuelvo a pantalla principal de chat
-	//		No->Cierro todo y voy a la interfaz del chat.
-	
-	
-	public void actualizarEstadoJuego(int i, int j, int id, JButton btn) {
-		/*
-		int aux;
-		setearIcono(jLabel2,(id+1)%2);
-		setearIcono(btn,id);
-		aux = bb.update(i, j, id);
-		if(aux != -1) {
-			if(aux == 1){
-				// Hay ganador
-				jLabel3.setText("Ganador: " + (id == 0?"Player2":"Player1"));
-			} else if(aux == 0) {
-				// Hay empate
-				jLabel3.setText("Empate!");
-			}
-			jLabel3.setVisible(true);
+	public void actualizarEstadoJuego(int i, int j) {
+		
+		// Actualizo label de siguiente participante
+		setearIcono(getJLabel2());
+		
+		// Actualizo boton
+		if(i == 0 && j == 0) {
+			setearIcono(getJButton1());
+			jButton1.setEnabled(false);
 		}
-		*/
+		if(i == 0 && j == 1) {
+			setearIcono(getJButton2());
+			jButton2.setEnabled(false);
+		}
+		if(i == 0 && j == 2) {
+			setearIcono(getJButton3());
+			jButton3.setEnabled(false);
+		}
+		if(i == 1 && j == 0) {
+			setearIcono(getJButton4());
+			jButton4.setEnabled(false);
+		}
+		if(i == 1 && j == 1) {
+			setearIcono(getJButton5());
+			jButton5.setEnabled(false);
+		}
+		if(i == 1 && j == 2) {
+			setearIcono(getJButton6());
+			jButton6.setEnabled(false);
+		}
+		if(i == 2 && j == 0) {
+			setearIcono(getJButton7());
+			jButton7.setEnabled(false);
+		}
+		if(i == 2 && j == 1) {
+			setearIcono(getJButton8());
+			jButton8.setEnabled(false);
+		}
+		if(i == 2 && j == 2) {
+			setearIcono(getJButton9());
+			jButton9.setEnabled(false);
+		}
+		
+		jLabel3.setText("Turno: " + pizarra.getProxturno());
 	}
 
 	public void actionPerformed(ActionEvent ae) {
-				
-		if(ae.getSource() == jButton1) {
-			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,0,0,jButton1,jLabel2,jLabel3);
-			ChatClient.getInstance().enviarMovimiento(msg);
+		int i=0, j=0;
+		proxTurno = pizarra.getProxturno();
+		if(user.equals(proxTurno)) {
+			boolean movido = false; //si se movio, al final se ajusta el turno
+			if(ae.getSource() == jButton1 && jButton1.isEnabled() && usados[0] == false) {
+				MensajeMovimiento msg = new MensajeMovimiento(user,rival,0,0);
+				i=j=0;
+				ChatClient.getInstance().realizaMovimiento(msg);
+				usados[0] = true;
+				movido = true;
+			}
+			
+			if(ae.getSource() == jButton2 && jButton2.isEnabled() && usados[1] == false) {
+				MensajeMovimiento msg = new MensajeMovimiento(user,rival,0,1);
+				i=0;
+				j=1;
+				usados[1] = true;
+				jButton2.setEnabled(false);
+				ChatClient.getInstance().realizaMovimiento(msg);
+				movido = true;
+			}
+			
+			if(ae.getSource() == jButton3 && jButton3.isEnabled() && usados[2] == false) {
+				MensajeMovimiento msg = new MensajeMovimiento(user,rival,0,2);
+				i=0;
+				j=2;
+				usados[2] = true;
+				jButton3.setEnabled(false);
+				ChatClient.getInstance().realizaMovimiento(msg);
+				movido = true;
+			}
+			
+			if(ae.getSource() == jButton4 && jButton4.isEnabled()&& usados[3] == false) {
+				MensajeMovimiento msg = new MensajeMovimiento(user,rival,1,0);
+				i=1;
+				j=0;
+				usados[3] = true;
+				jButton4.setEnabled(false);
+				ChatClient.getInstance().realizaMovimiento(msg);
+				movido = true;
+			}
+			
+			if(ae.getSource() == jButton5 && jButton5.isEnabled()&& usados[4] == false) {
+				MensajeMovimiento msg = new MensajeMovimiento(user,rival,1,1);
+				i=1;
+				j=1;
+				usados[4] = true;
+				jButton5.setEnabled(false);
+				ChatClient.getInstance().realizaMovimiento(msg);
+				movido = true;
+			}
+			
+			if(ae.getSource() == jButton6 && jButton6.isEnabled()&& usados[5] == false) {
+				MensajeMovimiento msg = new MensajeMovimiento(user,rival,1,2);
+				i=1;
+				j=2;
+				usados[5] = true;
+				jButton6.setEnabled(false);
+				ChatClient.getInstance().realizaMovimiento(msg);
+				movido = true;
+			}
+			
+			if(ae.getSource() == jButton7 && jButton7.isEnabled()&& usados[6] == false) {
+				MensajeMovimiento msg = new MensajeMovimiento(user,rival,2,0);
+				i=2;
+				j=0;
+				usados[6] = true;
+				jButton7.setEnabled(false);
+				ChatClient.getInstance().realizaMovimiento(msg);
+				movido = true;
+			}
+			
+			if(ae.getSource() == jButton8 && jButton8.isEnabled()&& usados[7] == false) {
+				MensajeMovimiento msg = new MensajeMovimiento(user,rival,2,1);
+				i=2;
+				j=1;
+				usados[7] = true;
+				jButton8.setEnabled(false);
+				ChatClient.getInstance().realizaMovimiento(msg);
+				movido = true;
+			}
+			
+			if(ae.getSource() == jButton9 && jButton9.isEnabled()&& usados[8] == false) {
+				MensajeMovimiento msg = new MensajeMovimiento(user,rival,2,2);
+				i=j=2;
+				usados[8] = true;
+				jButton9.setEnabled(false);
+				ChatClient.getInstance().realizaMovimiento(msg);
+				movido = true;
+			}
+			
+			if(true == movido){
+				//rescribo la gui
+				actualizarEstadoJuego(i, j);
+				pizarra.update(i, j, idLocal);
+				pizarra.setProxturno(rival);
+				updateTurno();
+				System.out.println("[" + pizarra.getNroJugadas() + "]"+ user + " movio "+ i +" " +j);
+			}
 		}
-		
-		if(ae.getSource() == jButton2) {
-			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,0,1,jButton2,jLabel2,jLabel3);
-			ChatClient.getInstance().enviarMovimiento(msg);
-		}
-		
-		if(ae.getSource() == jButton3) {
-			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,0,2,jButton3,jLabel2,jLabel3);
-			ChatClient.getInstance().enviarMovimiento(msg);
-		}
-		
-		if(ae.getSource() == jButton4) {
-			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,1,0,jButton4,jLabel2,jLabel3);
-			ChatClient.getInstance().enviarMovimiento(msg);
-		}
-		
-		if(ae.getSource() == jButton5) {
-			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,1,1,jButton5,jLabel2,jLabel3);
-			ChatClient.getInstance().enviarMovimiento(msg);
-		}
-		
-		if(ae.getSource() == jButton6) {
-			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,1,2,jButton6,jLabel2,jLabel3);
-			ChatClient.getInstance().enviarMovimiento(msg);
-		}
-		
-		if(ae.getSource() == jButton7) {
-			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,2,0,jButton7,jLabel2,jLabel3);
-			ChatClient.getInstance().enviarMovimiento(msg);
-		}
-		
-		if(ae.getSource() == jButton8) {
-			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,2,1,jButton8,jLabel2,jLabel3);
-			ChatClient.getInstance().enviarMovimiento(msg);
-		}
-		
-		if(ae.getSource() == jButton9) {
-			MensajeMovimiento msg = new MensajeMovimiento(ChatClient.getInstance().getUsuarioLogeado().getUser(),player1,player2,2,2,jButton9,jLabel2,jLabel3);
-			ChatClient.getInstance().enviarMovimiento(msg);
-		}
-		
-		/*	if(ae.getSource() == jButton1){
-			int iden = bb.nroJugadas%2;
-			int aux;
-			if(bb.inspect(0, 0, iden))							// Si inspect == true puedo realizar movimiento
-				this.actualizarEstadoJuego(0,0,iden,jButton1);
-			else
-				System.out.println("Posicion ya ocupada");
-		}
-		
-		if(ae.getSource() == jButton2){
-			int iden = bb.nroJugadas%2;
-			int aux;
-			if(bb.inspect(0, 1, iden))			
-				this.actualizarEstadoJuego(0,1,iden,jButton2);
-			else
-				System.out.println("Posicion ya ocupada");
-		}
-		
-		if(ae.getSource() == jButton3){
-			int iden = bb.nroJugadas%2;
-			int aux;
-			if(bb.inspect(0, 2, iden))						
-				this.actualizarEstadoJuego(0,2,iden,jButton3);
-			else
-				System.out.println("Posicion ya ocupada");
-		}		
-		
-		if(ae.getSource() == jButton4){
-			int iden = bb.nroJugadas%2;
-			int aux;
-			if(bb.inspect(1, 0, iden))					
-				this.actualizarEstadoJuego(1,0,iden,jButton4);
-			else
-				System.out.println("Posicion ya ocupada");
-		}
-		
-		if(ae.getSource() == jButton5){
-			int iden = bb.nroJugadas%2;
-			int aux;
-			if(bb.inspect(1, 1, iden))				
-				this.actualizarEstadoJuego(1,1,iden,jButton5);
-			else
-				System.out.println("Posicion ya ocupada");
-		}
-		
-		if(ae.getSource() == jButton6){
-			int iden = bb.nroJugadas%2;
-			int aux;
-			if(bb.inspect(1, 2, iden))					
-				this.actualizarEstadoJuego(1,2,iden,jButton6);
-			else
-				System.out.println("Posicion ya ocupada");
-		}
-		
-		if(ae.getSource() == jButton7){
-			int iden = bb.nroJugadas%2;
-			int aux;
-			if(bb.inspect(2, 0, iden))					
-				this.actualizarEstadoJuego(2,0,iden,jButton7);
-			else
-				System.out.println("Posicion ya ocupada");
-		}
-		
-		if(ae.getSource() == jButton8){
-			int iden = bb.nroJugadas%2;
-			int aux;
-			if(bb.inspect(2, 1, iden))					
-				this.actualizarEstadoJuego(2,1,iden,jButton8);
-			else
-				System.out.println("Posicion ya ocupada");
-		}
-		
-		if(ae.getSource() == jButton9){
-			int iden = bb.nroJugadas%2;
-			int aux;
-			if(bb.inspect(2, 2, iden))					
-				this.actualizarEstadoJuego(2,2,iden,jButton9);
-			else
-				System.out.println("Posicion ya ocupada");
-		}
-		
+		/*	ENVIAR MENSAJE CON EL CLICK
 		if(ae.getSource() == jButtonEnviarMensaje) {
 			int maxCaracteresPorLinea = 40;
 			String mensajeEmisor = textAreaMensajeEmisor.getText();			// TODO enviarselo al server para que lo cargue en el textAreaConversacion
@@ -343,23 +354,47 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 			}
 			textAreaConversacion.setText(mensajeReceptor + "\n");
 		}
-	*/	
+	 	*/	
 	}
-	public void setearIcono(Object obj, int id) {							
+		
+	public void setearIcono(Object obj) {							
+		int id;
+		if(pizarra.getProxturno().equals(user))
+			id = idLocal;
+		else
+			id = idRival;
 		if(obj instanceof JLabel) {
 			JLabel l = (JLabel) obj;
-			if (id != 0)
+			if (id == 1)
 				l.setIcon(new ImageIcon(getClass().getResource("cruzChica.png")));
 			else
 				l.setIcon(new ImageIcon(getClass().getResource("circuloChico.png")));
 		} else if(obj instanceof JButton) {
 			JButton b = (JButton) obj;
-			if (id != 0)
+			if (id == 0)
 				b.setIcon(new ImageIcon(getClass().getResource("cruzGrande.png")));
 			else
 			b.setIcon(new ImageIcon(getClass().getResource("circuloGrande.png")));
 		}
 	}
+	
+	public void abandono(){
+		/* El jugador 2 ha abandonado la partida */
+		SwingUtilities.invokeLater(new Runnable(){
+			public void run(){
+				JOptionPane.showMessageDialog(null, "El jugador " + rival + " abandono la partida.");	
+				//TODO sonido fin de partida
+			}
+		});
+		close();
+	}
+	
+	public void close(){
+		dispose();
+	}
+	
+	
+	
 	
 	/* PANEL JUEGO */
 	private JMenuBar getJJMenuBar() {
@@ -431,6 +466,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelPrincipal == null){
 			try {
 				jPanelPrincipal = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelPrincipal.setLayout(new FlowLayout());
 				jPanelPrincipal.add(getJPanelJuego());
 				jPanelPrincipal.add(getJPanelChat());
@@ -445,6 +481,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelJuego == null) {
 			try {
 				jPanelJuego = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelJuego.setLayout(new BorderLayout());
 				jPanelJuego.setBounds(0, 0, 450, 450);
 				//jPanelJuego.add(new JLabel("Panel1"));
@@ -462,6 +499,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelTabla == null) {
 			try {
 				jPanelTabla = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelTabla.setLayout(new BorderLayout());
 				jPanelTabla.setBounds(0, 0, 450, 375);
 				jPanelTabla.add(getJPanelLinea1(),java.awt.BorderLayout.NORTH);
@@ -482,7 +520,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 				jPanelInformacionJuego.setLayout(new BorderLayout());
 				jPanelInformacionJuego.setBounds(0,0,450,75);
 				jPanelInformacionJuego.add(getJPanelLabels(),java.awt.BorderLayout.CENTER);
-				jPanelInformacionJuego.add(getJPanelJugadores(),java.awt.BorderLayout.SOUTH);
+				//jPanelInformacionJuego.add(getJPanelJugadores(),java.awt.BorderLayout.SOUTH);
 				jPanelInformacionJuego.setVisible(true);
 			} catch(java.lang.Throwable e) {
 				
@@ -495,6 +533,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelLabels == null) {
 			try {
 				jPanelLabels = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelLabels.setLayout(new FlowLayout());
 				jPanelLabels.add(getJLabel1());
 				jPanelLabels.add(getJLabel2());
@@ -542,15 +581,15 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 				jLabel3.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.red, 5));
 				jLabel3.setFont(new java.awt.Font("Rockwell Extra Bold",java.awt.Font.BOLD, 20));
 				jLabel3.setForeground(java.awt.Color.RED);
-				jLabel3.setText("Ganador: Player1");		
+				jLabel3.setText("Turno: -");		
 			} catch(java.lang.Throwable e) {
-				
+				System.err.println(user + " - Error al escribir jLabel3.");
 			}
 		}
 		return jLabel3;
 	}
 	
-	public JPanel getJPanelJugadores() {			// TODO ver porque no se muestra el panel de jugadores
+	/*public JPanel getJPanelJugadores() {			// TODO ver porque no se muestra el panel de jugadores
 		if(jPanelJugadores == null) {
 			try {
 				jPanelJugadores = new JPanel();
@@ -591,11 +630,12 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		}
 		return jLabelPlayer2;
 	}
-	
+	*/
 	public JPanel getJPanelLinea1() {
 		if(jPanelLinea1 == null) {
 			try {
 				jPanelLinea1 = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelLinea1.setLayout(new FlowLayout());
 				jPanelLinea1.setBounds(0, 0, 450, 125);
 				//jPanelLinea1.setBackground(Color.YELLOW);
@@ -657,6 +697,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelLineas23 == null) {
 			try {
 				jPanelLineas23 = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelLineas23.setLayout(new BorderLayout());
 				jPanelLineas23.add(getJPanelLinea2(),java.awt.BorderLayout.NORTH);
 				jPanelLineas23.add(getJPanelLinea3(),java.awt.BorderLayout.CENTER);
@@ -673,6 +714,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelLinea2 == null) {
 			try {
 				jPanelLinea2 = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelLinea2.setLayout(new FlowLayout());
 				jPanelLinea2.setBounds(0, 0, 450, 125);
 				//jPanelLinea2.setBackground(Color.YELLOW);
@@ -735,6 +777,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelLinea3 == null) {
 			try {
 				jPanelLinea3 = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelLinea3.setLayout(new FlowLayout());
 				jPanelLinea3.setBounds(0, 0, 450, 125);
 				//jPanelLinea3.setBackground(Color.YELLOW);
@@ -792,6 +835,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		}
 		return jButton9;
 	}
+
 	/* FIN PANEL JUEGO */
 	
 	/* PANEL CHAT */
@@ -799,6 +843,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelChat == null) {
 			try {
 				jPanelChat = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelChat.setLayout(new BorderLayout());
 				jPanelChat.setBounds(0, 0, 300, 450);
 				//jPanelChat.setBackground(Color.BLUE);
@@ -817,6 +862,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelConversacion == null) {
 			try {
 				jPanelConversacion = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelConversacion.setLayout(new BorderLayout());
 				textAreaConversacion = new JTextArea(20,30);
 				textAreaConversacion.setEditable(false);
@@ -835,6 +881,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		if(jPanelMensajeEmisor == null) {
 			try {
 				jPanelMensajeEmisor = new JPanel();
+				//TODO SWING CONTIENE AWT
 				jPanelMensajeEmisor.setLayout(new BorderLayout());				
 				jScrollPaneMensajeEmisor = new JScrollPane(getTextAreaMensajeEmisor());
 				jPanelMensajeEmisor.add(jScrollPaneMensajeEmisor,java.awt.BorderLayout.CENTER);
@@ -870,26 +917,91 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		return textAreaMensajeEmisor;
 	}
 
-	public String getPlayer1() {
-		return player1;
+	public String getUser() {
+		return user;
 	}
 
-	public void setPlayer1(String player1) {
-		this.player1 = player1;
+	public void setUser(String user) {
+		this.user = user;
 	}
 
-	public String getPlayer2() {
-		return player2;
+	public String getRival() {
+		return rival;
 	}
 
-	public void setPlayer2(String player2) {
-		this.player2 = player2;
+	public void setRival(String rival) {
+		this.rival = rival;
+	}
+	
+	public void setPizarra(Blackboard pizarra){
+		this.pizarra = pizarra;
 	}
 	
 	/* FIN PANEL CHAT */
 	
 	public void mostrarMensajeDeRival(String mensaje){
-		textAreaConversacion.append(">> " +player2+": "+mensaje );
+		textAreaConversacion.append(">> " +rival+": "+mensaje );
 	}
 	
+	public void updateTurno(){
+		jLabel3.setText("Turno: "+ pizarra.getProxturno());
+	}
+
+	public int getNroJugadas() {
+		return pizarra.getNroJugadas();
+	}
+
+	public int getId() {
+		return idLocal;
+	}
+
+	public void setId(int id) {
+		this.idLocal = id;
+		if(idLocal == 0)
+			idRival = 1;
+		else
+			idRival = 0;
+	}
+
+	public int getIdRival() {
+		return idRival;
+	}
+
+	public int movimientoRival(int x, int y){
+		int aux = pizarra.update(x, y, idRival);
+		proxTurno = user;
+		actualizarEstadoJuego(x, y);
+		pizarra.setProxturno(proxTurno);
+		jLabel3.setText("Turno: " + pizarra.getProxturno());
+		System.out.println("[" + pizarra.getNroJugadas() + "]"+ rival + " movio "+ x +" " +y);
+		return aux;
+	}
+	
+	public void finPartida(int tipoFin, String ganador){
+		deshabilitarBotones();
+		gameOver = true;
+		if(InterfazTateti.EMPATE == tipoFin){
+			jLabel3.setText("Empate");
+			//popup "empate"
+			//sonido
+		}
+		
+		if(InterfazTateti.GANADOR == tipoFin){
+			jLabel3.setText("Ganador: " + ganador);
+			//popup "Usuario ganador ha ganado la partida"
+			//sonido
+		}
+	}
+
+	private void deshabilitarBotones(){
+		jButton1.setEnabled(false);
+		jButton2.setEnabled(false);
+		jButton3.setEnabled(false);
+		jButton4.setEnabled(false);
+		jButton5.setEnabled(false);
+		jButton6.setEnabled(false);
+		jButton7.setEnabled(false);
+		jButton8.setEnabled(false);
+		jButton9.setEnabled(false);
+	}
 }

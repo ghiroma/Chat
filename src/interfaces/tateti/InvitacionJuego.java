@@ -29,7 +29,7 @@ public class InvitacionJuego extends JFrame{
 	/* Constructores */
 	public InvitacionJuego() {
 		super();
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.addWindowListener(new WindowListener() {
 			public void windowClosing(WindowEvent arg0) {
 				InvitacionJuego.this.dispose(); 										// Cierro frame pero no la aplicacion, el metodo System.exit(0) cierra por completo la aplicacion
@@ -48,21 +48,25 @@ public class InvitacionJuego extends JFrame{
 		this.setResizable(true);
 		this.setContentPane(getJPanelPrincipal());
 		
-		jButtonSi.addActionListener(new java.awt.event.ActionListener() {
+		jButtonSi.addActionListener(new java.awt.event.ActionListener() { //Version Nico
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				// TODO Diego
-				MensajeRespuestaInvitacion mri = new MensajeRespuestaInvitacion(usuarioOrigen,usuarioDestino,true);
-				acepto = true;
-				ChatClient.getInstance().aceptacionInvitacionJuego(new Mensaje(Mensaje.RESPUESTA_INVITACION_JUEGO,mri));
+				if(ChatClient.getInstance().getMapaTateti().size() < 3)	//tiene menos de 3 partidas
+					ChatClient.getInstance().aceptacionInvitacionJuego(new Mensaje(Mensaje.ACEPTO_TATETI,usuarioOrigen));
+				else{
+					SwingUtilities.invokeLater(new Runnable(){
+						public void run(){
+							JOptionPane.showMessageDialog(null,"No puede tener mas de 3 juegos activos.");	
+						}
+
+					});
+				}
+					
 				dispose();
 			}
 		});
-		jButtonNo.addActionListener(new java.awt.event.ActionListener() {
+		jButtonNo.addActionListener(new java.awt.event.ActionListener() { // Version Nico
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				MensajeRespuestaInvitacion mri = new MensajeRespuestaInvitacion(usuarioOrigen,usuarioDestino,false);
-				acepto = false;
-				ChatClient.getInstance().aceptacionInvitacionJuego(new Mensaje(Mensaje.RESPUESTA_INVITACION_JUEGO,mri));
-				InvitacionJuego.this.dispose();				// System.exti(0) se reemplaoz por InvitacionJuego.this.dispose() porque terminaba con la ejecucion del programa y no debia ser asi, solo se debe cerrar de manera correcta el frame de la interfaz tateti
+				InvitacionJuego.this.dispose();	//No hace nada si cancelo la invitacion
 			}
 		});
 		

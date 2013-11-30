@@ -54,6 +54,7 @@ public class ChatServer {
 	}
 	private void go() {
 		/* Lanzamiento de handler de manejo de informacion de GUI */
+		DataAccess.getInstance().limpiarConectados();
 		frontEnd = new Principal();
 		frontEnd.setResizable(false);
 		frontEnd.setVisible(true);

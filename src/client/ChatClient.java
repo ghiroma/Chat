@@ -5,6 +5,7 @@ import interfaces.cliente.ClienteConversacion;
 import interfaces.cliente.ClienteInicial;
 import interfaces.cliente.UserLogin;
 import interfaces.grupos.ClienteModSalaDeChat;
+import interfaces.tateti.Blackboard;
 import interfaces.tateti.InterfazTateti;
 
 import java.io.FileInputStream;
@@ -19,19 +20,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import common.FriendStatus;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
+
 import common.Mensaje;
 import common.MensajeChat;
 import common.MensajeConsulta;
+import common.MensajeEstadoJuego;
 import common.MensajeGrupo;
 import common.MensajeInvitacion;
+import common.MensajeJuego;
 import common.MensajeMovimiento;
 import common.MensajePartida;
-import common.MensajePizarra;
+import common.MensajeRespuestaMovimiento;
 import common.MensajeSolicitudGrupo;
 import common.UserMetaData;
-
 import dataTier.BanInfo;
 
 public class ChatClient {
@@ -42,7 +48,8 @@ public class ChatClient {
 
 	// Negrada
 	private BanInfo banInfo;
-
+	private String username;
+	
 	// Conexion / Auxiliar
 	private ObjectInputStream entrada;
 	private ObjectOutputStream salida;
@@ -63,8 +70,8 @@ public class ChatClient {
 	private Map<String, ClienteModSalaDeChat> mapaGrupos;
 	private Map<String, ClienteModSalaDeChat> mapaGruposParaLista;
 	private Map<String, InterfazTateti> mapaTaTeTi;
-
-
+	private Map<String, Blackboard> mapaPizarra;
+	
 	/* Constructor */
 	private ChatClient() {
 		try {
@@ -74,8 +81,8 @@ public class ChatClient {
 			salida = new ObjectOutputStream(socket.getOutputStream());
 			entrada = new ObjectInputStream(socket.getInputStream());
 			new ListenFromServer().start();
-
-			banInfo = new BanInfo(0, "");
+			mapaPizarra = new HashMap<String, Blackboard>();
+			banInfo = new BanInfo(0,"");
 			chatClientInstance = this;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -126,7 +133,7 @@ public class ChatClient {
 		}
 	}
 
-	private void enviarAlServer(Mensaje msg) {
+	public void enviarAlServer(Mensaje msg) {
 		try {
 			salida.writeObject(msg);
 		} catch (IOException e) {
@@ -169,7 +176,7 @@ public class ChatClient {
 				// alive.start??
 				amigos = (ArrayList<FriendStatus>)msg.getCuerpo();
 				usuarioLogeado = obtenerUsuario(userData);
-	
+				username = usuarioLogeado.getUser();
 				this.mapaConversaciones = new HashMap<String ,ClienteConversacion>();
 				this.mapaGrupos = new HashMap<String, ClienteModSalaDeChat>();
 				this.mapaTaTeTi = new HashMap<String, InterfazTateti>();
@@ -280,20 +287,10 @@ public class ChatClient {
 						frontEnd.friendStatusChanged(((FriendStatus)msg.getCuerpo()).getUsername(), ((FriendStatus)msg.getCuerpo()).getEstado());
 					} else if(msg.getId() == Mensaje.INVITACION_JUEGO) {
 						frontEnd.mostrarPopUpInvitacionJuego(msg);
-					} else if(msg.getId() == Mensaje.INICIO_PARTIDA) {
-						MensajePartida mp = (MensajePartida)msg.getCuerpo();
-						mp.setPartida(frontEnd.mostrarTateti(msg));
-						enviarAlServer(msg);
-					} else if(msg.getId() == Mensaje.ENVIO_PARTIDA) {
-						MensajePartida mp = (MensajePartida)msg.getCuerpo();
-						mp.setPartida(frontEnd.mostrarTateti(msg));
-						enviarAlServer(msg);
+					} else if(msg.getId() == Mensaje.INICIO_PARTIDA) { //Version Nico
+						frontEnd.iniciarTaTeTi((MensajeJuego)msg.getCuerpo());
 					} else if(msg.getId() == Mensaje.CANTIDAD_PARTIDAS_VALIDA) {
 						enviarCantidadPartidas(msg);
-					} else if(msg.getId() == Mensaje.ENVIO_PIZARRA) {
-						enviarPizarra(msg);
-					} else if(msg.getId() == Mensaje.ACTUALIZACION_PIZARRA) {
-						//TODO Diego.
 					} else if(msg.getId() == Mensaje.ENVIAR_MENSAJE_TATETI) {
 						MensajeChat msgChat = (MensajeChat)msg.getCuerpo();
 						frontEnd.getNuevaConversacionTateti(msgChat.getDestinatario(), msgChat.getTexto());
@@ -306,6 +303,20 @@ public class ChatClient {
 					} else if (msg.getId() == Mensaje.CERRAR_GRUPO) {
 						MensajeChat msgChat = (MensajeChat) msg.getCuerpo();
 						frontEnd.cerrarGrupo(msgChat.getDestinatario(), msgChat.getTexto());
+					}
+ 					else if(msg.getId() == Mensaje.VERIFICACION_MOVIMIENTO) {
+						verificarMovimientoEnPizarra(msg);
+					} else if(msg.getId() == Mensaje.MOVIMIENTO) { //Version Nico
+						actualizarMovimiento(msg);
+					} else if(msg.getId() == Mensaje.ACTUALIZAR_TATETI) {
+						actualizarTateti(msg);
+					} else if(msg.getId() == Mensaje.ABANDONO) {
+						//cierro tateti
+						mapaTaTeTi.remove((String)msg.getCuerpo()).abandono();				
+					} else if(msg.getId() == Mensaje.EMPATE){
+						finalizarPartida(msg);
+					} else if(msg.getId() == Mensaje.GANADOR){
+						finalizarPartida(msg);
 					} else if (msg.getId() == Mensaje.BANNED_GRUPO) {
 						MensajeChat msgChat = (MensajeChat) msg.getCuerpo();
 						frontEnd.cerrarGrupo(msgChat.getDestinatario(), msgChat.getTexto());
@@ -350,6 +361,9 @@ public class ChatClient {
 	public Map<String, ClienteModSalaDeChat> getMapaGrupos() {
 		return mapaGrupos;
 	}
+	public Map<String, Blackboard> getMapaPizarra() {
+		return mapaPizarra;
+	}
 	public BanInfo getBanInfo() {
 		return this.banInfo;
 	}
@@ -357,8 +371,8 @@ public class ChatClient {
 
 	// Inicio: TATETI
 	// TODO Diego
-	public void invitarAmigoAJugar(String contacto) {
-		Mensaje msg = new Mensaje(Mensaje.INVITACION_JUEGO, new MensajeInvitacion(usuarioLogeado.getUser(), contacto));
+	public void invitarAmigoAJugar(String invitado) { //Version Nico
+		Mensaje msg = new Mensaje(Mensaje.INVITACION_JUEGO, invitado);
 		enviarAlServer(msg);
 	}
 
@@ -366,33 +380,93 @@ public class ChatClient {
 		enviarAlServer(msg);
 	}
 
-	public void enviarPizarra(Mensaje msg) {
-		MensajePizarra mp = (MensajePizarra)msg.getCuerpo();
-		//String aux = mp.getJugador1();					// En este caso como estoy enviando pizarra creada por el invitado a jugar al usuario que inicio partida el nombre de los jugadores esta cambiado
-		//mp.setJugador1(mp.getJugador2());
-		//mp.setJugador2(aux);
-		enviarAlServer(new Mensaje(Mensaje.RESPUESTA_PIZARRA,mp));		
+	public void realizaMovimiento(MensajeMovimiento msgMov){ //Version Nico
+		enviarAlServer(new Mensaje(Mensaje.MOVIMIENTO,msgMov));
+	}
+	
+	public void enviarMovimiento(MensajeMovimiento msg) {	//EN DESUSO
+		//enviarAlServer(new Mensaje(Mensaje.MOVIMIENTO,msg));
 	}
 
-	public void actualizarPizarra(Mensaje msg) {
-		MensajeMovimiento mm = (MensajeMovimiento)msg.getCuerpo();
-		enviarAlServer(new Mensaje(Mensaje.RESPUESTA_ACTUALIZACION_PIZARRA,mm));
+	public void verificarMovimientoEnPizarra(Mensaje msg) {
+		/*MensajeMovimiento mm = (MensajeMovimiento)msg.getCuerpo();   EN DESUSO
+		String usuario = mm.getOrigen();
+		String amigo = mm.getDestinatario();
+		/* Muestreo consola 
+		System.out.println(usuarioLogeado.getUser() + " Verificar Movimiento");
+		java.util.Iterator<Entry<String, InterfazTateti>> it =  mapaTaTeTi.entrySet().iterator();
+		while(it.hasNext()){
+			System.out.println(it.next().getKey());
+		}
+		/* ************** 
+		int x = mm.getX();
+		int y = mm.getY();
+		InterfazTateti tateti = mapaTaTeTi.get(amigo);
+		Blackboard pizarra = tateti.getBlackboard();
+		MensajeRespuestaMovimiento mrm = new MensajeRespuestaMovimiento(usuario,amigo,false,x,y,pizarra.nroJugadas);
+		if(pizarra.inspect(x, y, pizarra.nroJugadas))
+			mrm.setValido(true);
+		else
+			mrm.setValido(false);			
+		enviarAlServer(new Mensaje(Mensaje.RESPUESTA_VERIFICACION_MOVIMIENTO,mrm));
+		*/
 	}
+	public void actualizarMovimiento(Mensaje msg) {	//Ver Nico
+		MensajeMovimiento msgMov = (MensajeMovimiento) msg.getCuerpo();
+		String rival = msgMov.getOrigen();
+		int x = msgMov.getX();
+		int y = msgMov.getY();
+		InterfazTateti tateti = mapaTaTeTi.get(rival);
+		
+		/* Proceso movimiento del rival */
+		int aux = tateti.movimientoRival(x,y);
 
-	public void enviarMovimiento(MensajeMovimiento msg) {
-		enviarAlServer(new Mensaje(Mensaje.MOVIMIENTO,msg));
+		//Envio estado al Server
+			// 1 - Hay Ganador
+			// 0 - Empate 
+			// -1 - No paso nada
+		MensajeEstadoJuego mej;
+		if(aux == 0){
+			mej = new MensajeEstadoJuego(true, false, true, rival, username);
+			enviarAlServer(new Mensaje(Mensaje.EMPATE,mej));
+			tateti.finPartida(InterfazTateti.EMPATE,"");
+		}
+		if(aux == 1){
+			mej = new MensajeEstadoJuego(true, true, false, rival, username);
+			enviarAlServer(new Mensaje(Mensaje.GANADOR,mej));	
+			tateti.finPartida(InterfazTateti.GANADOR, rival);
+		}
 	}
-
-	public void enviarCantidadPartidas(Mensaje msg) {
+	
+	public void actualizarTateti(Mensaje msg) {
+		MensajeRespuestaMovimiento mrm = (MensajeRespuestaMovimiento)msg.getCuerpo();
+		InterfazTateti tateti = ChatClient.getInstance().getMapaTateti().get(mrm.getJugador2());
+																			//DEBERIA SER JUGADOR 2
+																	
+		tateti.actualizarEstadoJuego(mrm.getX(), mrm.getY());	// TODO determinar numero de jugada RespuestaMovimiento debe tener el numero de jugada
+	}
+	
+	public void enviarCantidadPartidas(Mensaje msg) {	//En Desuso
 		MensajeConsulta mc = (MensajeConsulta)msg.getCuerpo();
-		//msg.setId(Mensaje.RESPUESTA_CONSULTA_PARTIDAS);
-		//enviarAlServer(new Mensaje(Mensaje.RESPUESTA_CONSULTA_PARTIDAS,msg));
+		// Pregunto por la cantidad de partidas del cliente
+		if(mapaPizarra == null || mapaPizarra.size() < 3) //getMapaPizarra() == null es cuando ese usuario no ha inicializado ninguna partida
+			mc.setCantValida(true);
+		else
+			mc.setCantValida(false);
 		enviarAlServer(new Mensaje(Mensaje.RESPUESTA_CONSULTA_PARTIDAS,mc));
 	}
 
 	public void enviarMensajeChatTaTeTi(String amigo, String texto) {
 		Mensaje msg = new Mensaje(Mensaje.ENVIAR_MENSAJE_TATETI, new MensajeChat(amigo,texto));
 		enviarAlServer(msg);
+	}
+	
+	public void finalizarPartida(Mensaje msg){
+		InterfazTateti tateti = ChatClient.getInstance().getMapaTateti().get((String)msg.getCuerpo());
+		if(msg.getId() == Mensaje.EMPATE)
+			tateti.finPartida(InterfazTateti.EMPATE, "");
+		if(msg.getId() == Mensaje.GANADOR)
+			tateti.finPartida(InterfazTateti.GANADOR, username);
 	}
 	
 	public void obtenerPuntuacion() {

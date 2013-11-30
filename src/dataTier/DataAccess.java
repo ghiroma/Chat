@@ -385,4 +385,15 @@ public final class DataAccess {
 			ex.printStackTrace();
 		}
 	}
+
+	public void limpiarConectados(){ 
+		try{
+			String statement = "UPDATE USUARIOS SET CONECTADO = FALSE";
+			stat.execute(statement);
+			}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
+	}
 }

@@ -34,7 +34,7 @@ public class Mensaje implements Serializable {
 	public static final int INVITACION_JUEGO = 19;
 	public static final int RESPUESTA_INVITACION_JUEGO = 20;
 	public static final int INICIO_PARTIDA = 21;
-	public static final int ENVIO_PARTIDA = 22;
+	public static final int CREAR_PARTIDA = 22;
 	public static final int MOVIMIENTO = 23;
 	public static final int CANTIDAD_PARTIDAS_VALIDA = 24;
 	public static final int RESPUESTA_CONSULTA_PARTIDAS = 25;
@@ -45,6 +45,16 @@ public class Mensaje implements Serializable {
 	public static final int ENVIAR_MENSAJE_TATETI = 30;
 	public static final int PEDIR_PUNTUACION = 52;
 	public static final int PUNTUACION = 53;
+	public static final int VERIFICACION_MOVIMIENTO = 31;
+	public static final int RESPUESTA_VERIFICACION_MOVIMIENTO = 32;
+	public static final int ACTUALIZAR_MOVIMIENTO = 33;
+	public static final int ACTUALIZAR_TATETI = 34;
+	public static final int EMPATE = 35;
+	public static final int GANADOR = 36;
+	public static final int ABANDONO = 37;
+	
+	//Version Nico
+	public static final int ACEPTO_TATETI = 38;
 	// Fin: TATETI
 
 	// Inicio: GRUPOS

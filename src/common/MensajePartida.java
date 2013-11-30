@@ -10,21 +10,19 @@ public class MensajePartida implements Serializable {
 
 	private String jugador1;
 	private String jugador2;
-	private InterfazTateti partida;
-
+	private String proxTurno;
+	
 	/* Constructores */
-	public MensajePartida(String j1,String j2, InterfazTateti partida) {
+	public MensajePartida(String j1,String j2, String pt) {
 		this.jugador1 = j1;
 		this.jugador2 = j2;
-		this.partida = partida;
+		this.proxTurno = pt;
 	}
 	public MensajePartida() {
-		this("","",null);
+		this("","","");
 	}
 
-
 	/* Metodos */
-
 
 	/* Getters & Setters */
 	public String getJugador1() {
@@ -39,11 +37,11 @@ public class MensajePartida implements Serializable {
 	public void setJugador2(String jugador2) {
 		this.jugador2 = jugador2;
 	}
-	public InterfazTateti getPartida() {
-		return partida;
+	public String getProxTurno() {
+		return proxTurno;
 	}
-	public void setPartida(InterfazTateti partida) {
-		this.partida = partida;
+	public void setProxTurno(String proxTurno) {
+		this.proxTurno = proxTurno;
 	}
 	
 }
