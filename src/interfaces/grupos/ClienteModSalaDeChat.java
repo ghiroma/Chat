@@ -130,7 +130,6 @@ public class ClienteModSalaDeChat extends JFrame {
 
 		textArea = new JTextArea();
 		textArea.setEditable(false);
-		JScrollPane scroll = new JScrollPane(textArea);
 		textArea.setBounds(10, 49, 489, 371);
 		contentPane.add(textArea);
 
@@ -221,6 +220,12 @@ public class ClienteModSalaDeChat extends JFrame {
 		modelo.remove(modelo.indexOf(nombre));
 		list.setModel(modelo);
 		return 0;
+	}
+
+	public void insertarLista(String usuario){
+		DefaultListModel modelo = (DefaultListModel) list.getModel();
+		modelo.addElement(usuario);
+		list.setModel(modelo);
 	}
 
 }

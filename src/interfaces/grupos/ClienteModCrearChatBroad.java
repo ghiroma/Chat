@@ -219,12 +219,7 @@ public class ClienteModCrearChatBroad extends JFrame {
 	}
 	
 	private DefaultListModel obtenerListaAmigos() {
-		DefaultListModel modelAmigos = new DefaultListModel();
-		List<FriendStatus> amigos = ChatClient.getInstance().getAmigos();
-		for (FriendStatus amigo : amigos) {
-			if(amigo.getEstado() == 1)
-				modelAmigos.addElement(amigo.getUsername());
-		}
-		return modelAmigos;
+		return ChatClient.getInstance().obtenerListaAmigos();
+		
 	}	
 }
