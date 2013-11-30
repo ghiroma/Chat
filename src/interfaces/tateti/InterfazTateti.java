@@ -128,7 +128,31 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 		}
 		
 		/* Agrego eventos a los text areas y al boton del panelChat */
-		getJButtonEnviarMensaje().addActionListener(this);
+		getJButtonEnviarMensaje().addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				int maxCaracteresPorLinea = 40;
+				String mensajeEmisor = textAreaMensajeEmisor.getText()+"\r\n";								// TODO enviarselo al server para que lo cargue en el textAreaConversacion
+				String mensajeReceptor = textAreaConversacion.getText();
+				String aux = "";
+				ChatClient.getInstance().enviarMensajeChatTaTeTi(rival, mensajeEmisor);
+				textAreaConversacion.append("Tu: "+mensajeEmisor);
+				StringTokenizer palabras= new StringTokenizer(mensajeEmisor," ");					// Copio todo el mensaje y lo cargo en un vector de palabras
+				textAreaMensajeEmisor.setText("");
+				String linea = "";
+				while(palabras.hasMoreTokens()) {
+					aux = palabras.nextToken() + " ";
+					linea = linea + aux;
+					if(linea.length() > maxCaracteresPorLinea) {
+						mensajeReceptor = mensajeReceptor + "\r\n" + aux;
+						linea = "";
+					} else
+						mensajeReceptor = mensajeReceptor + aux;
+				}
+			}
+		});
 		getTextAreaMensajeEmisor().addKeyListener(new java.awt.event.KeyAdapter() {
 			public void keyReleased(java.awt.event.KeyEvent evt) {
 				if (evt.getKeyCode()==KeyEvent.VK_ENTER) {
@@ -336,7 +360,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 				System.out.println("[" + pizarra.getNroJugadas() + "]"+ user + " movio "+ i +" " +j);
 			}
 		}
-		/*	ENVIAR MENSAJE CON EL CLICK
+		
 		if(ae.getSource() == jButtonEnviarMensaje) {
 			int maxCaracteresPorLinea = 40;
 			String mensajeEmisor = textAreaMensajeEmisor.getText();			// TODO enviarselo al server para que lo cargue en el textAreaConversacion
@@ -356,7 +380,7 @@ public class InterfazTateti extends JFrame implements ActionListener, Serializab
 			}
 			textAreaConversacion.setText(mensajeReceptor + "\n");
 		}
-	 	*/	
+	 		
 	}
 		
 	public void setearIcono(Object obj) {							

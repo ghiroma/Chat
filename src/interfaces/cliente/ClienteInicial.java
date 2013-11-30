@@ -69,7 +69,7 @@ public class ClienteInicial extends JFrame {
 			}
 		});
 
-		setBounds(100, 100, 442, 301);
+		setBounds(100, 100, 500, 400);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
